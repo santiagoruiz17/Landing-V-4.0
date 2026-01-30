@@ -1,7 +1,20 @@
+@import "tailwindcss";
+
+@theme {
+  --color-charcoal: #1A1A1A;
+  --color-midnight: #0F172A;
+  --color-pure: #FFFFFF;
+  --color-concrete: #F9FAFB;
+  --color-firma-green: #006d4e;
+
+  --font-sans: "Inter", sans-serif;
+  --font-serif: "Playfair Display", serif;
+}
+
 body {
-  font-family: 'Inter', sans-serif;
-  background-color: #f9fafb;
-  color: #1a1a1a;
+  font-family: var(--font-sans);
+  background-color: var(--color-concrete);
+  color: var(--color-charcoal);
 }
 
 h1,
@@ -10,5 +23,5 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: 'Playfair Display', serif;
+  font-family: var(--font-serif);
 }
