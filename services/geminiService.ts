@@ -2,15 +2,16 @@ import { AISimulationData } from "../types";
 
 export const generateStrategicAdvice = async (data: AISimulationData): Promise<string> => {
   const rawKey = import.meta.env.VITE_GEMINI_API_KEY || '';
-  const apiKey = rawKey.trim();
+  // Limpieza total de la clave
+  const apiKey = rawKey.replace(/\s/g, '');
 
-  if (!apiKey || apiKey === '') return "Error: API Key no encontrada.";
+  if (!apiKey || apiKey.length < 10) return "Error: API Key no configurada.";
 
   const prompt = `Actúa como consultor. Negocio: ${data.niche}. Capital: ${data.amount}. Da 2 consejos con % en menos de 100 palabras.`;
 
   try {
-    // Usamos el endpoint más básico y estable de la v1
-    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    // Probamos con v1beta que es el endpoint que mejor soporta las keys de AI Studio
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
 
     const response = await fetch(url, {
       method: 'POST',
@@ -23,12 +24,15 @@ export const generateStrategicAdvice = async (data: AISimulationData): Promise<s
     const result = await response.json();
 
     if (!response.ok) {
-      // Si recibimos este error, necesitamos confirmar la región del servidor
-      return `Error de Google (${response.status}): ${result.error?.message || 'Verifica la ubicación de tu servidor en Hostinger. Si es Europa, cámbialo a USA.'}`;
+      // Diagnóstico detallado
+      if (response.status === 404) {
+        return `Error 404: El modelo Gemini Pro no está habilitado para esta API Key. Por favor, asegúrate de haber habilitado la 'Generative Language API' en tu consola de Google Cloud.`;
+      }
+      return `Error ${response.status}: ${result.error?.message || 'Error desconocido'}`;
     }
 
     return result.candidates?.[0]?.content?.parts?.[0]?.text || "No se pudo generar respuesta.";
   } catch (error: any) {
-    return "Error de red. Intenta de nuevo.";
+    return "Error de red. Verifica la conexión del servidor.";
   }
 };
