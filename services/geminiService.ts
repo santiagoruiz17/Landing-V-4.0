@@ -1,4 +1,3 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { AISimulationData } from "../types";
 
 export const generateStrategicAdvice = async (data: AISimulationData): Promise<string> => {
@@ -17,16 +16,35 @@ export const generateStrategicAdvice = async (data: AISimulationData): Promise<s
   `;
 
   try {
-    const genAI = new GoogleGenerativeAI(apiKey);
-    // Con la nueva API Key, regresamos al modelo estable gemini-1.5-flash
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // Usamos FETCH directo a la API v1 para máxima compatibilidad y evitar errores del SDK
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{ text: prompt }]
+        }]
+      })
+    });
 
-    const result = await model.generateContent(prompt);
-    const text = result.response.text();
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Gemini API Error details:", errorData);
+
+      if (response.status === 404) {
+        return "Error 404: El modelo no está disponible. Es posible que tu API Key no tenga acceso a Gemini 1.5 Flash o que la región de tu servidor no esté permitida por Google.";
+      }
+      return `Error ${response.status}: ${errorData.error?.message || 'Error desconocido'}`;
+    }
+
+    const result = await response.json();
+    const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
 
     return text || "No se pudo generar la respuesta.";
   } catch (error: any) {
-    console.error("Gemini Error:", error);
-    return `Error: ${error.message}`;
+    console.error("Fetch Error:", error);
+    return `Error de conexión: ${error.message}`;
   }
 };
