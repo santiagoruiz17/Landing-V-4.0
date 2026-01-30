@@ -39,8 +39,8 @@ export const generateStrategicAdvice = async (data: AISimulationData): Promise<s
   `;
 
   try {
-    const runAi = new GoogleGenerativeAI(currentKey);
-    const model = runAi.getGenerativeModel({ model: "gemini-1.5-flash" }, { apiVersion: "v1" });
+    const runAi = new GoogleGenerativeAI(currentKey.trim());
+    const model = runAi.getGenerativeModel({ model: "models/gemini-1.5-flash" });
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
