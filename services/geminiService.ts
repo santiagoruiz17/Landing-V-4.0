@@ -17,9 +17,9 @@ export const generateStrategicAdvice = async (data: AISimulationData): Promise<s
   `;
 
   try {
-    // Usamos la versión específica del modelo para evitar problemas de resolución de alias
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-001" });
+    // Cambiamos al modelo 2.0 Flash que es el más reciente y estable disponible
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
     const result = await model.generateContent(prompt);
     const text = result.response.text();
@@ -28,8 +28,8 @@ export const generateStrategicAdvice = async (data: AISimulationData): Promise<s
   } catch (error: any) {
     console.error("Gemini Error:", error);
     if (error.message?.includes('404')) {
-      return "Error 404: El modelo gemini-1.5-flash-001 no fue encontrado. Esto puede deberse a que el servicio no está disponible en la región de tu servidor o la API Key aún no tiene permisos activos para este modelo específico.";
+      return "El modelo solicitado no está disponible para tu API Key. Por favor verifica en Google AI Studio qué modelo tienes habilitado (ej. gemini-1.5-pro).";
     }
-    return "Hubo un problema al conectar con la IA de Google. Revisa tu consola para más detalles.";
+    return "Hubo un problema al conectar con la IA. Revisa la consola para más detalles.";
   }
 };
