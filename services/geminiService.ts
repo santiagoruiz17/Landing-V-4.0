@@ -3,24 +3,17 @@ import { AISimulationData } from "../types";
 
 // Safely access API key to prevent crashes in environments where process is undefined
 const getApiKey = () => {
-  try {
-    if (typeof process !== 'undefined' && process.env) {
-      return process.env.API_KEY;
-    }
-  } catch (e) {
-    console.warn('Process not defined, API key missing');
-  }
-  return '';
+  return import.meta.env.VITE_GEMINI_API_KEY || '';
 };
 
 const apiKey = getApiKey();
-const ai = new GoogleGenAI({ apiKey: apiKey || 'dummy-key' }); // Ensure constructor doesn't fail on empty key if strict
+const ai = new GoogleGenAI({ apiKey: apiKey || 'dummy-key' });
 
 export const generateStrategicAdvice = async (data: AISimulationData): Promise<string> => {
   const currentKey = getApiKey();
-  if (!currentKey) {
-    console.error("API Key not found in environment variables");
-    return "El servicio de IA no está disponible en este momento (API Key faltante).";
+  if (!currentKey || currentKey === 'PLACEHOLDER_API_KEY') {
+    console.error("API Key not found or is placeholder");
+    return "El servicio de IA no está disponible en este momento (API Key faltante o inválida).";
   }
 
   // Adjusted Prompt: Clear, Simple, and Actionable Language (No Jargon)
@@ -47,12 +40,12 @@ export const generateStrategicAdvice = async (data: AISimulationData): Promise<s
 
   try {
     const runAi = new GoogleGenAI({ apiKey: currentKey });
-    
+
     const response = await runAi.models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-1.5-flash',
       contents: prompt,
     });
-    
+
     return response.text || "No pudimos generar la estrategia en este momento. Intenta nuevamente.";
   } catch (error) {
     console.error("Error generating advice:", error);

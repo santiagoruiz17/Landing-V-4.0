@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, Loader2, Calendar } from 'lucide-react';
 import { FormStep, ProfilingFormData } from '../types';
+import { supabase } from "../services/supabase";
 
 const INITIAL_DATA: ProfilingFormData = {
   firstName: '',
@@ -32,7 +33,7 @@ export const ProfilingForm: React.FC = () => {
   const validateStep1 = () => {
     const rfcRegex = /^[A-ZÑ&]{3,4}\d{6}[A-V1-9][A-Z1-9]\d$/i;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    
+
     return (
       formData.firstName.trim().length > 1 &&
       formData.lastName.trim().length > 1 &&
@@ -52,24 +53,52 @@ export const ProfilingForm: React.FC = () => {
     return true;
   };
 
-  const calculateResult = () => {
+  const calculateResult = async () => {
     setLoading(true);
-    // Simulation of API processing
-    setTimeout(() => {
-      // Rejection Logic (OR condition):
-      // 1. Less than 6 months in SAT
-      // 2. Billing less than 150k
-      // 3. Bad Credit Score
-      // Note: "No tengo experiencia" is NOT a rejection criteria.
-      const isRejected = 
-        formData.satAntiquity === 'Menos de 6 meses' || 
-        formData.monthlyBilling === '<150k' || 
-        formData.creditScore === 'Malo';
 
-      setResultType(isRejected ? 'NOT_CANDIDATE' : 'VIABLE');
+    // Rejection Logic (OR condition):
+    const isRejected =
+      formData.satAntiquity === 'Menos de 6 meses' ||
+      formData.monthlyBilling === '<150k' ||
+      formData.creditScore === 'Malo';
+
+    const finalResult = isRejected ? 'NOT_CANDIDATE' : 'VIABLE';
+
+    try {
+      const { error } = await supabase
+        .from('leads')
+        .insert([
+          {
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            full_name: `${formData.firstName} ${formData.lastName}`,
+            phone: formData.phone,
+            email: formData.email,
+            rfc: formData.rfc,
+            company_name: formData.companyName,
+            person_type: formData.personType,
+            sat_antiquity: formData.satAntiquity,
+            monthly_billing: formData.monthlyBilling,
+            credit_score: formData.creditScore,
+            active_process: formData.activeProcess,
+            active_process_institutions: formData.activeProcessInstitutions,
+            result_type: finalResult
+          },
+        ]);
+
+      if (error) {
+        console.error('Error saving lead:', error);
+      }
+    } catch (err) {
+      console.error('Unexpected error saving lead:', err);
+    }
+
+    // Simulation of small delay for UX
+    setTimeout(() => {
+      setResultType(finalResult);
       setStep('result');
       setLoading(false);
-    }, 1500);
+    }, 1000);
   };
 
   const nextStep = () => {
@@ -81,11 +110,11 @@ export const ProfilingForm: React.FC = () => {
   const renderStep1 = () => (
     <div className="space-y-5">
       <h3 className="text-xl font-serif text-charcoal">Identidad</h3>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Nombre(s)</label>
-          <input 
+          <input
             type="text" name="firstName" value={formData.firstName} onChange={handleInputChange}
             className="w-full px-4 py-3 bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-firma-green focus:border-firma-green outline-none transition-all"
             placeholder="Ej. Roberto"
@@ -93,7 +122,7 @@ export const ProfilingForm: React.FC = () => {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Apellidos</label>
-          <input 
+          <input
             type="text" name="lastName" value={formData.lastName} onChange={handleInputChange}
             className="w-full px-4 py-3 bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-firma-green focus:border-firma-green outline-none transition-all"
             placeholder="Ej. Martínez"
@@ -104,7 +133,7 @@ export const ProfilingForm: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
-          <input 
+          <input
             type="tel" name="phone" value={formData.phone} onChange={handleInputChange}
             className="w-full px-4 py-3 bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-firma-green focus:border-firma-green outline-none transition-all"
             placeholder="Ej. 55 1234 5678"
@@ -112,7 +141,7 @@ export const ProfilingForm: React.FC = () => {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
-          <input 
+          <input
             type="email" name="email" value={formData.email} onChange={handleInputChange}
             className="w-full px-4 py-3 bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-firma-green focus:border-firma-green outline-none transition-all"
             placeholder="Ej. roberto@empresa.com"
@@ -122,7 +151,7 @@ export const ProfilingForm: React.FC = () => {
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">RFC (Con Homoclave)</label>
-        <input 
+        <input
           type="text" name="rfc" value={formData.rfc} onChange={handleInputChange}
           className="w-full px-4 py-3 bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-firma-green focus:border-firma-green outline-none transition-all uppercase"
           placeholder="Ej. ABCD800101XYZ"
@@ -133,7 +162,7 @@ export const ProfilingForm: React.FC = () => {
       </div>
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Nombre de la Empresa (Opcional)</label>
-        <input 
+        <input
           type="text" name="companyName" value={formData.companyName} onChange={handleInputChange}
           className="w-full px-4 py-3 bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-firma-green focus:border-firma-green outline-none transition-all"
           placeholder="Ej. Soluciones Industriales SA de CV"
@@ -144,13 +173,13 @@ export const ProfilingForm: React.FC = () => {
 
   const renderStep2 = () => {
     const creditOptions = ['Excelente', 'Bueno', 'Regular', 'Malo', 'No tengo experiencia'];
-    
+
     return (
       <div className="space-y-5">
         <h3 className="text-xl font-serif text-charcoal">Perfil Fiscal y Financiero</h3>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de Persona</label>
-          <select 
+          <select
             name="personType" value={formData.personType} onChange={handleInputChange}
             className="w-full px-4 py-3 bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-firma-green outline-none"
           >
@@ -176,7 +205,7 @@ export const ProfilingForm: React.FC = () => {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Facturación Mensual Promedio</label>
-          <select 
+          <select
             name="monthlyBilling" value={formData.monthlyBilling} onChange={handleInputChange}
             className="w-full px-4 py-3 bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-firma-green outline-none"
           >
@@ -189,20 +218,19 @@ export const ProfilingForm: React.FC = () => {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Calificación en Buró de Crédito</label>
           <div className="grid grid-cols-2 gap-2">
-             {creditOptions.map((opt) => (
-               <button
+            {creditOptions.map((opt) => (
+              <button
                 key={opt}
                 type="button"
                 onClick={() => setFormData(prev => ({ ...prev, creditScore: opt as any }))}
-                className={`py-2 px-2 text-sm border transition-colors ${
-                  formData.creditScore === opt 
-                    ? 'bg-charcoal text-white border-charcoal' 
-                    : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50 hover:border-firma-green/30'
-                } ${opt === 'No tengo experiencia' ? 'col-span-2' : ''}`}
-               >
-                 {opt}
-               </button>
-             ))}
+                className={`py-2 px-2 text-sm border transition-colors ${formData.creditScore === opt
+                  ? 'bg-charcoal text-white border-charcoal'
+                  : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50 hover:border-firma-green/30'
+                  } ${opt === 'No tengo experiencia' ? 'col-span-2' : ''}`}
+              >
+                {opt}
+              </button>
+            ))}
           </div>
         </div>
       </div>
@@ -226,11 +254,11 @@ export const ProfilingForm: React.FC = () => {
             </button>
           ))}
         </div>
-        
+
         {formData.activeProcess === 'Sí' && (
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}>
             <label className="block text-sm font-medium text-gray-700 mb-1">¿Con cuál/es?</label>
-            <input 
+            <input
               type="text" name="activeProcessInstitutions" value={formData.activeProcessInstitutions} onChange={handleInputChange}
               className="w-full px-4 py-3 bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-firma-green outline-none"
               placeholder="Indica el nombre de la institución"
@@ -260,7 +288,7 @@ export const ProfilingForm: React.FC = () => {
         </div>
       );
     }
-    
+
     // REJECTION CASE
     return (
       <div className="text-center py-8">
@@ -288,10 +316,10 @@ export const ProfilingForm: React.FC = () => {
 
         <div className="bg-white p-8 md:p-12 shadow-xl border border-gray-100 relative overflow-hidden">
           {loading ? (
-             <div className="absolute inset-0 bg-white z-50 flex items-center justify-center flex-col">
-               <Loader2 className="w-10 h-10 text-firma-green animate-spin mb-4" />
-               <p className="text-gray-500 font-serif">Analizando viabilidad...</p>
-             </div>
+            <div className="absolute inset-0 bg-white z-50 flex items-center justify-center flex-col">
+              <Loader2 className="w-10 h-10 text-firma-green animate-spin mb-4" />
+              <p className="text-gray-500 font-serif">Analizando viabilidad...</p>
+            </div>
           ) : null}
 
           <AnimatePresence mode='wait'>
@@ -311,16 +339,16 @@ export const ProfilingForm: React.FC = () => {
 
           {step !== 'result' && (
             <div className="mt-10 flex justify-between items-center border-t border-gray-100 pt-6">
-               {step > 1 ? (
-                 <button 
-                   onClick={() => setStep(prev => (prev as number - 1) as FormStep)}
-                   className="text-gray-500 hover:text-charcoal font-medium text-sm transition-colors"
-                 >
-                   Atrás
-                 </button>
-               ) : <div></div>}
-               
-               <button
+              {step > 1 ? (
+                <button
+                  onClick={() => setStep(prev => (prev as number - 1) as FormStep)}
+                  className="text-gray-500 hover:text-charcoal font-medium text-sm transition-colors"
+                >
+                  Atrás
+                </button>
+              ) : <div></div>}
+
+              <button
                 onClick={nextStep}
                 disabled={
                   (step === 1 && !validateStep1()) ||
@@ -328,18 +356,18 @@ export const ProfilingForm: React.FC = () => {
                   (step === 3 && !validateStep3())
                 }
                 className="bg-charcoal disabled:bg-gray-300 text-white px-8 py-3 font-medium tracking-wide hover:bg-firma-green transition-colors disabled:cursor-not-allowed shadow-md hover:shadow-xl"
-               >
-                 {step === 3 ? 'Finalizar Diagnóstico' : 'Siguiente'}
-               </button>
+              >
+                {step === 3 ? 'Finalizar Diagnóstico' : 'Siguiente'}
+              </button>
             </div>
           )}
-          
+
           {step !== 'result' && (
-             <div className="flex justify-center mt-6 gap-2">
-               {[1, 2, 3].map(i => (
-                 <div key={i} className={`h-1 w-8 rounded-full transition-colors ${step >= i ? 'bg-firma-green' : 'bg-gray-200'}`} />
-               ))}
-             </div>
+            <div className="flex justify-center mt-6 gap-2">
+              {[1, 2, 3].map(i => (
+                <div key={i} className={`h-1 w-8 rounded-full transition-colors ${step >= i ? 'bg-firma-green' : 'bg-gray-200'}`} />
+              ))}
+            </div>
           )}
         </div>
       </div>
