@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { AISimulationData } from "../types";
 
 // Safely access API key to prevent crashes in environments where process is undefined
@@ -7,7 +7,7 @@ const getApiKey = () => {
 };
 
 const apiKey = getApiKey();
-const ai = new GoogleGenAI({ apiKey: apiKey || 'dummy-key' });
+const genAI = new GoogleGenerativeAI(apiKey || 'dummy-key');
 
 export const generateStrategicAdvice = async (data: AISimulationData): Promise<string> => {
   const currentKey = getApiKey();
@@ -39,14 +39,14 @@ export const generateStrategicAdvice = async (data: AISimulationData): Promise<s
   `;
 
   try {
-    const runAi = new GoogleGenAI({ apiKey: currentKey });
+    const runAi = new GoogleGenerativeAI(currentKey);
+    const model = runAi.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const response = await runAi.models.generateContent({
-      model: 'gemini-1.5-flash',
-      contents: prompt,
-    });
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
 
-    return response.text || "No pudimos generar la estrategia en este momento. Intenta nuevamente.";
+    return text || "No pudimos generar la estrategia en este momento. Intenta nuevamente.";
   } catch (error) {
     console.error("Error generating advice:", error);
     throw error;
