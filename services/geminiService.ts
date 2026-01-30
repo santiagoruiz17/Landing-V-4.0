@@ -13,13 +13,13 @@ export const generateStrategicAdvice = async (data: AISimulationData): Promise<s
     Actúa como un Consultor de Negocios experto.
     Negocio: ${data.niche} en ${data.location}. Capital: ${data.amount} MXN.
     Explica brevemente cómo usar el dinero (2-3 acciones con %).
-    Usa lenguaje sencillo. Máximo 100 palabras.
+    Usa lenguaje sencillo y cercano. Máximo 120 palabras.
   `;
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
-    // Intentamos con el modelo Pro, que es el más robusto.
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    // Con la nueva API Key, regresamos al modelo estable gemini-1.5-flash
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const result = await model.generateContent(prompt);
     const text = result.response.text();
@@ -27,7 +27,6 @@ export const generateStrategicAdvice = async (data: AISimulationData): Promise<s
     return text || "No se pudo generar la respuesta.";
   } catch (error: any) {
     console.error("Gemini Error:", error);
-    // Si falla, devolvemos el error exacto para diagnosticar
     return `Error: ${error.message}`;
   }
 };
