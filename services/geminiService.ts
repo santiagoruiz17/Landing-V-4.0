@@ -2,45 +2,34 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { AISimulationData } from "../types";
 
 export const generateStrategicAdvice = async (data: AISimulationData): Promise<string> => {
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY || '';
+  const rawKey = import.meta.env.VITE_GEMINI_API_KEY || '';
+  const apiKey = rawKey.trim();
 
   if (!apiKey || apiKey === 'PLACEHOLDER_API_KEY' || apiKey === '') {
-    console.error("API Key not found or is placeholder");
-    return "El servicio de IA no está disponible en este momento (API Key faltante).";
+    return "Error: No se encontró la API Key en el entorno.";
   }
 
-  // Adjusted Prompt: Clear, Simple, and Actionable Language
   const prompt = `
-    Actúa como un Consultor de Negocios experto y empático.
-    Perfil del Cliente:
-    - Giro: ${data.niche}
-    - Ubicación: ${data.location}
-    - Capital Solicitado: ${data.amount}
-
-    Objetivo: Explícale al cliente de forma MUY SENCILLA cómo repartir este dinero.
-    Reglas: No uses tecnicismos. Enfócate en beneficios reales. Tono cercano y motivador.
-    Formato: 2 o 3 acciones con porcentaje sugerido y una frase simple del porqué.
-    Mantén la respuesta bajo 130 palabras.
+    Actúa como un Consultor de Negocios experto.
+    Negocio: ${data.niche} en ${data.location}. Capital: ${data.amount} MXN.
+    Explica brevemente cómo usar el dinero (2-3 acciones con %).
+    Usa lenguaje sencillo y cercano. Máximo 120 palabras.
   `;
 
   try {
-    // Definitive instantiation with trimmed key
-    const genAI = new GoogleGenerativeAI(apiKey.trim());
-
-    // Using the most stable model identifier
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // Usamos la versión específica del modelo para evitar problemas de resolución de alias
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-001" });
 
     const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+    const text = result.response.text();
 
-    return text || "No pudimos generar la estrategia. Intenta nuevamente.";
+    return text || "No se pudo generar la respuesta. Por favor intenta de nuevo.";
   } catch (error: any) {
-    console.error("Error generating advice:", error);
-    // Return a more descriptive error if possible
+    console.error("Gemini Error:", error);
     if (error.message?.includes('404')) {
-      return "Error de conexión con el modelo de IA. Por favor, verifica que la API Key sea válida para Gemini 1.5 Flash.";
+      return "Error 404: El modelo gemini-1.5-flash-001 no fue encontrado. Esto puede deberse a que el servicio no está disponible en la región de tu servidor o la API Key aún no tiene permisos activos para este modelo específico.";
     }
-    throw error;
+    return "Hubo un problema al conectar con la IA de Google. Revisa tu consola para más detalles.";
   }
 };
