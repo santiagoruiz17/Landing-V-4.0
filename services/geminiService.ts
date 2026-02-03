@@ -1,12 +1,11 @@
 import { AISimulationData } from "../types";
 
-export const generateStrategicAdvice = async (data: AISimulationData): Promise<string> => {
-  // Try both common naming conventions for environment variables
-  const rawKey = import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.GEMINI_API_KEY || '';
-  const apiKey = rawKey.trim();
+// API Configuration - Using the key provided by the user
+const API_KEY = "AIzaSyAD8k2p8rZJfxSHqW8adHZmHkZvHAswTds";
 
-  if (!apiKey || apiKey.length < 10) {
-    console.error("Gemini API Key missing or invalid. Tried VITE_GEMINI_API_KEY and GEMINI_API_KEY.");
+export const generateStrategicAdvice = async (data: AISimulationData): Promise<string> => {
+  if (!API_KEY || API_KEY.length < 10) {
+    console.error("Gemini API Key missing or invalid.");
     return "Error: El servicio de IA no está disponible en este momento (API Key faltante o inválida).";
   }
 
@@ -23,8 +22,8 @@ export const generateStrategicAdvice = async (data: AISimulationData): Promise<s
   Mantén un tono profesional, sofisticado y ejecutivo.`;
 
   try {
-    // Usamos el endpoint v1 que suele ser más estable para producción
-    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    // Usamos gemini-2.0-flash como se solicitó
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
 
     const response = await fetch(url, {
       method: 'POST',
