@@ -23,9 +23,8 @@ export const Navbar: React.FC = () => {
 
   return (
     <nav
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-        isScrolled || isMobileMenuOpen ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100' : 'bg-transparent'
-      }`}
+      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled || isMobileMenuOpen ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100' : 'bg-transparent'
+        }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-24">
@@ -43,7 +42,7 @@ export const Navbar: React.FC = () => {
                 <circle cx="76" cy="65" r="12" />
               </svg>
             </div>
-            
+
             {/* Texto del Logo */}
             <div className="flex flex-col justify-center">
               <div className="flex items-center gap-3 leading-none mb-1">
@@ -62,10 +61,10 @@ export const Navbar: React.FC = () => {
             <button onClick={() => scrollToSection('methodology')} className="text-sm font-medium text-gray-600 hover:text-[#006d4e] transition-colors">
               Metodología
             </button>
-            <button onClick={() => scrollToSection('ai-simulator')} className="text-sm font-medium text-gray-600 hover:text-[#006d4e] transition-colors">
-              Simulador IA
+            <button onClick={() => scrollToSection('calendar')} className="text-sm font-medium text-gray-600 hover:text-[#006d4e] transition-colors">
+              Agenda
             </button>
-            <button 
+            <button
               onClick={() => scrollToSection('profiling')}
               className="bg-charcoal text-white px-6 py-2.5 rounded-none text-sm font-medium hover:bg-[#006d4e] transition-colors duration-300 flex items-center gap-2 shadow-lg shadow-[#006d4e]/20"
             >
@@ -89,19 +88,19 @@ export const Navbar: React.FC = () => {
       {isMobileMenuOpen && (
         <div className="md:hidden bg-white border-t border-gray-100 absolute w-full shadow-xl">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <button 
+            <button
               onClick={() => scrollToSection('methodology')}
               className="block w-full text-left px-3 py-4 text-base font-medium text-gray-600 hover:text-[#006d4e] hover:bg-gray-50 transition-colors"
             >
               Metodología
             </button>
-            <button 
-              onClick={() => scrollToSection('ai-simulator')}
+            <button
+              onClick={() => scrollToSection('calendar')}
               className="block w-full text-left px-3 py-4 text-base font-medium text-gray-600 hover:text-[#006d4e] hover:bg-gray-50 transition-colors"
             >
-              Simulador IA
+              Agenda
             </button>
-            <button 
+            <button
               onClick={() => scrollToSection('profiling')}
               className="block w-full text-left px-3 py-4 text-base font-medium text-[#006d4e] font-bold bg-green-50"
             >

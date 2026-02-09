@@ -1,12 +1,12 @@
 import { AISimulationData } from "../types";
 
-// API Configuration - Using the key provided by the user
-const API_KEY = "AIzaSyAD8k2p8rZJfxSHqW8adHZmHkZvHAswTds";
+// API Configuration - Using the key from environment variables
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
 export const generateStrategicAdvice = async (data: AISimulationData): Promise<string> => {
   if (!API_KEY || API_KEY.length < 10) {
-    console.error("Gemini API Key missing or invalid.");
-    return "Error: El servicio de IA no está disponible en este momento (API Key faltante o inválida).";
+    console.error("Gemini API Key missing or invalid in environment variables.");
+    return "Error: El servicio de IA no está disponible en este momento (API Key no configurada).";
   }
 
   // Enhanced prompt for better strategic quality

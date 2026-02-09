@@ -4,7 +4,8 @@ import { Hero } from './components/Hero';
 import { Partners } from './components/Partners';
 import { Methodology } from './components/Methodology';
 import { ProfilingForm } from './components/ProfilingForm';
-import { AISimulator } from './components/AISimulator';
+import { CalendarSection } from './components/CalendarSection';
+// import { AISimulator } from './components/AISimulator';
 import { Stats } from './components/Stats';
 import { FAQ } from './components/FAQ';
 import { Footer } from './components/Footer';
@@ -17,7 +18,8 @@ function App() {
         <Hero />
         <Partners />
         <Methodology />
-        <AISimulator />
+        <CalendarSection />
+        {/* <AISimulator /> */}
         <Stats />
         <ProfilingForm />
         <FAQ />
