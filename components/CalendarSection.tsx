@@ -25,10 +25,10 @@ export const CalendarSection: React.FC = () => {
                     </p>
                 </div>
 
-                <div className="w-full max-w-4xl mx-auto shadow-xl rounded-2xl overflow-hidden bg-white">
+                <div className="w-full max-w-4xl mx-auto">
                     <iframe
                         src="https://api.leadconnectorhq.com/widget/booking/qXgJkbDL8iudpWIjMVP7"
-                        style={{ width: '100%', minHeight: '1500px', border: 'none' }}
+                        style={{ width: '100%', minHeight: '700px', border: 'none' }}
                         scrolling="yes"
                         id="qXgJkbDL8iudpWIjMVP7_1770661591461"
                         title="Calendar Booking Widget"
