@@ -25,7 +25,7 @@ export const CalendarSection: React.FC = () => {
                     </p>
                 </div>
 
-                <div className="w-full max-w-4xl mx-auto shadow-2xl rounded-xl overflow-hidden border border-gray-100">
+                <div className="w-full max-w-4xl mx-auto shadow-xl rounded-2xl overflow-hidden bg-white">
                     <iframe
                         src="https://api.leadconnectorhq.com/widget/booking/qXgJkbDL8iudpWIjMVP7"
                         style={{ width: '100%', minHeight: '1500px', border: 'none' }}
