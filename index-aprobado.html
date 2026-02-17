@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil Pre-Aprobado - Firma 7</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description"
+        content="¡Felicidades! Tu perfil ha sido pre-aprobado. Completa tu solicitud de financiamiento con Firma 7.">
+    <meta name="robots" content="noindex, nofollow">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'charcoal': '#1A1A1A',
+                        'midnight': '#0F172A',
+                        'pure': '#FFFFFF',
+                        'concrete': '#F9FAFB',
+                        'firma-green': '#006d4e',
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif'],
+                        'serif': ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: 'Playfair Display', serif;
+        }
+
+        @keyframes pulse-slow {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        .animate-pulse-slow {
+            animation: pulse-slow 2s infinite;
+        }
+
+        .gradient-green {
+            background: linear-gradient(135deg, #f0fdf4 0%, #d1fae5 100%);
+        }
+
+        .gradient-firma {
+            background: linear-gradient(135deg, #006d4e 0%, #15803d 100%);
+        }
+    </style>
+</head>
+
+<body class="bg-gradient-to-br from-gray-50 via-gray-100 to-gray-50 min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex items-center justify-between">
+                <!-- Logo SOC | FIRMA 7 -->
+                <a href="https://firma7.com" class="flex items-center gap-3 group text-decoration-none">
+                    <!-- Icono de puntos -->
+                    <div class="w-10 h-10 flex-shrink-0">
+                        <svg viewBox="0 0 100 100" fill="currentColor" class="w-full h-full text-[#006d4e]">
+                            <circle cx="50" cy="50" r="12" />
+                            <circle cx="50" cy="20" r="12" />
+                            <circle cx="50" cy="80" r="12" />
+                            <circle cx="24" cy="35" r="12" />
+                            <circle cx="24" cy="65" r="12" />
+                            <circle cx="76" cy="35" r="12" />
+                            <circle cx="76" cy="65" r="12" />
+                        </svg>
+                    </div>
+
+                    <!-- Texto del Logo -->
+                    <div class="flex flex-col justify-center">
+                        <div class="flex items-center gap-3 leading-none mb-1">
+                            <span
+                                class="font-sans text-2xl sm:text-3xl font-bold tracking-tight text-[#006d4e]">SOC</span>
+                            <div class="h-6 w-[2.5px] bg-[#006d4e]"></div>
+                            <span class="font-sans text-2xl sm:text-3xl font-medium tracking-wide text-[#006d4e]">FIRMA
+                                7</span>
+                        </div>
+                        <span
+                            class="hidden sm:block text-[0.6rem] font-bold tracking-[0.15em] text-[#006d4e] uppercase">
+                            LÍDERES EN ASESORÍA FINANCIERA
+                        </span>
+                    </div>
+                </a>
+
+                <!-- Botón Regresar -->
+                <div class="flex items-center">
+                    <a href="https://firma7.com"
+                        class="text-gray-600 hover:text-firma-green transition-colors font-medium flex items-center gap-2 group">
+                        <span class="hidden sm:inline">Volver al Inicio</span>
+                        <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none"
+                            stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+
+        <!-- Status Banner -->
+        <div class="mb-8 gradient-green border-2 border-green-400 rounded-2xl p-6 shadow-lg">
+            <div class="flex items-center justify-center space-x-4 flex-wrap">
+                <div class="flex-shrink-0">
+                    <svg class="w-12 h-12 text-green-600 animate-pulse-slow" fill="none" stroke="currentColor"
+                        stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div class="text-center">
+                    <h2 class="text-3xl font-bold text-green-800 mb-1">
+                        ¡Felicidades! Perfil Pre-Aprobado
+                    </h2>
+                    <p class="text-green-700 text-lg">
+                        Tu solicitud ha sido validada exitosamente
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Welcome Message -->
+        <div class="mb-10 text-center">
+            <h3 class="text-2xl font-serif font-bold text-charcoal mb-3">
+                Bienvenido a tu Portal de Cliente
+            </h3>
+            <p class="text-gray-600 max-w-2xl mx-auto">
+                Estás a un paso de obtener el financiamiento que tu empresa necesita.
+                Completa el siguiente formulario para continuar con tu proceso.
+            </p>
+        </div>
+
+        <!-- Value Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+
+            <!-- Card 1 -->
+            <div
+                class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-6 border border-gray-200 hover:border-firma-green group">
+                <div class="flex flex-col items-center text-center">
+                    <div
+                        class="w-16 h-16 gradient-firma rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" stroke-width="2.5"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h4 class="text-xl font-bold text-charcoal mb-2">Hasta $5M MXN</h4>
+                    <p class="text-gray-600 text-sm">
+                        Accede a financiamiento flexible adaptado a las necesidades de tu empresa
+                    </p>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div
+                class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-6 border border-gray-200 hover:border-firma-green group">
+                <div class="flex flex-col items-center text-center">
+                    <div
+                        class="w-16 h-16 gradient-firma rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" stroke-width="2.5"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h4 class="text-xl font-bold text-charcoal mb-2">Respuesta en 24h</h4>
+                    <p class="text-gray-600 text-sm">
+                        Evaluación rápida y eficiente de tu solicitud de financiamiento
+                    </p>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div
+                class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-6 border border-gray-200 hover:border-firma-green group">
+                <div class="flex flex-col items-center text-center">
+                    <div
+                        class="w-16 h-16 gradient-firma rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" stroke-width="2.5"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                    </div>
+                    <h4 class="text-xl font-bold text-charcoal mb-2">Asesoría Personalizada SOC</h4>
+                    <p class="text-gray-600 text-sm">
+                        Acompañamiento experto durante todo el proceso de financiamiento
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Form Container -->
+        <div class="bg-white rounded-2xl shadow-xl border border-gray-200 p-8 mb-10">
+            <div class="mb-6 text-center">
+                <h3 class="text-2xl font-serif font-bold text-charcoal mb-2">
+                    Formulario de Documentación
+                </h3>
+                <p class="text-gray-600">
+                    Por favor, completa el siguiente formulario con la documentación requerida
+                </p>
+            </div>
+
+            <!-- GoHighLevel Form Integration -->
+            <div class="ghl-form-container">
+                <iframe src="https://api.leadconnectorhq.com/widget/form/DxB8rjFqcSbClXQ5WCkI"
+                    style="width:100%;height:967px;border:none;border-radius:8px" id="inline-DxB8rjFqcSbClXQ5WCkI"
+                    data-layout="{'id':'INLINE'}" data-trigger-type="alwaysShow" data-trigger-value=""
+                    data-activation-type="alwaysActivated" data-activation-value=""
+                    data-deactivation-type="neverDeactivate" data-deactivation-value=""
+                    data-form-name="LEAD CALIFICADO | SOLICITUD DE INFO" data-height="967"
+                    data-layout-iframe-id="inline-DxB8rjFqcSbClXQ5WCkI" data-form-id="DxB8rjFqcSbClXQ5WCkI"
+                    title="LEAD CALIFICADO | SOLICITUD DE INFO">
+                </iframe>
+                <script src="https://link.msgsndr.com/js/form_embed.js"></script>
+            </div>
+        </div>
+
+        <!-- CTA Section -->
+        <div class="gradient-firma rounded-2xl shadow-xl p-8 text-center">
+            <h3 class="text-2xl font-serif font-bold text-white mb-3">
+                ¿Necesitas Ayuda Personalizada?
+            </h3>
+            <p class="text-green-50 mb-6 max-w-2xl mx-auto">
+                Agenda una sesión de perfilamiento con nuestros expertos para resolver tus dudas
+                y acelerar tu proceso de financiamiento
+            </p>
+
+            <!-- CTA Button - Reemplaza el href con tu enlace de calendario GHL -->
+            <a href="https://tu-enlace-de-calendario-ghl.com" target="_blank" rel="noopener noreferrer"
+                class="inline-flex items-center justify-center px-8 py-4 bg-white text-firma-green font-bold text-lg rounded-xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300">
+                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                Agendar Sesión de Perfilamiento
+            </a>
+        </div>
+
+        <!-- Footer Note -->
+        <div class="mt-10 text-center">
+            <p class="text-sm text-gray-500">
+                ¿Tienes preguntas? Contáctanos en
+                <a href="mailto:contacto@firma7.com" class="text-firma-green hover:underline font-semibold">
+                    contacto@firma7.com
+                </a>
+            </p>
+        </div>
+
+    </main>
+
+    <!-- Confetti Effect Script -->
+    <script>
+        // Confetti effect on page load - two bursts from bottom corners
+        window.addEventListener('load', function () {
+            const duration = 3000;
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            const interval = setInterval(function () {
+                const timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
+
+                const particleCount = 50 * (timeLeft / duration);
+
+                // Left corner burst
+                confetti({
+                    ...defaults,
+                    particleCount,
+                    origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
+                });
+
+                // Right corner burst
+                confetti({
+                    ...defaults,
+                    particleCount,
+                    origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
+                });
+            }, 250);
+        });
+    </script>
+
+</body>
+
+</html>
