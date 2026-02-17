@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil Pre-Aprobado - Firma 7</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description"
+        content="¡Felicidades! Tu perfil ha sido pre-aprobado. Completa tu solicitud de financiamiento con Firma 7.">
+    <meta name="robots" content="noindex, nofollow">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --color-charcoal: #1A1A1A;
+            --color-midnight: #0F172A;
+            --color-pure: #FFFFFF;
+            --color-concrete: #F9FAFB;
+            --color-firma-green: #006d4e;
+            --color-gray-50: #f9fafb;
+            --color-gray-100: #f3f4f6;
+            --color-gray-200: #e5e7eb;
+            --color-gray-300: #d1d5db;
+            --color-gray-500: #6b7280;
+            --color-gray-600: #4b5563;
+            --color-green-50: #f0fdf4;
+            --color-green-400: #4ade80;
+            --color-green-600: #16a34a;
+            --color-green-700: #15803d;
+            --color-green-800: #166534;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--color-gray-50) 0%, var(--color-gray-100) 50%, var(--color-gray-50) 100%);
+            color: var(--color-charcoal);
+            min-height: 100vh;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid var(--color-gray-200);
+        }
+
+        .header-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-box {
+            width: 40px;
+            height: 40px;
+            background: var(--color-firma-green);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.25rem;
+        }
+
+        .logo-text h1 {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--color-charcoal);
+        }
+
+        .logo-text p {
+            font-size: 0.75rem;
+            color: var(--color-gray-500);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: var(--color-gray-200);
+            border-radius: 50%;
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1152px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* Status Banner */
+        .status-banner {
+            background: linear-gradient(135deg, var(--color-green-50) 0%, #d1fae5 100%);
+            border: 2px solid var(--color-green-400);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 25px rgba(0, 109, 78, 0.1);
+        }
+
+        .status-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .status-icon {
+            color: var(--color-green-600);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        .status-text h2 {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--color-green-800);
+            margin-bottom: 0.25rem;
+            text-align: center;
+        }
+
+        .status-text p {
+            color: var(--color-green-700);
+            font-size: 1.125rem;
+            text-align: center;
+        }
+
+        /* Welcome Section */
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .welcome-section h3 {
+            font-size: 1.875rem;
+            font-weight: bold;
+            color: var(--color-charcoal);
+            margin-bottom: 0.75rem;
+        }
+
+        .welcome-section p {
+            color: var(--color-gray-600);
+            max-width: 42rem;
+            margin: 0 auto;
+        }
+
+        /* Value Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .value-card {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 2rem 1.5rem;
+            border: 1px solid var(--color-gray-200);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .value-card:hover {
+            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+            border-color: var(--color-firma-green);
+            transform: translateY(-4px);
+        }
+
+        .card-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--color-firma-green) 0%, var(--color-green-700) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .value-card:hover .card-icon {
+            transform: scale(1.1);
+        }
+
+        .card-icon svg {
+            color: white;
+            width: 32px;
+            height: 32px;
+        }
+
+        .value-card h4 {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--color-charcoal);
+            margin-bottom: 0.5rem;
+        }
+
+        .value-card p {
+            color: var(--color-gray-600);
+            font-size: 0.875rem;
+        }
+
+        /* Form Container */
+        .form-container {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--color-gray-200);
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-header h3 {
+            font-size: 1.875rem;
+            font-weight: bold;
+            color: var(--color-charcoal);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-header p {
+            color: var(--color-gray-600);
+        }
+
+        .ghl-placeholder {
+            border: 2px dashed var(--color-gray-300);
+            border-radius: 0.5rem;
+            padding: 3rem;
+            text-align: center;
+            background: var(--color-gray-50);
+        }
+
+        .placeholder-icon {
+            width: 64px;
+            height: 64px;
+            background: rgba(0, 109, 78, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+        }
+
+        .placeholder-icon svg {
+            color: var(--color-firma-green);
+            width: 32px;
+            height: 32px;
+        }
+
+        .ghl-placeholder h4 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--color-charcoal);
+            margin-bottom: 0.5rem;
+        }
+
+        .ghl-placeholder p {
+            color: var(--color-gray-600);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+            max-width: 28rem;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .ghl-placeholder code {
+            font-size: 0.75rem;
+            background: var(--color-gray-100);
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.25rem;
+            color: var(--color-firma-green);
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, var(--color-firma-green) 0%, var(--color-green-700) 100%);
+            border-radius: 1rem;
+            box-shadow: 0 20px 25px rgba(0, 109, 78, 0.2);
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .cta-section h3 {
+            font-size: 1.875rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 0.75rem;
+        }
+
+        .cta-section p {
+            color: #d1fae5;
+            margin-bottom: 1.5rem;
+            max-width: 42rem;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            background: white;
+            color: var(--color-firma-green);
+            font-weight: bold;
+            font-size: 1.125rem;
+            border-radius: 0.75rem;
+            text-decoration: none;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .cta-button:hover {
+            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.2);
+            transform: scale(1.05);
+        }
+
+        .cta-button svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Footer Note */
+        .footer-note {
+            margin-top: 2.5rem;
+            text-align: center;
+        }
+
+        .footer-note p {
+            font-size: 0.875rem;
+            color: var(--color-gray-500);
+        }
+
+        .footer-note a {
+            color: var(--color-firma-green);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .footer-note a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1.5rem 1rem;
+            }
+
+            .status-banner {
+                padding: 1.5rem;
+            }
+
+            .status-text h2 {
+                font-size: 1.5rem;
+            }
+
+            .status-text p {
+                font-size: 1rem;
+            }
+
+            .welcome-section h3 {
+                font-size: 1.5rem;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-container {
+                padding: 1.5rem;
+            }
+
+            .cta-section h3 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo-section">
+                <div class="logo-box">F7</div>
+                <div class="logo-text">
+                    <h1>Firma 7</h1>
+                    <p>Portal de Cliente</p>
+                </div>
+            </div>
+            <div class="user-avatar"></div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Status Banner -->
+        <div class="status-banner">
+            <div class="status-content">
+                <div class="status-icon">
+                    <i data-lucide="check-circle" style="width: 48px; height: 48px; stroke-width: 2.5;"></i>
+                </div>
+                <div class="status-text">
+                    <h2>¡Felicidades! Perfil Pre-Aprobado</h2>
+                    <p>Tu solicitud ha sido validada exitosamente</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Welcome Section -->
+        <div class="welcome-section">
+            <h3>Bienvenido a tu Portal de Cliente</h3>
+            <p>
+                Estás a un paso de obtener el financiamiento que tu empresa necesita.
+                Completa el siguiente formulario para continuar con tu proceso.
+            </p>
+        </div>
+
+        <!-- Value Cards -->
+        <div class="cards-grid">
+            <!-- Card 1 -->
+            <div class="value-card">
+                <div class="card-icon">
+                    <i data-lucide="dollar-sign"></i>
+                </div>
+                <h4>Hasta $5M MXN</h4>
+                <p>Accede a financiamiento flexible adaptado a las necesidades de tu empresa</p>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="value-card">
+                <div class="card-icon">
+                    <i data-lucide="clock"></i>
+                </div>
+                <h4>Respuesta en 24h</h4>
+                <p>Evaluación rápida y eficiente de tu solicitud de financiamiento</p>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="value-card">
+                <div class="card-icon">
+                    <i data-lucide="users"></i>
+                </div>
+                <h4>Asesoría Personalizada SOC</h4>
+                <p>Acompañamiento experto durante todo el proceso de financiamiento</p>
+            </div>
+        </div>
+
+        <!-- Form Container -->
+        <div class="form-container">
+            <div class="form-header">
+                <h3>Formulario de Documentación</h3>
+                <p>Por favor, completa el siguiente formulario con la documentación requerida</p>
+            </div>
+
+            <!-- GoHighLevel Form Integration -->
+            <div class="ghl-form-container">
+                <!-- 
+          INTEGRACIÓN GOHIGHLEVEL - FORMULARIO 2 (Carga de Documentos)
+          
+          Instrucciones para integrar:
+          1. Inicia sesión en tu cuenta de GoHighLevel
+          2. Ve a Sites > Forms y selecciona el "Formulario 2" (Carga de Documentos)
+          3. Haz clic en "Embed" o "Integrar"
+          4. Copia el código de integración (iframe o script)
+          5. Reemplaza el div.ghl-placeholder a continuación con el código copiado
+          
+          Ejemplo de integración con iframe:
+          <iframe 
+            src="https://api.leadconnectorhq.com/widget/form/TU_FORM_ID_AQUI" 
+            style="width:100%;height:800px;border:none;border-radius:8px;"
+            id="inline-TU_FORM_ID_AQUI" 
+            data-layout="{'id':'INLINE'}"
+            data-trigger-type="alwaysShow"
+            data-trigger-value=""
+            data-activation-type="alwaysActivated"
+            data-activation-value=""
+            data-deactivation-type="neverDeactivate"
+            data-deactivation-value=""
+            data-form-name="Formulario 2 - Carga de Documentos"
+            data-height="800"
+            data-layout-iframe-id="inline-TU_FORM_ID_AQUI"
+            data-form-id="TU_FORM_ID_AQUI"
+            title="Formulario 2 - Carga de Documentos">
+          </iframe>
+          <script src="https://link.msgsndr.com/js/form_embed.js"></script>
+        -->
+
+                <iframe src="https://api.leadconnectorhq.com/widget/form/DxB8rjFqcSbClXQ5WCkI"
+                    style="width:100%;height:967px;border:none;border-radius:8px" id="inline-DxB8rjFqcSbClXQ5WCkI"
+                    data-layout="{'id':'INLINE'}" data-trigger-type="alwaysShow" data-trigger-value=""
+                    data-activation-type="alwaysActivated" data-activation-value=""
+                    data-deactivation-type="neverDeactivate" data-deactivation-value=""
+                    data-form-name="LEAD CALIFICADO | SOLICITUD DE INFO" data-height="967"
+                    data-layout-iframe-id="inline-DxB8rjFqcSbClXQ5WCkI" data-form-id="DxB8rjFqcSbClXQ5WCkI"
+                    title="LEAD CALIFICADO | SOLICITUD DE INFO">
+                </iframe>
+                <script src="https://link.msgsndr.com/js/form_embed.js"></script>
+            </div>
+        </div>
+
+        <!-- CTA Section -->
+        <div class="cta-section">
+            <h3>¿Necesitas Ayuda Personalizada?</h3>
+            <p>
+                Agenda una sesión de perfilamiento con nuestros expertos para resolver tus dudas
+                y acelerar tu proceso de financiamiento
+            </p>
+
+            <!-- 
+        INTEGRACIÓN GOHIGHLEVEL - BOTÓN DE AGENDAMIENTO
+        Reemplaza el href con tu enlace de calendario de GoHighLevel
+        Ejemplo: https://firma7.gohighlevel.com/widget/bookings/tu-calendario-id
+      -->
+            <a href="https://tu-enlace-de-calendario-ghl.com" target="_blank" rel="noopener noreferrer"
+                class="cta-button">
+                <i data-lucide="calendar"></i>
+                Agendar Sesión de Perfilamiento
+            </a>
+        </div>
+
+        <!-- Footer Note -->
+        <div class="footer-note">
+            <p>
+                ¿Tienes preguntas? Contáctanos en
+                <a href="mailto:contacto@firma7.com">contacto@firma7.com</a>
+            </p>
+        </div>
+    </main>
+
+    <!-- Initialize Lucide Icons -->
+    <script>
+        lucide.createIcons();
+    </script>
+
+    <!-- Confetti Effect -->
+    <script>
+        // Confetti effect on page load - two bursts from bottom corners
+        window.addEventListener('load', function () {
+            const duration = 3000;
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            const interval = setInterval(function () {
+                const timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
+
+                const particleCount = 50 * (timeLeft / duration);
+
+                // Left corner burst
+                confetti({
+                    ...defaults,
+                    particleCount,
+                    origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
+                });
+
+                // Right corner burst
+                confetti({
+                    ...defaults,
+                    particleCount,
+                    origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
+                });
+            }, 250);
+        });
+    </script>
+</body>
+
+</html>
