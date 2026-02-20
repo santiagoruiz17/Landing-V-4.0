@@ -4,7 +4,7 @@ import { Hero } from './components/Hero';
 import { Partners } from './components/Partners';
 import { Methodology } from './components/Methodology';
 import { ProfilingForm } from './components/ProfilingForm';
-import { CalendarSection } from './components/CalendarSection';
+
 // import { AISimulator } from './components/AISimulator';
 import { Stats } from './components/Stats';
 import { FAQ } from './components/FAQ';
@@ -18,7 +18,7 @@ function App() {
         <Hero />
         <Partners />
         <Methodology />
-        <CalendarSection />
+
         {/* <AISimulator /> */}
         <Stats />
         <ProfilingForm />
