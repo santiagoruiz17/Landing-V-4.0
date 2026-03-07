@@ -31,15 +31,17 @@ export const ProfilingForm: React.FC = () => {
           </p>
         </div>
 
-        <div className="w-full bg-white shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] border border-gray-100 rounded-[2rem] overflow-hidden group">
+        <div className="w-full bg-white shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] border border-gray-100 rounded-[2rem] overflow-hidden group mb-8">
           <div className="h-2 w-full bg-gradient-to-r from-firma-green/20 via-firma-green to-firma-green/20"></div>
           <iframe
             src="https://api.leadconnectorhq.com/widget/form/ytF9MgH3xDmSVPGeKAyS"
             style={{
               width: '100%',
               border: 'none',
-              minHeight: '800px',
-              display: 'block'
+              minHeight: '1300px',
+              display: 'block',
+              paddingTop: '3rem',
+              paddingBottom: '4rem'
             }}
             id="inline-ytF9MgH3xDmSVPGeKAyS"
             data-layout="{'id':'INLINE'}"
