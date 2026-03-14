@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculadora de Crédito | SOC Firma 7</title>
+  <meta name="description" content="Simula tu crédito empresarial o automotriz con Firma 7. Conoce tu tabla de amortización y el pago mensual estimado." />
+  <meta name="robots" content="index, follow" />
+  <meta property="og:title" content="Calculadora de Crédito | SOC Firma 7" />
+  <meta property="og:description" content="Simula tu crédito empresarial o automotriz con Firma 7." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://calculadora.firma7.com" />
+  <meta name="theme-color" content="#006d4e" />
+  <link rel="canonical" href="https://calculadora.firma7.com" />
+  <link rel="icon"
+    href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="%23006d4e"><circle cx="50" cy="50" r="12"/><circle cx="50" cy="20" r="12"/><circle cx="50" cy="80" r="12"/><circle cx="24" cy="35" r="12"/><circle cx="24" cy="65" r="12"/><circle cx="76" cy="35" r="12"/><circle cx="76" cy="65" r="12"/></svg>'
+    type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <script src="https://link.msgsndr.com/js/form_embed.js" async></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green: #006d4e;
+      --green-light: #008f65;
+      --green-pale: #e6f4ef;
+      --green-glow: rgba(0, 109, 78, 0.12);
+      --charcoal: #1A1A1A;
+      --midnight: #0F172A;
+      --dark-footer: #052b22;
+      --gray-100: #F9FAFB;
+      --gray-200: #F3F4F6;
+      --gray-300: #E5E7EB;
+      --gray-400: #9CA3AF;
+      --gray-500: #6B7280;
+      --gray-600: #4B5563;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f8faf9;
+      color: var(--charcoal);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ───── NAVBAR ───── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; width: 100%;
+      z-index: 100;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--gray-300);
+      box-shadow: 0 1px 12px rgba(0,0,0,0.06);
+    }
+
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .logo svg { width: 36px; height: 36px; color: var(--green); }
+
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .logo-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .logo-brand span {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--green);
+      letter-spacing: -0.01em;
+    }
+
+    .logo-brand .divider {
+      width: 2px;
+      height: 22px;
+      background: var(--green);
+    }
+
+    .logo-sub {
+      font-size: 0.52rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      color: var(--green);
+      text-transform: uppercase;
+    }
+
+    .nav-back {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--gray-600);
+      transition: color 0.2s;
+    }
+
+    .nav-back:hover { color: var(--green); }
+
+    .nav-back svg { width: 16px; height: 16px; }
+
+    /* ───── HERO ───── */
+    .page-hero {
+      padding: 8rem 1.5rem 3rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .page-hero::before {
+      content: '';
+      position: absolute;
+      top: -100px; right: -100px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, var(--green-glow), transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.85rem;
+      border: 1px solid rgba(0,109,78,0.25);
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--green);
+      background: rgba(0,109,78,0.05);
+      margin-bottom: 1.25rem;
+    }
+
+    .page-hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 600;
+      color: var(--charcoal);
+      line-height: 1.15;
+      margin-bottom: 1rem;
+    }
+
+    .page-hero h1 em {
+      font-style: italic;
+      background: linear-gradient(135deg, var(--green), var(--midnight));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .page-hero p {
+      font-size: 1.05rem;
+      color: var(--gray-600);
+      max-width: 560px;
+      margin: 0 auto;
+      font-weight: 300;
+      line-height: 1.7;
+    }
+
+    /* ───── MAIN CONTAINER ───── */
+    main {
+      flex: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 0 1.5rem 4rem;
+    }
+
+    /* ───── TYPE SELECTOR ───── */
+    .type-selector {
+      display: flex;
+      background: white;
+      border: 1px solid var(--gray-300);
+      border-radius: 0.75rem;
+      padding: 0.35rem;
+      gap: 0.35rem;
+      margin-bottom: 2.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+      margin-bottom: 2.5rem;
+    }
+
+    .type-btn {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border: none;
+      border-radius: 0.5rem;
+      background: transparent;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--gray-500);
+      cursor: pointer;
+      transition: all 0.25s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .type-btn:hover { color: var(--green); background: var(--green-pale); }
+
+    .type-btn.active {
+      background: var(--green);
+      color: white;
+      box-shadow: 0 4px 14px rgba(0,109,78,0.3);
+    }
+
+    .type-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+    /* ───── CALCULATOR CARD ───── */
+    .calc-card {
+      background: white;
+      border: 1px solid var(--gray-300);
+      border-radius: 1.5rem;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.07);
+    }
+
+    .calc-card-top {
+      height: 4px;
+      background: linear-gradient(90deg, rgba(0,109,78,0.2), var(--green), rgba(0,109,78,0.2));
+    }
+
+    .calc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+
+    @media (max-width: 768px) {
+      .calc-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ───── INPUT PANEL ───── */
+    .input-panel {
+      padding: 2.5rem;
+      border-right: 1px solid var(--gray-200);
+    }
+
+    @media (max-width: 768px) {
+      .input-panel { border-right: none; border-bottom: 1px solid var(--gray-200); }
+    }
+
+    .panel-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 1.75rem;
+    }
+
+    .field-group { margin-bottom: 1.75rem; }
+
+    .field-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--gray-600);
+      margin-bottom: 0.6rem;
+      letter-spacing: 0.01em;
+    }
+
+    .amount-display {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--charcoal);
+      margin-bottom: 0.75rem;
+      line-height: 1;
+    }
+
+    .amount-display em {
+      font-style: normal;
+      color: var(--green);
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      background: var(--gray-300);
+      border-radius: 999px;
+      outline: none;
+      cursor: pointer;
+      background-image: linear-gradient(var(--green), var(--green));
+      background-size: 50% 100%;
+      background-repeat: no-repeat;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: white;
+      border: 3px solid var(--green);
+      box-shadow: 0 2px 8px rgba(0,109,78,0.3);
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+      box-shadow: 0 4px 14px rgba(0,109,78,0.4);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: white;
+      border: 3px solid var(--green);
+      box-shadow: 0 2px 8px rgba(0,109,78,0.3);
+      cursor: pointer;
+    }
+
+    .range-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 0.4rem;
+      font-size: 0.7rem;
+      color: var(--gray-400);
+    }
+
+    .term-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.4rem;
+    }
+
+    .term-btn {
+      padding: 0.6rem 0.25rem;
+      border: 1.5px solid var(--gray-300);
+      border-radius: 0.5rem;
+      background: white;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--gray-500);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .term-btn:hover { border-color: var(--green); color: var(--green); background: var(--green-pale); }
+
+    .term-btn.active {
+      border-color: var(--green);
+      background: var(--green);
+      color: white;
+      box-shadow: 0 3px 10px rgba(0,109,78,0.25);
+    }
+
+    .commission-note {
+      background: linear-gradient(135deg, #fefbf0, #fffbeb);
+      border: 1px solid #fde68a;
+      border-radius: 0.75rem;
+      padding: 0.85rem 1rem;
+      font-size: 0.75rem;
+      color: #92400e;
+      line-height: 1.5;
+      margin-top: 0.5rem;
+    }
+
+    .commission-note strong { font-weight: 600; }
+
+    .calc-btn {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      background: var(--charcoal);
+      color: white;
+      border: none;
+      border-radius: 0.75rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      letter-spacing: 0.01em;
+    }
+
+    .calc-btn:hover {
+      background: var(--green);
+      box-shadow: 0 8px 24px rgba(0,109,78,0.3);
+      transform: translateY(-1px);
+    }
+
+    .calc-btn svg { width: 18px; height: 18px; }
+
+    /* ───── RESULTS PANEL ───── */
+    .results-panel {
+      padding: 2.5rem;
+      background: var(--gray-100);
+    }
+
+    .results-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      min-height: 320px;
+      text-align: center;
+      color: var(--gray-400);
+      gap: 1rem;
+    }
+
+    .results-empty svg { width: 56px; height: 56px; opacity: 0.4; }
+    .results-empty p { font-size: 0.85rem; max-width: 220px; line-height: 1.6; }
+
+    .result-summary {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .summary-card {
+      background: white;
+      border: 1px solid var(--gray-300);
+      border-radius: 0.85rem;
+      padding: 1rem 1.1rem;
+      transition: box-shadow 0.2s;
+    }
+
+    .summary-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.07); }
+
+    .summary-card.highlight {
+      background: var(--green);
+      border-color: var(--green);
+      color: white;
+      grid-column: span 2;
+    }
+
+    .summary-card .label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gray-400);
+      margin-bottom: 0.3rem;
+    }
+
+    .summary-card.highlight .label { color: rgba(255,255,255,0.7); }
+
+    .summary-card .value {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--charcoal);
+      line-height: 1.1;
+    }
+
+    .summary-card.highlight .value {
+      font-size: 1.9rem;
+      color: white;
+    }
+
+    /* ───── AMORTIZATION TABLE ───── */
+    .amort-section { margin-top: 0; }
+
+    .amort-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.85rem;
+    }
+
+    .amort-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--green);
+    }
+
+    .table-wrapper {
+      max-height: 320px;
+      overflow-y: auto;
+      border-radius: 0.75rem;
+      border: 1px solid var(--gray-300);
+      scrollbar-width: thin;
+      scrollbar-color: var(--green) var(--gray-200);
+    }
+
+    .table-wrapper::-webkit-scrollbar { width: 6px; }
+    .table-wrapper::-webkit-scrollbar-track { background: var(--gray-200); }
+    .table-wrapper::-webkit-scrollbar-thumb { background: var(--green); border-radius: 999px; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+    }
+
+    thead {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    thead th {
+      padding: 0.7rem 0.85rem;
+      text-align: right;
+      font-weight: 700;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: white;
+      background: var(--green);
+    }
+
+    thead th:first-child { text-align: center; }
+
+    tbody tr { border-bottom: 1px solid var(--gray-200); transition: background 0.15s; }
+    tbody tr:hover { background: var(--green-pale); }
+    tbody tr:last-child { border-bottom: none; }
+
+    tbody td {
+      padding: 0.6rem 0.85rem;
+      text-align: right;
+      color: var(--gray-600);
+    }
+
+    tbody td:first-child {
+      text-align: center;
+      font-weight: 700;
+      color: var(--green);
+    }
+
+    tbody tr:nth-child(even) td:not(:first-child) { color: var(--charcoal); }
+
+    /* ───── CTA SECTION ───── */
+    .cta-section {
+      margin: 2.5rem auto 0;
+      max-width: 680px;
+      background: linear-gradient(135deg, var(--midnight) 0%, #0d2d1f 100%);
+      border-radius: 1.5rem;
+      padding: 2.5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    }
+
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      top: -50px; left: -50px;
+      width: 250px; height: 250px;
+      background: radial-gradient(circle, rgba(0,109,78,0.2), transparent 70%);
+      border-radius: 50%;
+    }
+
+    .cta-section::after {
+      content: '';
+      position: absolute;
+      bottom: -60px; right: -30px;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(0,109,78,0.15), transparent 70%);
+      border-radius: 50%;
+    }
+
+    .cta-section .badge {
+      background: rgba(0,109,78,0.2);
+      border-color: rgba(0,109,78,0.3);
+      color: #4ade80;
+      margin-bottom: 1rem;
+    }
+
+    .cta-section h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.5rem, 4vw, 2.2rem);
+      font-weight: 600;
+      color: white;
+      line-height: 1.2;
+      margin-bottom: 0.75rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cta-section h2 em {
+      font-style: italic;
+      color: #6ee7b7;
+    }
+
+    .cta-section p {
+      color: rgba(255,255,255,0.65);
+      font-size: 0.95rem;
+      margin-bottom: 2rem;
+      font-weight: 300;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 1rem 2rem;
+      background: var(--green);
+      color: white;
+      border: none;
+      border-radius: 0.75rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+      z-index: 1;
+      text-decoration: none;
+      box-shadow: 0 8px 24px rgba(0,109,78,0.4);
+    }
+
+    .cta-btn:hover {
+      background: var(--green-light);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(0,109,78,0.5);
+    }
+
+    .cta-btn svg { width: 18px; height: 18px; }
+
+    /* ───── MODAL ───── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s, visibility 0.3s;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-box {
+      background: white;
+      border-radius: 1.5rem;
+      max-width: 700px;
+      width: 100%;
+      max-height: 92vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.25);
+      transform: translateY(24px) scale(0.97);
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .modal-overlay.open .modal-box {
+      transform: translateY(0) scale(1);
+    }
+
+    .modal-top {
+      height: 4px;
+      background: linear-gradient(90deg, rgba(0,109,78,0.2), var(--green), rgba(0,109,78,0.2));
+      flex-shrink: 0;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.5rem 2rem 1rem;
+      flex-shrink: 0;
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .modal-header h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--charcoal);
+    }
+
+    .modal-header h3 em {
+      font-style: italic;
+      color: var(--green);
+    }
+
+    .modal-close {
+      width: 36px;
+      height: 36px;
+      border: none;
+      background: var(--gray-200);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--gray-600);
+      flex-shrink: 0;
+    }
+
+    .modal-close:hover { background: #fce4e4; color: #b91c1c; }
+
+    .modal-close svg { width: 16px; height: 16px; }
+
+    .modal-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0;
+    }
+
+    .modal-form-iframe {
+      width: 100%;
+      border: none;
+      min-height: 1000px;
+      display: block;
+    }
+
+    .modal-footer {
+      padding: 0.75rem 2rem;
+      border-top: 1px solid var(--gray-200);
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--gray-400);
+      font-style: italic;
+      flex-shrink: 0;
+    }
+
+    /* ───── FOOTER ───── */
+    footer {
+      background: var(--dark-footer);
+      color: white;
+      padding: 2.5rem 1.5rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      margin-top: auto;
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      text-align: center;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .footer-logo svg { width: 28px; height: 28px; color: white; }
+
+    .footer-logo-text .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .footer-logo-text .brand span {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: white;
+    }
+
+    .footer-logo-text .brand .div { width: 2px; height: 18px; background: rgba(255,255,255,0.4); }
+
+    .footer-logo-text .sub {
+      font-size: 0.5rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      color: rgba(255,255,255,0.45);
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .footer-copy {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.4);
+    }
+
+    /* ───── DISCLAIMER ───── */
+    .disclaimer {
+      background: white;
+      border: 1px solid var(--gray-300);
+      border-radius: 1rem;
+      padding: 1.25rem 1.5rem;
+      font-size: 0.75rem;
+      color: var(--gray-500);
+      line-height: 1.65;
+      margin-bottom: 2rem;
+    }
+
+    .disclaimer strong { color: var(--green); }
+
+    /* ───── ANIMATIONS ───── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-up { animation: fadeUp 0.6s ease both; }
+    .fade-up-d1 { animation-delay: 0.1s; }
+    .fade-up-d2 { animation-delay: 0.2s; }
+
+    /* ───── YEAR GRID ───── */
+    .year-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.4rem;
+    }
+
+    /* ───── AUTO TERM WRAP ───── */
+    .auto-term-wrap {
+      grid-template-columns: repeat(6, 1fr);
+      flex-wrap: wrap;
+    }
+
+    /* ───── RESPONSIVE ───── */
+    @media (max-width: 640px) {
+      .term-grid { grid-template-columns: repeat(4, 1fr); }
+      .year-grid { grid-template-columns: repeat(5, 1fr); }
+      .auto-term-wrap { grid-template-columns: repeat(4, 1fr) !important; }
+      .result-summary { grid-template-columns: 1fr; }
+      .summary-card.highlight { grid-column: span 1; }
+      .modal-header { padding: 1.25rem 1.25rem 0.85rem; }
+      .input-panel, .results-panel { padding: 1.5rem; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+  <nav>
+    <div class="nav-inner">
+      <a class="logo" href="https://firma7.com">
+        <svg viewBox="0 0 100 100" fill="currentColor">
+          <circle cx="50" cy="50" r="12"/><circle cx="50" cy="20" r="12"/>
+          <circle cx="50" cy="80" r="12"/><circle cx="24" cy="35" r="12"/>
+          <circle cx="24" cy="65" r="12"/><circle cx="76" cy="35" r="12"/>
+          <circle cx="76" cy="65" r="12"/>
+        </svg>
+        <div class="logo-text">
+          <div class="logo-brand">
+            <span>SOC</span>
+            <div class="divider"></div>
+            <span>FIRMA 7</span>
+          </div>
+          <span class="logo-sub">Líderes en Asesoría Financiera</span>
+        </div>
+      </a>
+      <a class="nav-back" href="https://firma7.com">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 5l-7 7 7 7"/>
+        </svg>
+        Volver al sitio principal
+      </a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="page-hero">
+    <div class="badge">Herramienta Financiera</div>
+    <h1>Calcula tu <em>Crédito</em> hoy mismo</h1>
+    <p>Simula tu financiamiento, conoce tu tabla de amortización y da el primer paso hacia el capital que necesitas.</p>
+  </div>
+
+  <!-- MAIN -->
+  <main>
+
+    <!-- TYPE SELECTOR -->
+    <div class="type-selector fade-up">
+      <button class="type-btn active" id="btn-empresarial" onclick="setType('empresarial')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/>
+        </svg>
+        Crédito Empresarial
+      </button>
+      <button class="type-btn" id="btn-automotriz" onclick="setType('automotriz')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 17H3a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M5 17a2 2 0 104 0 2 2 0 00-4 0zm10 0a2 2 0 104 0 2 2 0 00-4 0z"/><path d="M3 8l3.5-5h11L21 8"/>
+        </svg>
+        Crédito Automotriz
+      </button>
+    </div>
+
+    <!-- DISCLAIMER -->
+    <div class="disclaimer fade-up fade-up-d1">
+      <strong>⚠️ Aviso importante:</strong> Esta calculadora es únicamente una herramienta de estimación orientativa. Los resultados se basan en una tasa de referencia y pueden variar según la institución financiera, el perfil crediticio del solicitante y las condiciones del mercado. La comisión por apertura del <strong>3%</strong> es un estimado; <strong>puede variar dependiendo de la institución financiera</strong>. Para obtener una propuesta real y personalizada, te invitamos a iniciar tu diagnóstico gratuito.
+    </div>
+
+    <!-- CALCULATOR CARD -->
+    <div class="calc-card fade-up fade-up-d2">
+      <div class="calc-card-top"></div>
+      <div class="calc-grid">
+
+        <!-- ══ PANEL EMPRESARIAL ══ -->
+        <div class="input-panel" id="panel-empresarial">
+          <div class="panel-title">🏢 Crédito Empresarial — Configura tu simulación</div>
+
+          <!-- MONTO -->
+          <div class="field-group">
+            <label>Monto del crédito</label>
+            <div class="amount-display">$<em id="emp-amount-display">1,500,000</em></div>
+            <input type="range" id="emp-amount-range" min="150000" max="7500000" step="50000" value="1500000" oninput="empUpdateAmount(this.value)" />
+            <div class="range-labels"><span>$150,000</span><span>$7,500,000</span></div>
+          </div>
+
+          <!-- PLAZO EMPRESARIAL -->
+          <div class="field-group">
+            <label>Plazo en meses</label>
+            <div class="term-grid" id="emp-term-grid"></div>
+          </div>
+
+          <!-- COMISIÓN -->
+          <div class="field-group">
+            <label>Comisión por apertura</label>
+            <div style="font-size:1.15rem;font-weight:600;color:var(--charcoal);margin-bottom:0.4rem;">3.00%</div>
+            <div class="commission-note">
+              <strong>Nota:</strong> Esta comisión es un estimado de referencia. El porcentaje real <strong>puede variar dependiendo de la institución financiera</strong> que otorgue el crédito, así como del perfil y historial crediticio del solicitante.
+            </div>
+          </div>
+
+          <button class="calc-btn" onclick="calculateEmp()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/>
+              <line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/>
+            </svg>
+            Calcular Amortización
+          </button>
+        </div>
+
+        <!-- ══ PANEL AUTOMOTRIZ ══ -->
+        <div class="input-panel" id="panel-automotriz" style="display:none;">
+          <div class="panel-title">🚗 Crédito Automotriz — Configura tu simulación</div>
+
+          <!-- AÑO DEL VEHÍCULO -->
+          <div class="field-group">
+            <label>Año del vehículo</label>
+            <div class="year-grid" id="auto-year-grid"></div>
+          </div>
+
+          <!-- PRECIO DEL VEHÍCULO -->
+          <div class="field-group">
+            <label>Precio del vehículo</label>
+            <div style="position:relative;">
+              <span style="position:absolute;left:0.85rem;top:50%;transform:translateY(-50%);font-weight:700;color:var(--green);font-size:1rem;">$</span>
+              <input
+                type="text"
+                id="auto-price-input"
+                placeholder="Ej. 350,000"
+                oninput="autoPriceInput(this)"
+                style="width:100%;padding:0.75rem 0.85rem 0.75rem 1.75rem;border:1.5px solid var(--gray-300);border-radius:0.6rem;font-family:'Inter',sans-serif;font-size:1rem;font-weight:600;color:var(--charcoal);outline:none;transition:border-color 0.2s;"
+                onfocus="this.style.borderColor='var(--green)'"
+                onblur="this.style.borderColor='var(--gray-300)'"
+              />
+            </div>
+          </div>
+
+          <!-- ENGANCHE -->
+          <div class="field-group">
+            <label>Enganche: <strong id="auto-enganche-pct" style="color:var(--green)">20%</strong>
+              &nbsp;<span id="auto-enganche-monto" style="color:var(--gray-400);font-weight:400;font-size:0.8rem;"></span>
+            </label>
+            <input type="range" id="auto-enganche-range" min="10" max="90" step="5" value="20" oninput="autoEngancheUpdate(this.value)" />
+            <div class="range-labels"><span>10%</span><span>90%</span></div>
+          </div>
+
+          <!-- PLAZO AUTOMOTRIZ -->
+          <div class="field-group">
+            <label>Plazo en meses <span id="auto-plazo-hint" style="color:var(--gray-400);font-weight:400;font-size:0.75rem;"></span></label>
+            <div class="term-grid auto-term-wrap" id="auto-term-grid"></div>
+          </div>
+
+          <!-- COMISIÓN -->
+          <div class="field-group">
+            <label>Comisión por apertura</label>
+            <div style="font-size:1.15rem;font-weight:600;color:var(--charcoal);margin-bottom:0.4rem;">3.00%</div>
+            <div class="commission-note">
+              <strong>Nota:</strong> Esta comisión es un estimado de referencia. El porcentaje real <strong>puede variar dependiendo de la institución financiera</strong>.
+            </div>
+          </div>
+
+          <button class="calc-btn" onclick="calculateAuto()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/>
+              <line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/>
+            </svg>
+            Calcular Amortización
+          </button>
+        </div>
+
+        <!-- RESULTS PANEL -->
+        <div class="results-panel" id="results-panel">
+          <div class="results-empty" id="results-empty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 7H6a2 2 0 00-2 2v9a2 2 0 002 2h9a2 2 0 002-2v-3"/><path d="M9 15l6.5-6.5"/>
+              <path d="M17 3l4 4-4 4"/><path d="M21 7H13"/>
+            </svg>
+            <p>Configura los parámetros y presiona <strong>Calcular</strong> para ver tu tabla de amortización.</p>
+          </div>
+          <div id="results-content" style="display:none;">
+            <div class="result-summary" id="summary-cards"></div>
+            <div class="amort-section">
+              <div class="amort-header">
+                <div class="amort-title">📋 Tabla de Amortización</div>
+              </div>
+              <div class="table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Mes</th>
+                      <th>Pago Mensual</th>
+                      <th>Capital</th>
+                      <th>Interés</th>
+                      <th>Saldo Restante</th>
+                    </tr>
+                  </thead>
+                  <tbody id="amort-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- CTA SECTION -->
+    <div class="cta-section">
+      <div class="badge">Siguiente Paso</div>
+      <h2>¿Listo para <em>pre-calificarte</em>?</h2>
+      <p>Nuestros socios directores analizarán tu perfil y te presentarán las mejores opciones de financiamiento disponibles para ti.</p>
+      <button class="cta-btn" onclick="openModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
+          <path d="M22 4L12 14.01l-3-3"/>
+        </svg>
+        Iniciar Diagnóstico Gratuito
+      </button>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-logo">
+        <svg viewBox="0 0 100 100" fill="currentColor">
+          <circle cx="50" cy="50" r="12"/><circle cx="50" cy="20" r="12"/>
+          <circle cx="50" cy="80" r="12"/><circle cx="24" cy="35" r="12"/>
+          <circle cx="24" cy="65" r="12"/><circle cx="76" cy="35" r="12"/>
+          <circle cx="76" cy="65" r="12"/>
+        </svg>
+        <div class="footer-logo-text">
+          <div class="brand">
+            <span>SOC</span>
+            <div class="div" style="width:2px;height:18px;background:rgba(255,255,255,0.35);"></div>
+            <span>FIRMA 7</span>
+          </div>
+          <div class="sub">Líderes en Asesoría Financiera</div>
+        </div>
+      </div>
+      <div class="footer-copy">© 2025 Firma 7. Todos los derechos reservados. · Av Patria 2085 Piso 1, Puerta de Hierro, Zapopan, Jalisco.</div>
+    </div>
+  </footer>
+
+  <!-- MODAL DIAGNÓSTICO -->
+  <div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
+    <div class="modal-box" id="modal-box">
+      <div class="modal-top"></div>
+      <div class="modal-header">
+        <h3><em>Pre-califícate</em> hoy mismo</h3>
+        <button class="modal-close" onclick="closeModal()" aria-label="Cerrar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <iframe
+          class="modal-form-iframe"
+          src="https://api.leadconnectorhq.com/widget/form/ytF9MgH3xDmSVPGeKAyS"
+          id="modal-form-iframe"
+          data-layout="{'id':'INLINE'}"
+          data-trigger-type="alwaysShow"
+          data-trigger-value=""
+          data-activation-type="alwaysActivated"
+          data-activation-value=""
+          data-deactivation-type="neverDeactivate"
+          data-deactivation-value=""
+          data-form-name="FORMULARIO LANDING PAGE"
+          data-height="958"
+          data-layout-iframe-id="inline-ytF9MgH3xDmSVPGeKAyS"
+          data-form-id="ytF9MgH3xDmSVPGeKAyS"
+          title="Formulario de Diagnóstico Firma 7"
+          style="padding-top:1.5rem;"
+        ></iframe>
+      </div>
+      <div class="modal-footer">🔒 Tu información está protegida por nuestros protocolos de seguridad bancaria y confidencialidad.</div>
+    </div>
+  </div>
+
+  <script>
+    // ══════════════════════════════════════════
+    // ─── SHARED STATE & CONSTANTS ───
+    // ══════════════════════════════════════════
+    const COMMISSION_PCT = 0.03;
+
+    function fmt(n) {
+      return '$' + n.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function fmtNum(n) {
+      return n.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function updateRangeBackground(input) {
+      const min = parseFloat(input.min);
+      const max = parseFloat(input.max);
+      const val = parseFloat(input.value);
+      const pct = ((val - min) / (max - min)) * 100;
+      input.style.backgroundSize = pct + '% 100%';
+    }
+
+    function resetResults() {
+      document.getElementById('results-empty').style.display = 'flex';
+      document.getElementById('results-content').style.display = 'none';
+    }
+
+    function renderResults(payment, principal, commission, totalInterest, totalPaid, n, extraCards) {
+      const summaryEl = document.getElementById('summary-cards');
+      summaryEl.innerHTML = `
+        <div class="summary-card highlight">
+          <div class="label">Pago mensual estimado</div>
+          <div class="value">${fmt(payment)}</div>
+        </div>
+        ${extraCards}
+        <div class="summary-card">
+          <div class="label">Monto financiado</div>
+          <div class="value">${fmt(principal)}</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">Comisión por apertura</div>
+          <div class="value">${fmt(commission)}</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">Total intereses</div>
+          <div class="value">${fmt(totalInterest)}</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">Total a pagar (con comisión)</div>
+          <div class="value">${fmt(totalPaid)}</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">Plazo</div>
+          <div class="value">${n} meses</div>
+        </div>
+      `;
+
+      const tbody = document.getElementById('amort-body');
+      let balance = principal;
+      let totalInt = 0;
+      const monthlyRate = payment / principal; // recalculated inside loop
+      // We'll use the passed values directly
+      tbody.innerHTML = '';
+      let bal = principal;
+      // We need monthlyRate from context — pass it as param
+    }
+
+    function buildAmortTable(principal, monthlyRate, payment, n) {
+      let balance = principal;
+      const rows = [];
+      for (let i = 1; i <= n; i++) {
+        const interest = balance * monthlyRate;
+        const capitalPaid = payment - interest;
+        balance = Math.max(0, balance - capitalPaid);
+        rows.push({ mes: i, pago: payment, capital: capitalPaid, interes: interest, saldo: balance });
+      }
+      return rows;
+    }
+
+    function renderTable(rows) {
+      document.getElementById('amort-body').innerHTML = rows.map(r => `
+        <tr>
+          <td>${r.mes}</td>
+          <td>${fmt(r.pago)}</td>
+          <td>${fmt(r.capital)}</td>
+          <td>${fmt(r.interes)}</td>
+          <td>${fmt(r.saldo)}</td>
+        </tr>
+      `).join('');
+    }
+
+    function showResults() {
+      document.getElementById('results-empty').style.display = 'none';
+      document.getElementById('results-content').style.display = 'block';
+      if (window.innerWidth < 769) {
+        document.getElementById('results-content').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    // ══════════════════════════════════════════
+    // ─── TYPE SWITCHER ───
+    // ══════════════════════════════════════════
+    let currentType = 'empresarial';
+
+    function setType(type) {
+      currentType = type;
+      document.getElementById('btn-empresarial').classList.toggle('active', type === 'empresarial');
+      document.getElementById('btn-automotriz').classList.toggle('active', type === 'automotriz');
+      document.getElementById('panel-empresarial').style.display = type === 'empresarial' ? '' : 'none';
+      document.getElementById('panel-automotriz').style.display  = type === 'automotriz'  ? '' : 'none';
+      resetResults();
+    }
+
+    // ══════════════════════════════════════════
+    // ─── CRÉDITO EMPRESARIAL ───
+    // ══════════════════════════════════════════
+    const EMP_RATE_ANNUAL = 0.30;
+    const EMP_TERMS = [12, 18, 24, 36];
+    let empSelectedTerm = 24;
+
+    function empUpdateAmount(val) {
+      document.getElementById('emp-amount-display').textContent = parseInt(val).toLocaleString('es-MX');
+      updateRangeBackground(document.getElementById('emp-amount-range'));
+    }
+
+    function empRenderTerms() {
+      const grid = document.getElementById('emp-term-grid');
+      grid.innerHTML = '';
+      EMP_TERMS.forEach(t => {
+        const btn = document.createElement('button');
+        btn.className = 'term-btn' + (t === empSelectedTerm ? ' active' : '');
+        btn.textContent = t + ' m';
+        btn.onclick = () => { empSelectedTerm = t; empRenderTerms(); };
+        grid.appendChild(btn);
+      });
+    }
+
+    function calculateEmp() {
+      const principal = parseInt(document.getElementById('emp-amount-range').value);
+      const n = empSelectedTerm;
+      const monthlyRate = EMP_RATE_ANNUAL / 12;
+      const payment = principal * (monthlyRate * Math.pow(1 + monthlyRate, n)) / (Math.pow(1 + monthlyRate, n) - 1);
+      const commission = principal * COMMISSION_PCT;
+      const rows = buildAmortTable(principal, monthlyRate, payment, n);
+      const totalInterest = rows.reduce((s, r) => s + r.interes, 0);
+      const totalPaid = payment * n + commission;
+
+      document.getElementById('summary-cards').innerHTML = `
+        <div class="summary-card highlight">
+          <div class="label">Pago mensual estimado</div>
+          <div class="value">${fmt(payment)}</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">Monto solicitado</div>
+          <div class="value">${fmt(principal)}</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">Comisión por apertura</div>
+          <div class="value">${fmt(commission)}</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">Total intereses</div>
+          <div class="value">${fmt(totalInterest)}</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">Total a pagar (con comisión)</div>
+          <div class="value">${fmt(totalPaid)}</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">Plazo</div>
+          <div class="value">${n} meses</div>
+        </div>
+      `;
+      renderTable(rows);
+      showResults();
+    }
+
+    // ══════════════════════════════════════════
+    // ─── CRÉDITO AUTOMOTRIZ ───
+    // ══════════════════════════════════════════
+    const AUTO_RATE_ANNUAL = 0.14;
+    const AUTO_MAX_TERMS = {
+      2017: 24, 2018: 36, 2019: 48, 2020: 60,
+      2021: 60, 2022: 72, 2023: 84, 2024: 96,
+      2025: 108, 2026: 120
+    };
+    let autoSelectedYear = 2024;
+    let autoSelectedTerm = 60;
+    let autoPriceValue = 0;
+
+    function autoGetTerms(year) {
+      const maxT = AUTO_MAX_TERMS[year] || 36;
+      const terms = [];
+      for (let t = 12; t <= maxT; t += 12) terms.push(t);
+      return terms;
+    }
+
+    function autoRenderYears() {
+      const grid = document.getElementById('auto-year-grid');
+      grid.innerHTML = '';
+      Object.keys(AUTO_MAX_TERMS).forEach(y => {
+        const year = parseInt(y);
+        const btn = document.createElement('button');
+        btn.className = 'term-btn' + (year === autoSelectedYear ? ' active' : '');
+        btn.textContent = year;
+        btn.onclick = () => {
+          autoSelectedYear = year;
+          const terms = autoGetTerms(year);
+          // Clamp selected term to max available
+          if (!terms.includes(autoSelectedTerm)) {
+            autoSelectedTerm = terms[Math.floor(terms.length / 2)] || terms[0];
+          }
+          document.getElementById('auto-plazo-hint').textContent = '(máx. ' + AUTO_MAX_TERMS[year] + ' meses para ' + year + ')';
+          autoRenderYears();
+          autoRenderTerms();
+          resetResults();
+        };
+        grid.appendChild(btn);
+      });
+    }
+
+    function autoRenderTerms() {
+      const grid = document.getElementById('auto-term-grid');
+      grid.innerHTML = '';
+      const terms = autoGetTerms(autoSelectedYear);
+      // Dynamic columns based on count
+      const cols = terms.length <= 5 ? terms.length : 6;
+      grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+      terms.forEach(t => {
+        const btn = document.createElement('button');
+        btn.className = 'term-btn' + (t === autoSelectedTerm ? ' active' : '');
+        btn.textContent = t + ' m';
+        btn.onclick = () => { autoSelectedTerm = t; autoRenderTerms(); };
+        grid.appendChild(btn);
+      });
+    }
+
+    function autoPriceInput(input) {
+      // Strip non-numeric and reformat
+      const raw = input.value.replace(/[^0-9]/g, '');
+      autoPriceValue = parseInt(raw) || 0;
+      if (raw) {
+        input.value = parseInt(raw).toLocaleString('es-MX');
+      } else {
+        input.value = '';
+      }
+      // Update enganche amount display
+      autoEngancheUpdate(document.getElementById('auto-enganche-range').value);
+    }
+
+    function autoEngancheUpdate(val) {
+      const pct = parseInt(val);
+      document.getElementById('auto-enganche-pct').textContent = pct + '%';
+      updateRangeBackground(document.getElementById('auto-enganche-range'));
+      if (autoPriceValue > 0) {
+        const engancheMonto = autoPriceValue * pct / 100;
+        document.getElementById('auto-enganche-monto').textContent = '≈ ' + fmt(engancheMonto);
+      } else {
+        document.getElementById('auto-enganche-monto').textContent = '';
+      }
+    }
+
+    function calculateAuto() {
+      if (!autoPriceValue || autoPriceValue <= 0) {
+        alert('Por favor ingresa el precio del vehículo.');
+        return;
+      }
+      const price = autoPriceValue;
+      const enganchePct = parseInt(document.getElementById('auto-enganche-range').value) / 100;
+      const enganche = price * enganchePct;
+      const principal = price - enganche;
+
+      if (principal <= 0) {
+        alert('El enganche no puede ser igual o mayor al precio del vehículo.');
+        return;
+      }
+
+      const n = autoSelectedTerm;
+      const monthlyRate = AUTO_RATE_ANNUAL / 12;
+      const payment = principal * (monthlyRate * Math.pow(1 + monthlyRate, n)) / (Math.pow(1 + monthlyRate, n) - 1);
+      const commission = principal * COMMISSION_PCT;
+      const rows = buildAmortTable(principal, monthlyRate, payment, n);
+      const totalInterest = rows.reduce((s, r) => s + r.interes, 0);
+      const totalPaid = payment * n + commission;
+
+      document.getElementById('summary-cards').innerHTML = `
+        <div class="summary-card highlight">
+          <div class="label">Pago mensual estimado</div>
+          <div class="value">${fmt(payment)}</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">Precio del vehículo</div>
+          <div class="value">${fmt(price)}</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">Enganche (${Math.round(enganchePct*100)}%)</div>
+          <div class="value">${fmt(enganche)}</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">Monto financiado</div>
+          <div class="value">${fmt(principal)}</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">Comisión por apertura</div>
+          <div class="value">${fmt(commission)}</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">Total intereses</div>
+          <div class="value">${fmt(totalInterest)}</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">Total a pagar (con comisión)</div>
+          <div class="value">${fmt(totalPaid)}</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">Año / Plazo</div>
+          <div class="value">${autoSelectedYear} · ${n} m</div>
+        </div>
+      `;
+      renderTable(rows);
+      showResults();
+    }
+
+    // ══════════════════════════════════════════
+    // ─── INIT ───
+    // ══════════════════════════════════════════
+    empRenderTerms();
+    updateRangeBackground(document.getElementById('emp-amount-range'));
+    autoRenderYears();
+    autoRenderTerms();
+    updateRangeBackground(document.getElementById('auto-enganche-range'));
+    document.getElementById('auto-plazo-hint').textContent = '(máx. ' + AUTO_MAX_TERMS[autoSelectedYear] + ' meses para ' + autoSelectedYear + ')';
+
+    // ══════════════════════════════════════════
+    // ─── MODAL ───
+    // ══════════════════════════════════════════
+    function openModal() {
+      document.getElementById('modal-overlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function handleOverlayClick(e) {
+      if (e.target === document.getElementById('modal-overlay')) closeModal();
+    }
+
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+  </script>
+
+</body>
+</html>

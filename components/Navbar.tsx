@@ -64,6 +64,18 @@ export const Navbar: React.FC = () => {
             <button onClick={() => scrollToSection('calendar')} className="text-sm font-medium text-gray-600 hover:text-[#006d4e] transition-colors cursor-pointer" style={{ cursor: 'pointer' }}>
               Agenda
             </button>
+            <a
+              href="https://calculadora.firma7.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-medium text-gray-600 hover:text-[#006d4e] transition-colors cursor-pointer flex items-center gap-1.5"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/>
+                <line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/>
+              </svg>
+              Calculadora
+            </a>
             <button
               onClick={() => scrollToSection('profiling')}
               className="bg-charcoal text-white px-6 py-2.5 rounded-none text-sm font-medium hover:bg-[#006d4e] transition-colors duration-300 flex items-center gap-2 shadow-lg shadow-[#006d4e]/20 cursor-pointer"
@@ -104,6 +116,18 @@ export const Navbar: React.FC = () => {
             >
               Agenda
             </button>
+            <a
+              href="https://calculadora.firma7.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 w-full px-3 py-4 text-base font-medium text-gray-600 hover:text-[#006d4e] hover:bg-gray-50 transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/>
+                <line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/>
+              </svg>
+              Calculadora de Crédito
+            </a>
             <button
               onClick={() => scrollToSection('profiling')}
               className="block w-full text-left px-3 py-4 text-base font-medium text-[#006d4e] font-bold bg-green-50 cursor-pointer"
