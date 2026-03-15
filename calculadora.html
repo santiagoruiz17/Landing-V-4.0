@@ -687,6 +687,13 @@
       pointer-events: auto;
     }
 
+    /* Fix para burbuja/formulario interceptando clics */
+    body:not(.modal-open) .preact-border-shadow-host,
+    body:not(.modal-open) .modal-form-iframe,
+    body:not(.modal-open) iframe {
+      pointer-events: none !important;
+    }
+
     .modal-box {
       background: white;
       border-radius: 1.5rem;
@@ -1487,11 +1494,13 @@
     function openModal() {
       document.getElementById('modal-overlay').classList.add('open');
       document.body.style.overflow = 'hidden';
+      document.body.classList.add('modal-open');
     }
 
     function closeModal() {
       document.getElementById('modal-overlay').classList.remove('open');
       document.body.style.overflow = '';
+      document.body.classList.remove('modal-open');
     }
 
     function handleOverlayClick(e) {
