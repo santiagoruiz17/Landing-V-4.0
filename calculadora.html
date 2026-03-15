@@ -1052,29 +1052,21 @@
               <path d="M9 7H6a2 2 0 00-2 2v9a2 2 0 002 2h9a2 2 0 002-2v-3"/><path d="M9 15l6.5-6.5"/>
               <path d="M17 3l4 4-4 4"/><path d="M21 7H13"/>
             </svg>
-            <p>Configura los parámetros y presiona <strong>Calcular</strong> para ver tu tabla de amortización.</p>
+            <p>Configura los parámetros y presiona <strong>Calcular</strong> para ver tu pago mensual estimado.</p>
           </div>
           <div id="results-content" style="display:none;">
-            <div class="result-summary" id="summary-cards"></div>
-            <div class="amort-section">
-              <div class="amort-header">
-                <div class="amort-title">📋 Tabla de Amortización</div>
-              </div>
-              <div class="table-wrapper">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Mes</th>
-                      <th>Pago Mensual</th>
-                      <th>Capital</th>
-                      <th>Interés</th>
-                      <th>Saldo Restante</th>
-                    </tr>
-                  </thead>
-                  <tbody id="amort-body"></tbody>
-                </table>
-              </div>
-            </div>
+            <div class="result-summary" id="summary-cards" style="grid-template-columns: 1fr; margin-bottom: 2rem;"></div>
+            
+            <button class="cta-btn" onclick="" style="width: 100%;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+              Solicitar tabla de amortización
+            </button>
           </div>
         </div>
 
@@ -1215,27 +1207,6 @@
 
       const tbody = document.getElementById('amort-body');
       let balance = principal;
-      let totalInt = 0;
-      const monthlyRate = payment / principal; // recalculated inside loop
-      // We'll use the passed values directly
-      tbody.innerHTML = '';
-      let bal = principal;
-      // We need monthlyRate from context — pass it as param
-    }
-
-    function buildAmortTable(principal, monthlyRate, payment, n) {
-      let balance = principal;
-      const rows = [];
-      for (let i = 1; i <= n; i++) {
-        const interest = balance * monthlyRate;
-        const capitalPaid = payment - interest;
-        balance = Math.max(0, balance - capitalPaid);
-        rows.push({ mes: i, pago: payment, capital: capitalPaid, interes: interest, saldo: balance });
-      }
-      return rows;
-    }
-
-    function renderTable(rows) {
       document.getElementById('amort-body').innerHTML = rows.map(r => `
         <tr>
           <td>${r.mes}</td>
@@ -1307,38 +1278,13 @@
       const n = empSelectedTerm;
       const monthlyRate = EMP_RATE_ANNUAL / 12;
       const payment = principal * (monthlyRate * Math.pow(1 + monthlyRate, n)) / (Math.pow(1 + monthlyRate, n) - 1);
-      const commission = principal * COMMISSION_PCT;
-      const rows = buildAmortTable(principal, monthlyRate, payment, n);
-      const totalInterest = rows.reduce((s, r) => s + r.interes, 0);
-      const totalPaid = payment * n + commission;
 
       document.getElementById('summary-cards').innerHTML = `
-        <div class="summary-card highlight">
-          <div class="label">Pago mensual estimado</div>
-          <div class="value">${fmt(payment)}</div>
-        </div>
-        <div class="summary-card">
-          <div class="label">Monto solicitado</div>
-          <div class="value">${fmt(principal)}</div>
-        </div>
-        <div class="summary-card">
-          <div class="label">Comisión por apertura</div>
-          <div class="value">${fmt(commission)}</div>
-        </div>
-        <div class="summary-card">
-          <div class="label">Total intereses</div>
-          <div class="value">${fmt(totalInterest)}</div>
-        </div>
-        <div class="summary-card">
-          <div class="label">Total a pagar (con comisión)</div>
-          <div class="value">${fmt(totalPaid)}</div>
-        </div>
-        <div class="summary-card">
-          <div class="label">Plazo</div>
-          <div class="value">${n} meses</div>
+        <div class="summary-card highlight" style="background: linear-gradient(135deg, var(--green), var(--midnight)); color: white;">
+          <div class="label" style="color: rgba(255,255,255,0.8);">Pago mensual estimado</div>
+          <div class="value" style="color: white; font-size: 2.2rem;">${fmt(payment)}</div>
         </div>
       `;
-      renderTable(rows);
       showResults();
     }
 
@@ -1445,46 +1391,13 @@
       const n = autoSelectedTerm;
       const monthlyRate = AUTO_RATE_ANNUAL / 12;
       const payment = principal * (monthlyRate * Math.pow(1 + monthlyRate, n)) / (Math.pow(1 + monthlyRate, n) - 1);
-      const commission = principal * COMMISSION_PCT;
-      const rows = buildAmortTable(principal, monthlyRate, payment, n);
-      const totalInterest = rows.reduce((s, r) => s + r.interes, 0);
-      const totalPaid = payment * n + commission;
 
       document.getElementById('summary-cards').innerHTML = `
-        <div class="summary-card highlight">
-          <div class="label">Pago mensual estimado</div>
-          <div class="value">${fmt(payment)}</div>
-        </div>
-        <div class="summary-card">
-          <div class="label">Precio del vehículo</div>
-          <div class="value">${fmt(price)}</div>
-        </div>
-        <div class="summary-card">
-          <div class="label">Enganche (${Math.round(enganchePct*100)}%)</div>
-          <div class="value">${fmt(enganche)}</div>
-        </div>
-        <div class="summary-card">
-          <div class="label">Monto financiado</div>
-          <div class="value">${fmt(principal)}</div>
-        </div>
-        <div class="summary-card">
-          <div class="label">Comisión por apertura</div>
-          <div class="value">${fmt(commission)}</div>
-        </div>
-        <div class="summary-card">
-          <div class="label">Total intereses</div>
-          <div class="value">${fmt(totalInterest)}</div>
-        </div>
-        <div class="summary-card">
-          <div class="label">Total a pagar (con comisión)</div>
-          <div class="value">${fmt(totalPaid)}</div>
-        </div>
-        <div class="summary-card">
-          <div class="label">Año / Plazo</div>
-          <div class="value">${autoSelectedYear} · ${n} m</div>
+        <div class="summary-card highlight" style="background: linear-gradient(135deg, var(--green), var(--midnight)); color: white;">
+          <div class="label" style="color: rgba(255,255,255,0.8);">Pago mensual estimado</div>
+          <div class="value" style="color: white; font-size: 2.2rem;">${fmt(payment)}</div>
         </div>
       `;
-      renderTable(rows);
       showResults();
     }
 
