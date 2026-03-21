@@ -672,9 +672,10 @@
       backdrop-filter: blur(8px);
       z-index: 1000;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
-      padding: 1rem;
+      overflow-y: auto;
+      padding: 3rem 1rem;
       opacity: 0;
       visibility: hidden;
       pointer-events: none;
@@ -699,7 +700,7 @@
       border-radius: 1.5rem;
       max-width: 700px;
       width: 100%;
-      max-height: 92vh;
+      margin: auto;
       overflow: hidden;
       display: flex;
       flex-direction: column;
@@ -760,14 +761,13 @@
 
     .modal-body {
       flex: 1;
-      overflow-y: auto;
       padding: 0;
     }
 
     .modal-form-iframe {
       width: 100%;
       border: none;
-      min-height: 1000px;
+      min-height: 85vh;
       display: block;
     }
 
@@ -944,7 +944,7 @@
 
     <!-- DISCLAIMER -->
     <div class="disclaimer fade-up fade-up-d1">
-      <strong>⚠️ Aviso importante:</strong> Esta calculadora es únicamente una herramienta de estimación orientativa. Los resultados se basan en una tasa de referencia y pueden variar según la institución financiera, el perfil crediticio del solicitante y las condiciones del mercado. La comisión por apertura del <strong>3%</strong> es un estimado; <strong>puede variar dependiendo de la institución financiera</strong>. Para obtener una propuesta real y personalizada, te invitamos a iniciar tu diagnóstico gratuito.
+      <strong>⚠️ Aviso importante:</strong> Esta calculadora es únicamente una herramienta de estimación orientativa. Los resultados se basan en una tasa de referencia y pueden variar según la institución financiera, el perfil crediticio del solicitante y las condiciones del mercado. Para obtener una propuesta real y personalizada, te invitamos a iniciar tu diagnóstico gratuito.
     </div>
 
     <!-- CALCULATOR CARD -->
@@ -970,14 +970,6 @@
             <div class="term-grid" id="emp-term-grid"></div>
           </div>
 
-          <!-- COMISIÓN -->
-          <div class="field-group">
-            <label>Comisión por apertura</label>
-            <div style="font-size:1.15rem;font-weight:600;color:var(--charcoal);margin-bottom:0.4rem;">3.00%</div>
-            <div class="commission-note">
-              <strong>Nota:</strong> Esta comisión es un estimado de referencia. El porcentaje real <strong>puede variar dependiendo de la institución financiera</strong> que otorgue el crédito, así como del perfil y historial crediticio del solicitante.
-            </div>
-          </div>
 
           <button class="calc-btn" id="btn-calc-emp">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1027,14 +1019,7 @@
             <div class="term-grid auto-term-wrap" id="auto-term-grid"></div>
           </div>
 
-          <!-- COMISIÓN -->
-          <div class="field-group">
-            <label>Comisión por apertura</label>
-            <div style="font-size:1.15rem;font-weight:600;color:var(--charcoal);margin-bottom:0.4rem;">3.00%</div>
-            <div class="commission-note">
-              <strong>Nota:</strong> Esta comisión es un estimado de referencia. El porcentaje real <strong>puede variar dependiendo de la institución financiera</strong>.
-            </div>
-          </div>
+
 
           <button class="calc-btn" id="btn-calc-auto">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1057,7 +1042,7 @@
           <div id="results-content" style="display:none;">
             <div class="result-summary" id="summary-cards" style="grid-template-columns: 1fr; margin-bottom: 2rem;"></div>
             
-            <button class="cta-btn" onclick="" style="width: 100%;">
+            <button class="cta-btn" onclick="sendToWhatsApp()" style="width: 100%;">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                 <polyline points="14 2 14 8 20 8"></polyline>
@@ -1127,6 +1112,7 @@
       <div class="modal-body">
         <iframe
           class="modal-form-iframe"
+          scrolling="no"
           src="https://api.leadconnectorhq.com/widget/form/ytF9MgH3xDmSVPGeKAyS"
           id="modal-form-iframe"
           data-layout="{'id':'INLINE'}"
@@ -1402,17 +1388,46 @@
     }
 
     // ══════════════════════════════════════════
+    // ─── WHATSAPP INTEGRATION ───
+    // ══════════════════════════════════════════
+    function sendToWhatsApp() {
+      // ⚠️ REEMPLAZA ESTE NÚMERO POR EL TUYO CON EL CÓDIGO DE PAÍS (ej: 52...)
+      const phoneNumber = "525525069817";
+      let text = "";
+
+      if (window.currentType === 'empresarial') {
+        const principal = parseInt(document.getElementById('emp-amount-range').value);
+        const paymentElem = document.querySelector('#summary-cards .value');
+        const payment = paymentElem ? paymentElem.innerText : "";
+        
+        text = `Hola, me gustaría solicitar la tabla de amortización para un *Crédito Empresarial*.\n\n*Monto solicitado:* ${fmt(principal)}\n*Plazo:* ${empSelectedTerm} meses.\n*Pago mensual estimado:* ${payment}`;
+      } else {
+        const price = autoPriceValue;
+        const enganchePct = parseInt(document.getElementById('auto-enganche-range').value);
+        const principal = price - (price * (enganchePct / 100));
+        const paymentElem = document.querySelector('#summary-cards .value');
+        const payment = paymentElem ? paymentElem.innerText : "";
+
+        text = `Hola, me gustaría solicitar la tabla de amortización para un *Crédito Automotriz*.\n\n*Vehículo:* Año ${autoSelectedYear}\n*Precio:* ${fmt(price)}\n*Enganche:* ${enganchePct}%\n*Monto a financiar:* ${fmt(principal)}\n*Plazo:* ${autoSelectedTerm} meses.\n*Pago mensual estimado:* ${payment}`;
+      }
+
+      window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(text)}`, '_blank');
+    }
+
+    // ══════════════════════════════════════════
     // ─── MODAL ───
     // ══════════════════════════════════════════
     function openModal() {
       document.getElementById('modal-overlay').classList.add('open');
       document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
       document.body.classList.add('modal-open');
     }
 
     function closeModal() {
       document.getElementById('modal-overlay').classList.remove('open');
       document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
       document.body.classList.remove('modal-open');
     }
 
