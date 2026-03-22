@@ -94,7 +94,29 @@ const partners = [
       </div>
     `
   },
-  { name: 'Xepelin', slug: 'xepelin', logo: 'https://almomento.mx/wp-content/uploads/2024/02/Logotipo-Xepelin-Press-Kit-1-scaled.jpg' },
+  { 
+    name: 'Xepelin', 
+    slug: 'xepelin', 
+    logo: 'https://almomento.mx/wp-content/uploads/2024/02/Logotipo-Xepelin-Press-Kit-1-scaled.jpg',
+    contentHtml: `
+      <div class="partner-details">
+        <h3>¿Quiénes son?</h3>
+        <p>Fintech fundada en 2019, especializada en servicios financieros B2B, pagos y factoraje 100% digital para PyMEs.</p>
+        
+        <h3>¿Cómo trabajan?</h3>
+        <p>Su plataforma se conecta directamente con el SAT para leer tus facturas. Usan inteligencia artificial para evaluar tu cartera, permitiéndote adelantar el cobro de tus facturas emitidas o financiar el pago a tus proveedores de forma muy sencilla.</p>
+        
+        <h3>Tiempo de respuesta</h3>
+        <p>Evaluación inicial en cuestión de minutos. Una vez autorizada tu línea, el fondeo o adelanto de tus facturas se realiza en menos de 24 horas.</p>
+        
+        <h3>Ventaja principal</h3>
+        <p>Centralizas, organizas y financias todas tus cuentas por pagar y por cobrar en una sola plataforma.</p>
+        
+        <h3>Monto Máximo de financiamiento</h3>
+        <p>Te otorgan líneas de factoraje que escalan según tus ventas y el volumen de tus facturas, llegando generalmente hasta los $15,000,000 de pesos.</p>
+      </div>
+    `
+  },
   { name: 'finkargo', slug: 'finkargo', logo: '../../images/logo-finkargo.png' },
   { name: 'imagina LEASING', slug: 'imagina-leasing', logo: '../../images/logo-imagina.png' },
   { name: 'Covalto', slug: 'covalto', logo: 'https://media.cdn.teamtailor.com/images/s3/teamtailor-production/logotype-v3/image_uploads/15e2f7f9-b5a4-476a-852c-c435bc8cc489/original.png' },
