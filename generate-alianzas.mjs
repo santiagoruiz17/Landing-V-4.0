@@ -232,7 +232,29 @@ const partners = [
       </div>
     `
   },
-  { name: 'Anticipa', slug: 'anticipa', logo: 'https://www.credenza.mx/img/clients/ANTICIPA.png' },
+  { 
+    name: 'Anticipa', 
+    slug: 'anticipa', 
+    logo: 'https://www.credenza.mx/img/clients/ANTICIPA.png',
+    contentHtml: `
+      <div class="partner-details">
+        <h3>¿Quiénes son?</h3>
+        <p>Plataforma financiera (recientemente integrada al ecosistema de Finsus) especializada en inyectar liquidez a los negocios a través del anticipo de sus ventas.</p>
+        
+        <h3>¿Cómo trabajan?</h3>
+        <p>No es un crédito tradicional con cuotas fijas. Evalúan el historial de tu terminal punto de venta (TPV) y te adelantan capital. La devolución se realiza automáticamente reteniendo un porcentaje de tus ventas diarias con tarjeta.</p>
+        
+        <h3>Tiempo de respuesta</h3>
+        <p>Proceso 100% digital. Emiten pre-aprobación en un máximo de 24 horas, depositando los fondos entre 24 y 48 horas una vez que se firma el contrato.</p>
+        
+        <h3>Ventaja principal</h3>
+        <p>Flexibilidad absoluta. La retención se ajusta a tu nivel de transacciones diarias, asegurando que tu flujo de efectivo no se vea comprometido si las ventas varían.</p>
+        
+        <h3>Monto Máximo de financiamiento</h3>
+        <p>Otorgan líneas desde $150,000 pesos, alcanzando generalmente hasta 1.5 a 2.5 veces tus ventas mensuales cobradas con tarjeta.</p>
+      </div>
+    `
+  },
   { name: 'axionex Financiera', slug: 'axionex-financiera', logo: '../../images/logo-axionex.png' },
   { name: 'Bx+', slug: 'bx-plus', logo: '../../images/logo-bxplus.png' },
   { name: 'Finsus', slug: 'finsus', logo: '../../images/logo-finsus.png' },
