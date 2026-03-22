@@ -25,10 +25,22 @@
     .logo-name span { font-size: 1.5rem; font-weight: 700; color: var(--green); letter-spacing: -0.01em; }
     .logo-divider { height: 24px; width: 2px; background: var(--green); }
     .logo-sub { font-size: 0.52rem; font-weight: 700; letter-spacing: 0.18em; color: var(--green); text-transform: uppercase; margin-top: 3px; }
-
-    .nav-back { display: flex; align-items: center; gap: 8px; font-size: 0.875rem; font-weight: 500; color: var(--gray-text); text-decoration: none; transition: all 0.2s; padding: 8px 20px; border: 1px solid var(--gray-border); border-radius: 8px; }
-    .nav-back:hover { color: var(--green); border-color: var(--green); background: var(--green-light); }
-    .nav-back svg { width: 16px; height: 16px; }
+    
+    .desktop-menu { display: none; align-items: center; gap: 2rem; }
+    @media (min-width: 768px) { .desktop-menu { display: flex; } }
+    .nav-link { font-size: 0.875rem; font-weight: 500; color: #4B5563; text-decoration: none; transition: color 0.2s; cursor: pointer; }
+    .nav-link:hover { color: #006d4e; }
+    .flex-icon { display: flex; align-items: center; gap: 6px; }
+    .nav-btn-primary { background: #1a1a2e; color: white; padding: 0.625rem 1.5rem; font-size: 0.875rem; font-weight: 500; text-decoration: none; display: flex; align-items: center; gap: 8px; transition: background 0.3s; box-shadow: 0 10px 15px -3px rgba(0, 109, 78, 0.2); cursor: pointer; }
+    .nav-btn-primary:hover { background: #006d4e; }
+    .mobile-toggle { background: transparent; border: none; color: #4B5563; cursor: pointer; display: flex; align-items: center; }
+    @media (min-width: 768px) { .mobile-toggle { display: none; } }
+    .mobile-toggle:hover { color: #006d4e; }
+    .mobile-menu { display: none; background: white; border-top: 1px solid #F3F4F6; position: absolute; width: 100%; top: 80px; left: 0; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+    .mobile-menu.active { display: block; }
+    .mobile-nav-link { display: block; padding: 1rem 1.25rem; font-size: 1rem; font-weight: 500; color: #4B5563; text-decoration: none; transition: background 0.2s; border-bottom: 1px solid #f9fafb; }
+    .mobile-nav-link:hover { background: #F9FAFB; color: #006d4e; }
+    .mobile-nav-btn { display: block; padding: 1rem 1.25rem; font-size: 1rem; font-weight: 700; color: #006d4e; background: var(--green-light); text-decoration: none; }
 
     /* CONTENT */
     .partner-content { flex: 1; max-width: 800px; margin: 0 auto; padding: 10rem 2rem 5rem; text-align: center; width: 100%; animation: fadeUp 0.6s ease; }
@@ -68,7 +80,7 @@
 </head>
 <body>
 
-  <nav class="navbar">
+  <nav class="navbar" id="main-nav">
     <div class="navbar-inner">
       <a href="/" class="logo-link">
         <svg class="logo-icon" viewBox="0 0 100 100" fill="currentColor">
@@ -81,13 +93,34 @@
           <span class="logo-sub">Líderes en Asesoría Financiera</span>
         </div>
       </a>
-      <a href="/alianzas/" class="nav-back">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="19" y1="12" x2="5" y2="12"></line>
-          <polyline points="12 19 5 12 12 5"></polyline>
-        </svg>
-        Regresar a Alianzas
+
+      <div class="desktop-menu">
+        <a href="/#methodology" class="nav-link">Metodología</a>
+        <a href="/alianzas/" class="nav-link" style="color:#006d4e;">Alianzas</a>
+        <a href="https://calculadora.firma7.com" target="_blank" class="nav-link flex-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/></svg>
+          Calculadora
+        </a>
+        <a href="/#profiling" class="nav-btn-primary">
+          Diagnóstico Rápido 
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+      </div>
+
+      <button class="mobile-toggle" id="mobile-toggle" aria-label="Abrir menú">
+        <svg id="icon-menu" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        <svg id="icon-close" style="display:none;" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="mobile-menu" id="mobile-menu">
+      <a href="/#methodology" class="mobile-nav-link">Metodología</a>
+      <a href="/alianzas/" class="mobile-nav-link" style="color:#006d4e; background:#f9fafb;">Alianzas</a>
+      <a href="https://calculadora.firma7.com" target="_blank" class="mobile-nav-link flex-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/></svg>
+        Calculadora de Crédito
       </a>
+      <a href="/#profiling" class="mobile-nav-btn">Iniciar Diagnóstico</a>
     </div>
   </nav>
 
@@ -130,5 +163,24 @@
     </div>
   </footer>
 
+  <script>
+    const toggleBtn = document.getElementById('mobile-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const iconMenu = document.getElementById('icon-menu');
+    const iconClose = document.getElementById('icon-close');
+
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('active');
+        if (mobileMenu.classList.contains('active')) {
+          iconMenu.style.display = 'none';
+          iconClose.style.display = 'block';
+        } else {
+          iconMenu.style.display = 'block';
+          iconClose.style.display = 'none';
+        }
+      });
+    }
+  </script>
 </body>
 </html>
