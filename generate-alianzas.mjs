@@ -48,7 +48,29 @@ const partners = [
       </div>
     `
   },
-  { name: 'UNIFIN', slug: 'unifin', logo: '../../images/logo-unifin.png' },
+  { 
+    name: 'UNIFIN', 
+    slug: 'unifin', 
+    logo: '../../images/logo-unifin.png',
+    contentHtml: `
+      <div class="partner-details">
+        <h3>¿Quiénes son?</h3>
+        <p>Institución financiera mexicana con amplia trayectoria, especializada en impulsar el crecimiento operativo de las PyMEs mediante arrendamiento y factoraje.</p>
+        
+        <h3>¿Cómo trabajan?</h3>
+        <p>Con Arrendamiento Puro. Te permiten financiar flotillas, maquinaria o equipo especializado sin necesidad de comprarlos de contado, con rentas que pueden ser 100% deducibles de impuestos.</p>
+        
+        <h3>Tiempo de respuesta</h3>
+        <p>Cuentan con un proceso digital ágil que permite evaluar y pre-autorizar líneas de arrendamiento de forma segura.</p>
+        
+        <h3>Ventaja principal</h3>
+        <p>Adquieres los activos productivos que tu negocio necesita para operar de inmediato, sin descapitalizarte y aprovechando grandes beneficios fiscales.</p>
+        
+        <h3>Monto Máximo de financiamiento</h3>
+        <p>Hasta $15 millones de pesos</p>
+      </div>
+    `
+  },
   { name: 'FinBe ABC', slug: 'finbe-abc', logo: '../../images/logo-finbe-abc.png' },
   { name: 'Xepelin', slug: 'xepelin', logo: 'https://almomento.mx/wp-content/uploads/2024/02/Logotipo-Xepelin-Press-Kit-1-scaled.jpg' },
   { name: 'finkargo', slug: 'finkargo', logo: '../../images/logo-finkargo.png' },
