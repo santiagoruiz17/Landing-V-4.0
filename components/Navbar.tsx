@@ -65,6 +65,12 @@ export const Navbar: React.FC = () => {
               Agenda
             </button>
             <a
+              href="/alianzas.html"
+              className="text-sm font-medium text-gray-600 hover:text-[#006d4e] transition-colors cursor-pointer"
+            >
+              Alianzas
+            </a>
+            <a
               href="https://calculadora.firma7.com"
               target="_blank"
               rel="noopener noreferrer"
@@ -109,6 +115,12 @@ export const Navbar: React.FC = () => {
             >
               Metodología
             </button>
+            <a
+              href="/alianzas.html"
+              className="block w-full text-left px-3 py-4 text-base font-medium text-gray-600 hover:text-[#006d4e] hover:bg-gray-50 transition-colors"
+            >
+              Alianzas
+            </a>
             <button
               onClick={() => scrollToSection('calendar')}
               className="block w-full text-left px-3 py-4 text-base font-medium text-gray-600 hover:text-[#006d4e] hover:bg-gray-50 transition-colors cursor-pointer"

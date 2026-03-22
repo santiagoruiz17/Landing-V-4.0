@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alianzas Estratégicas | SOC · Firma 7</title>
+  <meta name="description" content="Conoce todas las instituciones financieras con las que SOC · Firma 7 tiene alianzas estratégicas para ofrecerte las mejores soluciones de crédito empresarial." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://firma7.com/alianzas" />
+  <link rel="icon"
+    href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="%23006d4e"><circle cx="50" cy="50" r="12"/><circle cx="50" cy="20" r="12"/><circle cx="50" cy="80" r="12"/><circle cx="24" cy="35" r="12"/><circle cx="24" cy="65" r="12"/><circle cx="76" cy="35" r="12"/><circle cx="76" cy="65" r="12"/></svg>'
+    type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green: #006d4e;
+      --green-dark: #052b22;
+      --green-light: #e6f4ef;
+      --charcoal: #1a1a2e;
+      --gray-subtle: #f8f9fa;
+      --gray-border: #e9ecef;
+      --gray-text: #6c757d;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #fff;
+      color: var(--charcoal);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── NAVBAR ── */
+    .navbar {
+      position: fixed;
+      top: 0; left: 0; width: 100%;
+      z-index: 100;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--gray-border);
+      box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+    }
+    .navbar-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; cursor: pointer; }
+    .logo-icon { width: 36px; height: 36px; color: var(--green); }
+    .logo-text { display: flex; flex-direction: column; }
+    .logo-name { display: flex; align-items: center; gap: 10px; line-height: 1; }
+    .logo-name span { font-size: 1.5rem; font-weight: 700; color: var(--green); letter-spacing: -0.01em; }
+    .logo-divider { height: 24px; width: 2px; background: var(--green); }
+    .logo-sub { font-size: 0.52rem; font-weight: 700; letter-spacing: 0.18em; color: var(--green); text-transform: uppercase; margin-top: 3px; }
+
+    .nav-back {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--gray-text);
+      text-decoration: none;
+      transition: color 0.2s;
+      padding: 8px 16px;
+      border: 1px solid var(--gray-border);
+      border-radius: 6px;
+    }
+    .nav-back:hover { color: var(--green); border-color: var(--green); background: var(--green-light); }
+    .nav-back svg { width: 16px; height: 16px; }
+
+    /* ── HERO HEADER ── */
+    .page-header {
+      margin-top: 80px;
+      padding: 5rem 2rem 4rem;
+      text-align: center;
+      background: linear-gradient(160deg, var(--green-light) 0%, #fff 60%);
+      border-bottom: 1px solid var(--gray-border);
+    }
+    .page-header .eyebrow {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .eyebrow-line { width: 32px; height: 1.5px; background: var(--green); }
+    .page-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 600;
+      color: var(--charcoal);
+      line-height: 1.15;
+      margin-bottom: 1.25rem;
+    }
+    .page-header h1 em { font-style: normal; color: var(--green); }
+    .page-header p {
+      max-width: 600px;
+      margin: 0 auto;
+      font-size: 1.05rem;
+      color: var(--gray-text);
+      line-height: 1.7;
+    }
+    .counter-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 2rem;
+      padding: 8px 20px;
+      background: var(--green);
+      color: white;
+      border-radius: 100px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+    .counter-badge span { font-size: 1.1rem; font-weight: 700; }
+
+    /* ── GRID ── */
+    .partners-section {
+      flex: 1;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 4rem 2rem 5rem;
+      width: 100%;
+    }
+
+    .partners-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .partner-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      padding: 2rem 1.5rem 1.75rem;
+      background: #fff;
+      border: 1px solid var(--gray-border);
+      border-radius: 16px;
+      cursor: default;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .partner-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--green), #00a86b);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
+    }
+    .partner-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 40px rgba(0, 109, 78, 0.12);
+      border-color: transparent;
+    }
+    .partner-card:hover::before { transform: scaleX(1); }
+
+    .partner-logo-wrap {
+      width: 160px;
+      height: 88px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .partner-logo-wrap img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      mix-blend-mode: multiply;
+      filter: grayscale(30%);
+      transition: filter 0.3s ease;
+    }
+    .partner-card:hover .partner-logo-wrap img {
+      filter: grayscale(0%);
+    }
+
+    .partner-name {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--gray-text);
+      letter-spacing: 0.04em;
+      text-align: center;
+      text-transform: uppercase;
+      transition: color 0.25s;
+    }
+    .partner-card:hover .partner-name { color: var(--green); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--green-dark);
+      color: white;
+      padding: 2.5rem 2rem;
+      text-align: center;
+    }
+    footer .footer-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+    footer .logo-wrap { display: flex; align-items: center; gap: 10px; }
+    footer .f-logo-icon { width: 28px; height: 28px; color: white; }
+    footer .f-logo-name { display: flex; align-items: center; gap: 8px; }
+    footer .f-logo-name span { font-size: 1.25rem; font-weight: 700; color: white; }
+    footer .f-logo-divider { height: 20px; width: 1.5px; background: rgba(255,255,255,0.4); }
+    footer p { font-size: 0.8rem; color: rgba(255,255,255,0.45); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .partner-card { animation: fadeUp 0.4s ease both; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      .page-header { padding: 3.5rem 1.25rem 2.5rem; }
+      .partners-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+      .partner-logo-wrap { width: 120px; height: 70px; }
+      .logo-sub { display: none; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="/" class="logo-link">
+        <svg class="logo-icon" viewBox="0 0 100 100" fill="currentColor">
+          <circle cx="50" cy="50" r="12"/>
+          <circle cx="50" cy="20" r="12"/>
+          <circle cx="50" cy="80" r="12"/>
+          <circle cx="24" cy="35" r="12"/>
+          <circle cx="24" cy="65" r="12"/>
+          <circle cx="76" cy="35" r="12"/>
+          <circle cx="76" cy="65" r="12"/>
+        </svg>
+        <div class="logo-text">
+          <div class="logo-name">
+            <span>SOC</span>
+            <div class="logo-divider"></div>
+            <span style="font-weight:400;">FIRMA 7</span>
+          </div>
+          <span class="logo-sub">Líderes en Asesoría Financiera</span>
+        </div>
+      </a>
+
+      <a href="/" class="nav-back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+        Regresar
+      </a>
+    </div>
+  </nav>
+
+  <!-- HEADER -->
+  <header class="page-header">
+    <p class="eyebrow">
+      <span class="eyebrow-line"></span>
+      Red de Alianzas
+      <span class="eyebrow-line"></span>
+    </p>
+    <h1>Nuestras <em>Alianzas</em> Estratégicas</h1>
+    <p>Trabajamos con las instituciones financieras más sólidas del mercado para ofrecerte el financiamiento ideal para tu empresa.</p>
+    <div class="counter-badge">
+      <span id="partner-count">18</span> instituciones aliadas
+    </div>
+  </header>
+
+  <!-- GRID -->
+  <main class="partners-section">
+    <div class="partners-grid" id="partners-grid">
+      <!-- Cards generadas por JS -->
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="logo-wrap">
+        <svg class="f-logo-icon" viewBox="0 0 100 100" fill="currentColor">
+          <circle cx="50" cy="50" r="12"/>
+          <circle cx="50" cy="20" r="12"/>
+          <circle cx="50" cy="80" r="12"/>
+          <circle cx="24" cy="35" r="12"/>
+          <circle cx="24" cy="65" r="12"/>
+          <circle cx="76" cy="35" r="12"/>
+          <circle cx="76" cy="65" r="12"/>
+        </svg>
+        <div class="f-logo-name">
+          <span>SOC</span>
+          <div class="f-logo-divider"></div>
+          <span style="font-weight:400;">FIRMA 7</span>
+        </div>
+      </div>
+      <p>&copy; <span id="year"></span> Firma 7. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const partners = [
+      { name: 'Konfío',            logo: 'https://static.wixstatic.com/media/84b48d_c3d0407487a44c8bac8cd9dd0bed9444~mv2.png/v1/fill/w_1000,h_563,al_c,q_90,usm_0.66_1.00_0.01/84b48d_c3d0407487a44c8bac8cd9dd0bed9444~mv2.png' },
+      { name: 'PDN',               logo: '/images/logo-pdn.jpg' },
+      { name: 'UNIFIN',            logo: '/images/logo-unifin.png' },
+      { name: 'FinBe ABC',         logo: '/images/logo-finbe-abc.png' },
+      { name: 'Xepelin',           logo: 'https://almomento.mx/wp-content/uploads/2024/02/Logotipo-Xepelin-Press-Kit-1-scaled.jpg' },
+      { name: 'finkargo',          logo: '/images/logo-finkargo.png' },
+      { name: 'imagina LEASING',   logo: '/images/logo-imagina.png' },
+      { name: 'Covalto',           logo: 'https://media.cdn.teamtailor.com/images/s3/teamtailor-production/logotype-v3/image_uploads/15e2f7f9-b5a4-476a-852c-c435bc8cc489/original.png' },
+      { name: 'engen CAPITAL',     logo: '/images/logo-engen-capital.png' },
+      { name: 'hey banco',         logo: '/images/logo-hey-banco.png' },
+      { name: 'Anticipa',          logo: 'https://www.credenza.mx/img/clients/ANTICIPA.png' },
+      { name: 'axionex Financiera',logo: '/images/logo-axionex.png' },
+      { name: 'Bx+',              logo: '/images/logo-bxplus.png' },
+      { name: 'Finsus',            logo: '/images/logo-finsus.png' },
+      { name: 'Hey Cash',          logo: 'https://socasesores.com/oficinas/img/bancos/empresarial/HEY-CASH-color.png' },
+      { name: 'BANORTE',           logo: '/images/logo-banorte.png' },
+      { name: 'AFIRME',            logo: '/images/logo-afirme.png' },
+      { name: 'Creze',             logo: 'https://fincor.com.mx/wp-content/uploads/2019/08/creze222.png' },
+    ];
+
+    document.getElementById('partner-count').textContent = partners.length;
+
+    const grid = document.getElementById('partners-grid');
+
+    partners.forEach((p, i) => {
+      const card = document.createElement('div');
+      card.className = 'partner-card';
+      card.style.animationDelay = `${i * 0.045}s`;
+      card.innerHTML = `
+        <div class="partner-logo-wrap">
+          <img src="${p.logo}" alt="${p.name}" loading="lazy" />
+        </div>
+        <p class="partner-name">${p.name}</p>
+      `;
+      grid.appendChild(card);
+    });
+  </script>
+
+</body>
+</html>
