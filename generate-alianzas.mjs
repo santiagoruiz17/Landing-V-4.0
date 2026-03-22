@@ -255,7 +255,29 @@ const partners = [
       </div>
     `
   },
-  { name: 'axionex Financiera', slug: 'axionex-financiera', logo: '../../images/logo-axionex.png' },
+  { 
+    name: 'axionex Financiera', 
+    slug: 'axionex-financiera', 
+    logo: '../../images/logo-axionex.png',
+    contentHtml: `
+      <div class="partner-details">
+        <h3>¿Quiénes son?</h3>
+        <p>Es una SOFOM mexicana enfocada en impulsar el crecimiento y la operatividad de las PyMEs a través de soluciones de liquidez rápidas y personalizadas.</p>
+        
+        <h3>¿Cómo trabajan?</h3>
+        <p>Ofrecen Crédito Simple, Crédito Revolvente y Arrendamiento Financiero. Analizan el panorama completo de la empresa, por lo que el Buró de Crédito no es el factor determinante para su autorización (generalmente solicitan garantía hipotecaria).</p>
+        
+        <h3>Tiempo de respuesta</h3>
+        <p>Cuentan con un proceso de análisis ágil y transparente que les permite emitir una pre-aprobación en un lapso de 2 a 3 días.</p>
+        
+        <h3>Ventaja principal</h3>
+        <p>Flexibilidad en sus criterios de evaluación.</p>
+        
+        <h3>Monto Máximo de financiamiento</h3>
+        <p>Sus líneas de crédito y arrendamiento PyME van desde los $300,000 pesos y alcanzan hasta los $5,000,000 de pesos.</p>
+      </div>
+    `
+  },
   { name: 'Bx+', slug: 'bx-plus', logo: '../../images/logo-bxplus.png' },
   { name: 'Finsus', slug: 'finsus', logo: '../../images/logo-finsus.png' },
   { name: 'Hay Cash', slug: 'hay-cash', logo: 'https://socasesores.com/oficinas/img/bancos/empresarial/HEY-CASH-color.png' },
