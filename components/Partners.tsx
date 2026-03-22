@@ -73,7 +73,7 @@ const partners = [
     sizeClass: 'scale-90'
   },
   { 
-    name: 'Hey Cash', 
+    name: 'Hay Cash', 
     url: 'https://socasesores.com/oficinas/img/bancos/empresarial/HEY-CASH-color.png',
     sizeClass: 'scale-95'
   },
