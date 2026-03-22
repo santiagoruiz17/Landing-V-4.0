@@ -117,7 +117,29 @@ const partners = [
       </div>
     `
   },
-  { name: 'finkargo', slug: 'finkargo', logo: '../../images/logo-finkargo.png' },
+  { 
+    name: 'finkargo', 
+    slug: 'finkargo', 
+    logo: '../../images/logo-finkargo.png',
+    contentHtml: `
+      <div class="partner-details">
+        <h3>¿Quiénes son?</h3>
+        <p>Fintech especializada en financiamiento de comercio exterior, diseñada exclusivamente para potenciar las importaciones de las PyMEs en México.</p>
+        
+        <h3>¿Cómo trabajan?</h3>
+        <p>Financian la compra de tu inventario internacional. Ellos se encargan de pagarle de contado a tu proveedor en el extranjero (Asia, Europa, EE. UU., etc.), y tú les pagas a ellos a plazos (hasta 180 días), basando su análisis en tu historial aduanero y financiero sin pedir garantías hipotecarias.</p>
+        
+        <h3>Tiempo de respuesta</h3>
+        <p>Tienen un proceso de evaluación digital muy ágil. Una vez que integras tu expediente, la línea de crédito suele estar aprobada y lista para usarse en un promedio de 48 a 72 horas.</p>
+        
+        <h3>Ventaja principal</h3>
+        <p>Multiplicas tu capacidad de importar mercancía y negocias mejores precios por pago de contado con tus proveedores internacionales, todo sin afectar tu flujo de caja diario.</p>
+        
+        <h3>Monto Máximo de financiamiento</h3>
+        <p>Otorgan líneas de crédito revolventes (en dólares o pesos) que generalmente llegan hasta los $2,000,000 USD (o su equivalente en pesos), escalables según tu volumen de importación.</p>
+      </div>
+    `
+  },
   { name: 'imagina LEASING', slug: 'imagina-leasing', logo: '../../images/logo-imagina.png' },
   { name: 'Covalto', slug: 'covalto', logo: 'https://media.cdn.teamtailor.com/images/s3/teamtailor-production/logotype-v3/image_uploads/15e2f7f9-b5a4-476a-852c-c435bc8cc489/original.png' },
   { name: 'engen CAPITAL', slug: 'engen-capital', logo: '../../images/logo-engen-capital.png' },
