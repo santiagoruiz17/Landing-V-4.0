@@ -347,7 +347,29 @@ const partners = [
       </div>
     `
   },
-  { name: 'BANORTE', slug: 'banorte', logo: '../../images/logo-banorte.png' },
+  { 
+    name: 'BANORTE', 
+    slug: 'banorte', 
+    logo: '../../images/logo-banorte.png',
+    contentHtml: `
+      <div class="partner-details">
+        <h3>¿Quiénes son?</h3>
+        <p>Institución bancaria mexicana de alcance nacional, que cuenta con una división específica para la atención financiera de PyMEs y corporativos.</p>
+        
+        <h3>¿Cómo trabajan?</h3>
+        <p>Operan bajo el modelo de banca múltiple tradicional. Ofrecen Crédito Simple, requiriendo un análisis detallado de estados financieros, historial crediticio y, frecuentemente, la constitución de garantías tangibles.</p>
+        
+        <h3>Tiempo de respuesta</h3>
+        <p>Al requerir una evaluación integral y autorización mediante comité de crédito, el proceso toma en promedio de 2 a 4 semanas a partir de la entrega del expediente completo.</p>
+        
+        <h3>Ventaja principal</h3>
+        <p>Acceso a productos con tasas de interés del sector bancario tradicional.</p>
+        
+        <h3>Monto Máximo de financiamiento</h3>
+        <p>Sus líneas de crédito para el segmento PyME alcanzan generalmente hasta los $30,000,000 de pesos (pudiendo estructurar montos superiores para el sector corporativo o con garantías específicas).</p>
+      </div>
+    `
+  },
   { name: 'AFIRME', slug: 'afirme', logo: '../../images/logo-afirme.png' },
   { name: 'Creze', slug: 'creze', logo: 'https://fincor.com.mx/wp-content/uploads/2019/08/creze222.png' }
 ];
