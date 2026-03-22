@@ -163,7 +163,29 @@ const partners = [
       </div>
     `
   },
-  { name: 'Covalto', slug: 'covalto', logo: 'https://media.cdn.teamtailor.com/images/s3/teamtailor-production/logotype-v3/image_uploads/15e2f7f9-b5a4-476a-852c-c435bc8cc489/original.png' },
+  { 
+    name: 'Covalto', 
+    slug: 'covalto', 
+    logo: 'https://media.cdn.teamtailor.com/images/s3/teamtailor-production/logotype-v3/image_uploads/15e2f7f9-b5a4-476a-852c-c435bc8cc489/original.png',
+    contentHtml: `
+      <div class="partner-details">
+        <h3>¿Quiénes son?</h3>
+        <p>Banco digital y fintech mexicano (anteriormente conocido como Credijusto) fundado en 2015. Evolucionaron para convertirse en una institución bancaria regulada enfocada 100% en las PyMEs.</p>
+        
+        <h3>¿Cómo trabajan?</h3>
+        <p>Combinan la agilidad de la tecnología con la solidez de un banco tradicional. Evalúan tu facturación y ofrecen un portafolio multiproducto (crédito simple, arrendamiento y factoraje), con esquemas que pueden o no requerir garantía inmobiliaria.</p>
+        
+        <h3>Tiempo de respuesta</h3>
+        <p>Tienen una pre-aprobación digital muy rápida. Dependiendo de la estructura del crédito y las garantías, el fondeo final suele tomar entre 5 y 10 días hábiles.</p>
+        
+        <h3>Ventaja principal</h3>
+        <p>Te brindan la seguridad y capacidad de financiamiento de un banco formal, pero operando con la velocidad, atención y tecnología de una fintech moderna.</p>
+        
+        <h3>Monto Máximo de financiamiento</h3>
+        <p>Sus líneas son muy robustas, alcanzando generalmente hasta $30,000,000 de pesos para impulsar proyectos de gran calado.</p>
+      </div>
+    `
+  },
   { name: 'engen CAPITAL', slug: 'engen-capital', logo: '../../images/logo-engen-capital.png' },
   { name: 'hey banco', slug: 'hey-banco', logo: '../../images/logo-hey-banco.png' },
   { name: 'Anticipa', slug: 'anticipa', logo: 'https://www.credenza.mx/img/clients/ANTICIPA.png' },
