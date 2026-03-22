@@ -2,7 +2,29 @@ import fs from 'fs';
 import path from 'path';
 
 const partners = [
-  { name: 'Konfío', slug: 'konfio', logo: 'https://static.wixstatic.com/media/84b48d_c3d0407487a44c8bac8cd9dd0bed9444~mv2.png/v1/fill/w_1000,h_563,al_c,q_90,usm_0.66_1.00_0.01/84b48d_c3d0407487a44c8bac8cd9dd0bed9444~mv2.png' },
+  { 
+    name: 'Konfío', 
+    slug: 'konfio', 
+    logo: 'https://static.wixstatic.com/media/84b48d_c3d0407487a44c8bac8cd9dd0bed9444~mv2.png/v1/fill/w_1000,h_563,al_c,q_90,usm_0.66_1.00_0.01/84b48d_c3d0407487a44c8bac8cd9dd0bed9444~mv2.png',
+    contentHtml: `
+      <div class="partner-details">
+        <h3>¿Quiénes son?</h3>
+        <p>Fintech mexicana fundada en 2013 y regulada por la CNBV, especializada en impulsar el crecimiento de las PyMEs.</p>
+        
+        <h3>¿Cómo trabajan?</h3>
+        <p>Proceso 100% digital. Evalúan la salud de tu negocio conectándose de forma segura a tu facturación del SAT, sin exigir garantías hipotecarias ni papeleo interminable.</p>
+        
+        <h3>Tiempo de respuesta</h3>
+        <p>Pre-aprobación en cuestión de minutos. Una vez autorizado, el fondeo se deposita entre 24 y 48 horas.</p>
+        
+        <h3>Ventaja principal</h3>
+        <p>Liquidez rápida y sin fricciones burocráticas para que no pierdas oportunidades de negocio.</p>
+        
+        <h3>Monto Máximo de financiamiento</h3>
+        <p>Hasta $5 millones de pesos</p>
+      </div>
+    `
+  },
   { name: 'PDN', slug: 'pdn', logo: '../../images/logo-pdn.jpg' },
   { name: 'UNIFIN', slug: 'unifin', logo: '../../images/logo-unifin.png' },
   { name: 'FinBe ABC', slug: 'finbe-abc', logo: '../../images/logo-finbe-abc.png' },
@@ -66,6 +88,10 @@ const template = (partner) => `<!DOCTYPE html>
     h1 { font-family: 'Playfair Display', serif; font-size: 3.5rem; color: var(--charcoal); margin-bottom: 1rem; }
     p.subtitle { font-size: 1.1rem; color: var(--gray-text); line-height: 1.7; margin-bottom: 3rem; max-width: 600px; margin-left: auto; margin-right: auto; }
     
+    .partner-details { max-width: 600px; margin: 0 auto 3rem; text-align: left; background: var(--gray-subtle); padding: 2.5rem; border-radius: 16px; border: 1px solid var(--gray-border); box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+    .partner-details h3 { font-size: 1.05rem; color: var(--green); margin-bottom: 0.6rem; margin-top: 1.5rem; font-weight: 700; }
+    .partner-details h3:first-child { margin-top: 0; }
+    .partner-details p { font-size: 0.95rem; color: var(--charcoal); line-height: 1.6; }
     .contact-btn {
       display: inline-flex; align-items: center; gap: 10px; padding: 1rem 2.5rem; background: var(--green); color: white;
       text-decoration: none; font-weight: 600; border-radius: 12px; font-size: 1rem; transition: transform 0.2s, box-shadow 0.2s;
@@ -115,11 +141,11 @@ const template = (partner) => `<!DOCTYPE html>
     <div class="partner-logo-container">
       <img src="${partner.logo}" alt="Logo de ${partner.name}" />
     </div>
-    <p class="subtitle">Conoce los detalles de nuestra red de financiamiento y cómo esta alianza puede impulsar el crecimiento de tu empresa.</p>
+    ${partner.contentHtml ? partner.contentHtml : '<p class="subtitle">Conoce los detalles de nuestra red de financiamiento y cómo esta alianza puede impulsar el crecimiento de tu empresa.</p>'}
     
-    <a href="/#profiling" class="contact-btn">
-      Solicitar Diagnóstico con ${partner.name}
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+    <a href="https://api.whatsapp.com/send?phone=5215525069817&text=${encodeURIComponent(`Hola, me interesa iniciar un diagnóstico financiero con ${partner.name}. ¿Me podrían dar información?`)}" class="contact-btn" target="_blank" rel="noopener noreferrer">
+      Contactar a un asesor por WhatsApp
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
     </a>
   </main>
 
