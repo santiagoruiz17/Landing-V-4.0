@@ -5,21 +5,51 @@ const partners = [
   { 
     name: 'Konfío', 
     url: 'https://static.wixstatic.com/media/84b48d_c3d0407487a44c8bac8cd9dd0bed9444~mv2.png/v1/fill/w_1000,h_563,al_c,q_90,usm_0.66_1.00_0.01/84b48d_c3d0407487a44c8bac8cd9dd0bed9444~mv2.png',
-    sizeClass: 'scale-125' // Increased
+    sizeClass: 'scale-125'
   },
   { 
-    name: 'Finsus', 
-    url: 'https://finsus.mx/wp-content/uploads/2023/09/Logo-Finsus_800x-600x187.png',
-    sizeClass: 'scale-75' // Decreased significantly
+    name: 'PDN', 
+    url: '/images/logo-pdn.jpg',
+    sizeClass: 'scale-90'
+  },
+  { 
+    name: 'UNIFIN', 
+    url: '/images/logo-unifin.png',
+    sizeClass: 'scale-90'
+  },
+  { 
+    name: 'FinBe ABC', 
+    url: '/images/logo-finbe-abc.png',
+    sizeClass: 'scale-90'
   },
   { 
     name: 'Xepelin', 
     url: 'https://almomento.mx/wp-content/uploads/2024/02/Logotipo-Xepelin-Press-Kit-1-scaled.jpg',
-    sizeClass: 'scale-[1.7]' // Increased significantly to crop whitespace
+    sizeClass: 'scale-[1.7]'
+  },
+  { 
+    name: 'finkargo', 
+    url: '/images/logo-finkargo.png',
+    sizeClass: 'scale-90'
+  },
+  { 
+    name: 'imagina LEASING', 
+    url: '/images/logo-imagina.png',
+    sizeClass: 'scale-90'
   },
   { 
     name: 'Covalto', 
     url: 'https://media.cdn.teamtailor.com/images/s3/teamtailor-production/logotype-v3/image_uploads/15e2f7f9-b5a4-476a-852c-c435bc8cc489/original.png',
+    sizeClass: 'scale-90'
+  },
+  { 
+    name: 'engen CAPITAL', 
+    url: '/images/logo-engen-capital.png',
+    sizeClass: 'scale-90'
+  },
+  { 
+    name: 'hey banco', 
+    url: '/images/logo-hey-banco.png',
     sizeClass: 'scale-90'
   },
   { 
@@ -28,14 +58,39 @@ const partners = [
     sizeClass: 'scale-90'
   },
   { 
+    name: 'axionex Financiera', 
+    url: '/images/logo-axionex.png',
+    sizeClass: 'scale-90'
+  },
+  { 
+    name: 'Bx+', 
+    url: '/images/logo-bxplus.png',
+    sizeClass: 'scale-90'
+  },
+  { 
+    name: 'Finsus', 
+    url: '/images/logo-finsus.png',
+    sizeClass: 'scale-90'
+  },
+  { 
     name: 'Hey Cash', 
     url: 'https://socasesores.com/oficinas/img/bancos/empresarial/HEY-CASH-color.png',
     sizeClass: 'scale-95'
   },
   { 
+    name: 'BANORTE', 
+    url: '/images/logo-banorte.png',
+    sizeClass: 'scale-90'
+  },
+  { 
+    name: 'AFIRME', 
+    url: '/images/logo-afirme.png',
+    sizeClass: 'scale-90'
+  },
+  { 
     name: 'Creze', 
     url: 'https://fincor.com.mx/wp-content/uploads/2019/08/creze222.png',
-    sizeClass: 'scale-125' // Increased
+    sizeClass: 'scale-125'
   },
 ];
 
