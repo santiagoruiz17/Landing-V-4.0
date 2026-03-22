@@ -25,7 +25,29 @@ const partners = [
       </div>
     `
   },
-  { name: 'PDN', slug: 'pdn', logo: '../../images/logo-pdn.jpg' },
+  { 
+    name: 'PDN', 
+    slug: 'pdn', 
+    logo: '../../images/logo-pdn.jpg',
+    contentHtml: `
+      <div class="partner-details">
+        <h3>¿Quiénes son?</h3>
+        <p>SOFOM mexicana regulada por la CNBV con más de 17 años de trayectoria, dedicada exclusivamente a financiar el crecimiento de las PyMEs.</p>
+        
+        <h3>¿Cómo trabajan?</h3>
+        <p>Diseñan créditos empresariales a la medida. Requiriendo que la empresa tenga al menos dos años de operación.</p>
+        
+        <h3>Tiempo de respuesta</h3>
+        <p>Trámite ágil. Una vez completado el expediente y firmado el contrato, los fondos se liberan en un máximo de 72 horas.</p>
+        
+        <h3>Ventaja principal</h3>
+        <p>Flexibilidad y garantías adaptadas a la realidad de tu industria.</p>
+        
+        <h3>Monto Máximo de financiamiento</h3>
+        <p>Hasta $15 millones de pesos</p>
+      </div>
+    `
+  },
   { name: 'UNIFIN', slug: 'unifin', logo: '../../images/logo-unifin.png' },
   { name: 'FinBe ABC', slug: 'finbe-abc', logo: '../../images/logo-finbe-abc.png' },
   { name: 'Xepelin', slug: 'xepelin', logo: 'https://almomento.mx/wp-content/uploads/2024/02/Logotipo-Xepelin-Press-Kit-1-scaled.jpg' },
