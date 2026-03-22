@@ -186,7 +186,29 @@ const partners = [
       </div>
     `
   },
-  { name: 'engen CAPITAL', slug: 'engen-capital', logo: '../../images/logo-engen-capital.png' },
+  { 
+    name: 'engen CAPITAL', 
+    slug: 'engen-capital', 
+    logo: '../../images/logo-engen-capital.png',
+    contentHtml: `
+      <div class="partner-details">
+        <h3>¿Quiénes son?</h3>
+        <p>Financiera mexicana con más de 25 años de trayectoria, especializada en financiamiento de activos y crédito para medianas y grandes empresas.</p>
+        
+        <h3>¿Cómo trabajan?</h3>
+        <p>Estructuran soluciones de arrendamiento (puro y financiero) y crédito empresarial a la medida. Facilitan la adquisición de maquinaria pesada, flotillas de transporte, equipo médico y tecnología, adaptando los pagos a los flujos de tu proyecto.</p>
+        
+        <h3>Tiempo de respuesta</h3>
+        <p>Al tratarse de estructuración financiera avanzada y análisis corporativo detallado, el proceso integral de evaluación y autorización toma en promedio de 1 a 3 semanas.</p>
+        
+        <h3>Ventaja principal</h3>
+        <p>Gran capacidad para fondear proyectos intensivos en capital. Diseñan la estructura fiscal y financiera más eficiente para que adquieras equipamiento de alto valor sin descapitalizarte.</p>
+        
+        <h3>Monto Máximo de financiamiento</h3>
+        <p>Orientados a operaciones de mayor escala, manejan líneas robustas que generalmente van desde los $10,000,000 hasta superar los $100,000,000 de pesos.</p>
+      </div>
+    `
+  },
   { name: 'hey banco', slug: 'hey-banco', logo: '../../images/logo-hey-banco.png' },
   { name: 'Anticipa', slug: 'anticipa', logo: 'https://www.credenza.mx/img/clients/ANTICIPA.png' },
   { name: 'axionex Financiera', slug: 'axionex-financiera', logo: '../../images/logo-axionex.png' },
