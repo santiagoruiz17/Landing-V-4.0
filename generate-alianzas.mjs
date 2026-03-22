@@ -301,7 +301,29 @@ const partners = [
       </div>
     `
   },
-  { name: 'Finsus', slug: 'finsus', logo: '../../images/logo-finsus.png' },
+  { 
+    name: 'Finsus', 
+    slug: 'finsus', 
+    logo: '../../images/logo-finsus.png',
+    contentHtml: `
+      <div class="partner-details">
+        <h3>¿Quiénes son?</h3>
+        <p>Sociedad Financiera Popular (SOFIPO) regulada, que opera bajo un modelo 100% digital.</p>
+        
+        <h3>¿Cómo trabajan?</h3>
+        <p>Ofrecen soluciones de inversión y financiamiento para PyMEs. Evalúan la capacidad de pago mediante procesos tecnológicos, permitiendo a las empresas acceder a esquemas de crédito con o sin el requerimiento de una garantía inmobiliaria.</p>
+        
+        <h3>Tiempo de respuesta</h3>
+        <p>Al estar centralizado en una plataforma digital, la pre-aprobación inicial suele darse en cuestión de horas. El fondeo final se concreta en pocos días hábiles tras la firma y revisión del expediente.</p>
+        
+        <h3>Ventaja principal</h3>
+        <p>Trámite de solicitud completamente en línea, simplificando el acceso al crédito sin necesidad de acudir a sucursales físicas.</p>
+        
+        <h3>Monto Máximo de financiamiento</h3>
+        <p>Sus líneas de crédito para negocios alcanzan generalmente hasta $7,500,000 de pesos en esquemas sin garantía, y pueden llegar hasta $25,000,000 de pesos si se cuenta con respaldo inmobiliario.</p>
+      </div>
+    `
+  },
   { name: 'Hay Cash', slug: 'hay-cash', logo: 'https://socasesores.com/oficinas/img/bancos/empresarial/HEY-CASH-color.png' },
   { name: 'BANORTE', slug: 'banorte', logo: '../../images/logo-banorte.png' },
   { name: 'AFIRME', slug: 'afirme', logo: '../../images/logo-afirme.png' },
