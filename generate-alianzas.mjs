@@ -140,7 +140,29 @@ const partners = [
       </div>
     `
   },
-  { name: 'imagina LEASING', slug: 'imagina-leasing', logo: '../../images/logo-imagina.png' },
+  { 
+    name: 'imagina LEASING', 
+    slug: 'imagina-leasing', 
+    logo: '../../images/logo-imagina.png',
+    contentHtml: `
+      <div class="partner-details">
+        <h3>¿Quiénes son?</h3>
+        <p>Institución financiera mexicana enfocada en impulsar la productividad y competitividad de las empresas a través de soluciones estratégicas de arrendamiento.</p>
+        
+        <h3>¿Cómo trabajan?</h3>
+        <p>Facilitan el acceso a herramientas, maquinaria y equipo clave para tu negocio. En lugar de exigir compras de contado, diseñan planes de arrendamiento flexibles y personalizados apoyados en tecnología para que adquieras los bienes sin afectar tu liquidez.</p>
+        
+        <h3>Tiempo de respuesta</h3>
+        <p>Cuentan con procesos digitales muy optimizados que van desde la evaluación hasta la entrega del activo.</p>
+        
+        <h3>Ventaja principal</h3>
+        <p>Crecimiento sin barreras. Te permite escalar la operación de tu empresa de inmediato sin grandes inversiones iniciales, sumando además un fuerte acompañamiento estratégico y beneficios fiscales.</p>
+        
+        <h3>Monto Máximo de financiamiento</h3>
+        <p>Al tratarse de arrendamiento, las líneas se estructuran como un "traje a la medida", adaptándose específicamente al valor de los activos productivos que tu empresa necesite incorporar.</p>
+      </div>
+    `
+  },
   { name: 'Covalto', slug: 'covalto', logo: 'https://media.cdn.teamtailor.com/images/s3/teamtailor-production/logotype-v3/image_uploads/15e2f7f9-b5a4-476a-852c-c435bc8cc489/original.png' },
   { name: 'engen CAPITAL', slug: 'engen-capital', logo: '../../images/logo-engen-capital.png' },
   { name: 'hey banco', slug: 'hey-banco', logo: '../../images/logo-hey-banco.png' },
