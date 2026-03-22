@@ -209,7 +209,29 @@ const partners = [
       </div>
     `
   },
-  { name: 'hey banco', slug: 'hey-banco', logo: '../../images/logo-hey-banco.png' },
+  { 
+    name: 'hey banco', 
+    slug: 'hey-banco', 
+    logo: '../../images/logo-hey-banco.png',
+    contentHtml: `
+      <div class="partner-details">
+        <h3>¿Quiénes son?</h3>
+        <p>Es el brazo 100% digital de Banregio. Una institución bancaria regulada que combina la agilidad y experiencia de usuario de una fintech con el respaldo, solidez y seguridad de un banco tradicional.</p>
+        
+        <h3>¿Cómo trabajan?</h3>
+        <p>Ofrecen un ecosistema financiero completo para tu empresa. Brindan tarjetas de crédito empresariales y créditos para capital de trabajo, evaluando el historial y la facturación de tu negocio.</p>
+        
+        <h3>Tiempo de respuesta</h3>
+        <p>Todo el trámite es en línea. La pre-aprobación es inmediata y el proceso completo de evaluación y fondeo para líneas de crédito toma en promedio de 48 a 72 horas hábiles.</p>
+        
+        <h3>Ventaja principal</h3>
+        <p>Centralizas toda la operación diaria de tu negocio en una sola plataforma digital muy intuitiva.</p>
+        
+        <h3>Monto Máximo de financiamiento</h3>
+        <p>Sus líneas de crédito PyME ágiles (sin necesidad de garantía hipotecaria) alcanzan generalmente hasta los $3,000,000 de pesos.</p>
+      </div>
+    `
+  },
   { name: 'Anticipa', slug: 'anticipa', logo: 'https://www.credenza.mx/img/clients/ANTICIPA.png' },
   { name: 'axionex Financiera', slug: 'axionex-financiera', logo: '../../images/logo-axionex.png' },
   { name: 'Bx+', slug: 'bx-plus', logo: '../../images/logo-bxplus.png' },
