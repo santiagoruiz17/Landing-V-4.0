@@ -71,7 +71,29 @@ const partners = [
       </div>
     `
   },
-  { name: 'FinBe ABC', slug: 'finbe-abc', logo: '../../images/logo-finbe-abc.png' },
+  { 
+    name: 'FinBe ABC', 
+    slug: 'finbe-abc', 
+    logo: '../../images/logo-finbe-abc.png',
+    contentHtml: `
+      <div class="partner-details">
+        <h3>¿Quiénes son?</h3>
+        <p>Institución financiera respaldada por el sólido Grupo Bepensa, con fuerte presencia nacional y enfocada en PyMEs.</p>
+        
+        <h3>¿Cómo trabajan?</h3>
+        <p>Ofrecen Crédito Simple, Crédito Revolvente y Arrendamiento Puro, adaptándose al ciclo de ingresos de tu empresa para que los pagos no ahoguen tu flujo de efectivo.</p>
+        
+        <h3>Tiempo de respuesta</h3>
+        <p>Cuentan con procesos de evaluación estandarizados. Una vez integrado el expediente completo, el análisis y respuesta toman en promedio de 3 a 5 días hábiles.</p>
+        
+        <h3>Ventaja principal</h3>
+        <p>El respaldo de un gran corporativo les permite combinar líneas de crédito con arrendamiento en un solo lugar.</p>
+        
+        <h3>Monto Máximo de financiamiento</h3>
+        <p>Generalmente hasta $5,000,000 de pesos para créditos ágiles (pudiendo estructurar montos mayores dependiendo del perfil, garantías o si se trata de arrendamiento de equipo mayor).</p>
+      </div>
+    `
+  },
   { name: 'Xepelin', slug: 'xepelin', logo: 'https://almomento.mx/wp-content/uploads/2024/02/Logotipo-Xepelin-Press-Kit-1-scaled.jpg' },
   { name: 'finkargo', slug: 'finkargo', logo: '../../images/logo-finkargo.png' },
   { name: 'imagina LEASING', slug: 'imagina-leasing', logo: '../../images/logo-imagina.png' },
