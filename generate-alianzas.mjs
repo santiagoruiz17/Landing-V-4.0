@@ -324,7 +324,29 @@ const partners = [
       </div>
     `
   },
-  { name: 'Hay Cash', slug: 'hay-cash', logo: 'https://socasesores.com/oficinas/img/bancos/empresarial/HEY-CASH-color.png' },
+  { 
+    name: 'Hay Cash', 
+    slug: 'hay-cash', 
+    logo: 'https://socasesores.com/oficinas/img/bancos/empresarial/HEY-CASH-color.png',
+    contentHtml: `
+      <div class="partner-details">
+        <h3>¿Quiénes son?</h3>
+        <p>Empresa financiera mexicana especializada en brindar liquidez rápida a negocios formales a través del esquema de adelanto de ventas.</p>
+        
+        <h3>¿Cómo trabajan?</h3>
+        <p>Evalúan el historial de facturación de la Terminal Punto de Venta (TPV) del negocio (solicitando un volumen mínimo de ventas mensuales con tarjeta). El crédito se paga de manera automática mediante la retención de un porcentaje fijo sobre las ventas futuras diarias.</p>
+        
+        <h3>Tiempo de respuesta</h3>
+        <p>Su proceso es 100% digital. Una vez que se entrega la información completa y se aprueba el trámite, el fondeo se realiza en un lapso de 24 a 72 horas.</p>
+        
+        <h3>Ventaja principal</h3>
+        <p>El esquema de pago es variable y se adapta directamente al flujo de ingresos del negocio, sin plazos fijos ni cuotas forzosas.</p>
+        
+        <h3>Monto Máximo de financiamiento</h3>
+        <p>Otorgan un adelanto de capital que generalmente alcanza hasta 2.5 veces el promedio de las ventas mensuales cobradas con tarjeta.</p>
+      </div>
+    `
+  },
   { name: 'BANORTE', slug: 'banorte', logo: '../../images/logo-banorte.png' },
   { name: 'AFIRME', slug: 'afirme', logo: '../../images/logo-afirme.png' },
   { name: 'Creze', slug: 'creze', logo: 'https://fincor.com.mx/wp-content/uploads/2019/08/creze222.png' }
