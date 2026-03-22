@@ -278,7 +278,29 @@ const partners = [
       </div>
     `
   },
-  { name: 'Bx+', slug: 'bx-plus', logo: '../../images/logo-bxplus.png' },
+  { 
+    name: 'Bx+', 
+    slug: 'bx-plus', 
+    logo: '../../images/logo-bxplus.png',
+    contentHtml: `
+      <div class="partner-details">
+        <h3>¿Quiénes son?</h3>
+        <p>Institución bancaria mexicana enfocada en atender al sector empresarial, agropecuario y corporativo.</p>
+        
+        <h3>¿Cómo trabajan?</h3>
+        <p>Operan bajo un modelo de banca tradicional. Ofrecen un portafolio que incluye Crédito Simple, Crédito Revolvente, Arrendamiento y Factoraje, estructurando los financiamientos según el perfil de la empresa.</p>
+        
+        <h3>Tiempo de respuesta</h3>
+        <p>Al requerir un análisis tradicional por comité, el proceso de evaluación y autorización toma en promedio de 2 a 4 semanas una vez entregado el expediente completo.</p>
+        
+        <h3>Ventaja principal</h3>
+        <p>Ofrecen el esquema y los productos de la banca tradicional.</p>
+        
+        <h3>Monto Máximo de financiamiento</h3>
+        <p>Sus líneas de crédito corporativo suelen alcanzar hasta los $50,000,000 de pesos (el monto final depende de las garantías y el análisis del proyecto).</p>
+      </div>
+    `
+  },
   { name: 'Finsus', slug: 'finsus', logo: '../../images/logo-finsus.png' },
   { name: 'Hay Cash', slug: 'hay-cash', logo: 'https://socasesores.com/oficinas/img/bancos/empresarial/HEY-CASH-color.png' },
   { name: 'BANORTE', slug: 'banorte', logo: '../../images/logo-banorte.png' },
