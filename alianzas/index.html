@@ -7,7 +7,7 @@
   <title>Alianzas Estratégicas | SOC · Firma 7</title>
   <meta name="description" content="Conoce todas las instituciones financieras con las que SOC · Firma 7 tiene alianzas estratégicas para ofrecerte las mejores soluciones de crédito empresarial." />
   <meta name="robots" content="index, follow" />
-  <link rel="canonical" href="https://firma7.com/alianzas" />
+  <link rel="canonical" href="https://firma7.com/alianzas/" />
   <link rel="icon"
     href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="%23006d4e"><circle cx="50" cy="50" r="12"/><circle cx="50" cy="20" r="12"/><circle cx="50" cy="80" r="12"/><circle cx="24" cy="35" r="12"/><circle cx="24" cy="65" r="12"/><circle cx="76" cy="35" r="12"/><circle cx="76" cy="65" r="12"/></svg>'
     type="image/svg+xml">
@@ -56,7 +56,7 @@
       align-items: center;
       justify-content: space-between;
     }
-    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; cursor: pointer; }
+    .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
     .logo-icon { width: 36px; height: 36px; color: var(--green); }
     .logo-text { display: flex; flex-direction: column; }
     .logo-name { display: flex; align-items: center; gap: 10px; line-height: 1; }
@@ -72,10 +72,10 @@
       font-weight: 500;
       color: var(--gray-text);
       text-decoration: none;
-      transition: color 0.2s;
-      padding: 8px 16px;
+      transition: color 0.2s, border-color 0.2s, background 0.2s;
+      padding: 8px 20px;
       border: 1px solid var(--gray-border);
-      border-radius: 6px;
+      border-radius: 8px;
     }
     .nav-back:hover { color: var(--green); border-color: var(--green); background: var(--green-light); }
     .nav-back svg { width: 16px; height: 16px; }
@@ -157,7 +157,6 @@
       background: #fff;
       border: 1px solid var(--gray-border);
       border-radius: 16px;
-      cursor: default;
       transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
       position: relative;
       overflow: hidden;
@@ -194,9 +193,7 @@
       filter: grayscale(30%);
       transition: filter 0.3s ease;
     }
-    .partner-card:hover .partner-logo-wrap img {
-      filter: grayscale(0%);
-    }
+    .partner-card:hover .partner-logo-wrap img { filter: grayscale(0%); }
 
     .partner-name {
       font-size: 0.8rem;
@@ -277,7 +274,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="15 18 9 12 15 6"/>
         </svg>
-        Regresar
+        Regresar al inicio
       </a>
     </div>
   </nav>
@@ -298,9 +295,7 @@
 
   <!-- GRID -->
   <main class="partners-section">
-    <div class="partners-grid" id="partners-grid">
-      <!-- Cards generadas por JS -->
-    </div>
+    <div class="partners-grid" id="partners-grid"></div>
   </main>
 
   <!-- FOOTER -->
@@ -329,31 +324,31 @@
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
 
+    // Rutas relativas desde /alianzas/ → ../images/
     const partners = [
-      { name: 'Konfío',            logo: 'https://static.wixstatic.com/media/84b48d_c3d0407487a44c8bac8cd9dd0bed9444~mv2.png/v1/fill/w_1000,h_563,al_c,q_90,usm_0.66_1.00_0.01/84b48d_c3d0407487a44c8bac8cd9dd0bed9444~mv2.png' },
-      { name: 'PDN',               logo: '/images/logo-pdn.jpg' },
-      { name: 'UNIFIN',            logo: '/images/logo-unifin.png' },
-      { name: 'FinBe ABC',         logo: '/images/logo-finbe-abc.png' },
-      { name: 'Xepelin',           logo: 'https://almomento.mx/wp-content/uploads/2024/02/Logotipo-Xepelin-Press-Kit-1-scaled.jpg' },
-      { name: 'finkargo',          logo: '/images/logo-finkargo.png' },
-      { name: 'imagina LEASING',   logo: '/images/logo-imagina.png' },
-      { name: 'Covalto',           logo: 'https://media.cdn.teamtailor.com/images/s3/teamtailor-production/logotype-v3/image_uploads/15e2f7f9-b5a4-476a-852c-c435bc8cc489/original.png' },
-      { name: 'engen CAPITAL',     logo: '/images/logo-engen-capital.png' },
-      { name: 'hey banco',         logo: '/images/logo-hey-banco.png' },
-      { name: 'Anticipa',          logo: 'https://www.credenza.mx/img/clients/ANTICIPA.png' },
-      { name: 'axionex Financiera',logo: '/images/logo-axionex.png' },
-      { name: 'Bx+',              logo: '/images/logo-bxplus.png' },
-      { name: 'Finsus',            logo: '/images/logo-finsus.png' },
-      { name: 'Hey Cash',          logo: 'https://socasesores.com/oficinas/img/bancos/empresarial/HEY-CASH-color.png' },
-      { name: 'BANORTE',           logo: '/images/logo-banorte.png' },
-      { name: 'AFIRME',            logo: '/images/logo-afirme.png' },
-      { name: 'Creze',             logo: 'https://fincor.com.mx/wp-content/uploads/2019/08/creze222.png' },
+      { name: 'Konfío',             logo: 'https://static.wixstatic.com/media/84b48d_c3d0407487a44c8bac8cd9dd0bed9444~mv2.png/v1/fill/w_1000,h_563,al_c,q_90,usm_0.66_1.00_0.01/84b48d_c3d0407487a44c8bac8cd9dd0bed9444~mv2.png' },
+      { name: 'PDN',                logo: '../images/logo-pdn.jpg' },
+      { name: 'UNIFIN',             logo: '../images/logo-unifin.png' },
+      { name: 'FinBe ABC',          logo: '../images/logo-finbe-abc.png' },
+      { name: 'Xepelin',            logo: 'https://almomento.mx/wp-content/uploads/2024/02/Logotipo-Xepelin-Press-Kit-1-scaled.jpg' },
+      { name: 'finkargo',           logo: '../images/logo-finkargo.png' },
+      { name: 'imagina LEASING',    logo: '../images/logo-imagina.png' },
+      { name: 'Covalto',            logo: 'https://media.cdn.teamtailor.com/images/s3/teamtailor-production/logotype-v3/image_uploads/15e2f7f9-b5a4-476a-852c-c435bc8cc489/original.png' },
+      { name: 'engen CAPITAL',      logo: '../images/logo-engen-capital.png' },
+      { name: 'hey banco',          logo: '../images/logo-hey-banco.png' },
+      { name: 'Anticipa',           logo: 'https://www.credenza.mx/img/clients/ANTICIPA.png' },
+      { name: 'axionex Financiera', logo: '../images/logo-axionex.png' },
+      { name: 'Bx+',               logo: '../images/logo-bxplus.png' },
+      { name: 'Finsus',             logo: '../images/logo-finsus.png' },
+      { name: 'Hey Cash',           logo: 'https://socasesores.com/oficinas/img/bancos/empresarial/HEY-CASH-color.png' },
+      { name: 'BANORTE',            logo: '../images/logo-banorte.png' },
+      { name: 'AFIRME',             logo: '../images/logo-afirme.png' },
+      { name: 'Creze',              logo: 'https://fincor.com.mx/wp-content/uploads/2019/08/creze222.png' },
     ];
 
     document.getElementById('partner-count').textContent = partners.length;
 
     const grid = document.getElementById('partners-grid');
-
     partners.forEach((p, i) => {
       const card = document.createElement('div');
       card.className = 'partner-card';
