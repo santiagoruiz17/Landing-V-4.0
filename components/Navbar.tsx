@@ -61,9 +61,6 @@ export const Navbar: React.FC = () => {
             <button onClick={() => scrollToSection('methodology')} className="text-sm font-medium text-gray-600 hover:text-[#006d4e] transition-colors cursor-pointer" style={{ cursor: 'pointer' }}>
               Metodología
             </button>
-            <button onClick={() => scrollToSection('calendar')} className="text-sm font-medium text-gray-600 hover:text-[#006d4e] transition-colors cursor-pointer" style={{ cursor: 'pointer' }}>
-              Agenda
-            </button>
             <a
               href="/alianzas/"
               className="text-sm font-medium text-gray-600 hover:text-[#006d4e] transition-colors cursor-pointer"
@@ -121,13 +118,6 @@ export const Navbar: React.FC = () => {
             >
               Alianzas
             </a>
-            <button
-              onClick={() => scrollToSection('calendar')}
-              className="block w-full text-left px-3 py-4 text-base font-medium text-gray-600 hover:text-[#006d4e] hover:bg-gray-50 transition-colors cursor-pointer"
-              style={{ cursor: 'pointer' }}
-            >
-              Agenda
-            </button>
             <a
               href="https://calculadora.firma7.com"
               target="_blank"

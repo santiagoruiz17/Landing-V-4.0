@@ -49,83 +49,58 @@
       flex-direction: column;
     }
 
-    /* ───── NAVBAR ───── */
+    /* ───── FULL NAVBAR STYLES ───── */
     nav {
-      position: fixed;
-      top: 0; left: 0; width: 100%;
-      z-index: 100;
-      background: rgba(255,255,255,0.95);
-      backdrop-filter: blur(12px);
+      position: fixed; top: 0; left: 0; width: 100%; z-index: 100;
+      background: rgba(255,255,255,0.95); backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--gray-300);
       box-shadow: 0 1px 12px rgba(0,0,0,0.06);
     }
-
     .nav-inner {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 72px;
+      max-width: 1280px; margin: 0 auto; padding: 0 1.5rem;
+      display: flex; align-items: center; justify-content: space-between; height: 80px;
     }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      text-decoration: none;
-      cursor: pointer;
-    }
-
+    .logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; cursor: pointer; }
     .logo svg { width: 36px; height: 36px; color: var(--green); }
-
-    .logo-text {
-      display: flex;
-      flex-direction: column;
+    .logo-text { display: flex; flex-direction: column; justify-content: center; }
+    .logo-brand { display: flex; align-items: center; gap: 0.5rem; line-height: 1; margin-bottom: 3px; }
+    .logo-brand span { font-size: 1.5rem; font-weight: 700; color: var(--green); letter-spacing: -0.01em; }
+    .logo-brand .divider { height: 24px; width: 2px; background: var(--green); }
+    .logo-sub { display: none; }
+    @media (min-width: 640px) {
+      .logo-sub { display: block; font-size: 0.52rem; font-weight: 700; letter-spacing: 0.15em; color: var(--green); text-transform: uppercase; }
     }
-
-    .logo-brand {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
+    
+    .desktop-menu { display: none; align-items: center; gap: 2rem; }
+    @media (min-width: 768px) { .desktop-menu { display: flex; } }
+    
+    .nav-link { font-size: 0.875rem; font-weight: 500; color: var(--gray-600); text-decoration: none; transition: color 0.2s; cursor: pointer; }
+    .nav-link:hover { color: var(--green); }
+    .flex-icon { display: flex; align-items: center; gap: 6px; }
+    
+    .nav-btn-primary {
+      background: var(--charcoal); color: white; padding: 0.625rem 1.5rem; font-size: 0.875rem; font-weight: 500;
+      text-decoration: none; display: flex; align-items: center; gap: 8px; transition: background 0.3s;
+      box-shadow: 0 10px 15px -3px rgba(0, 109, 78, 0.2); cursor: pointer;
     }
-
-    .logo-brand span {
-      font-size: 1.35rem;
-      font-weight: 700;
-      color: var(--green);
-      letter-spacing: -0.01em;
+    .nav-btn-primary:hover { background: var(--green); }
+    
+    .mobile-toggle { background: transparent; border: none; color: var(--gray-600); cursor: pointer; display: flex; align-items: center; padding: 4px; }
+    @media (min-width: 768px) { .mobile-toggle { display: none; } }
+    .mobile-toggle:hover { color: var(--green); }
+    
+    .mobile-menu {
+      display: none; background: white; border-top: 1px solid var(--gray-200); position: absolute; width: 100%; top: 80px; left: 0; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     }
-
-    .logo-brand .divider {
-      width: 2px;
-      height: 22px;
-      background: var(--green);
+    .mobile-menu.active { display: block; }
+    
+    .mobile-nav-link {
+      display: block; padding: 1rem 1.5rem; font-size: 1rem; font-weight: 500; color: var(--gray-600); text-decoration: none; transition: background 0.2s; border-bottom: 1px solid var(--gray-100);
     }
-
-    .logo-sub {
-      font-size: 0.52rem;
-      font-weight: 700;
-      letter-spacing: 0.15em;
-      color: var(--green);
-      text-transform: uppercase;
+    .mobile-nav-link:hover { background: var(--gray-100); color: var(--green); }
+    .mobile-nav-btn {
+      display: block; padding: 1rem 1.5rem; font-size: 1rem; font-weight: 700; color: var(--green); background: var(--green-pale); text-decoration: none;
     }
-
-    .nav-back {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      text-decoration: none;
-      font-size: 0.85rem;
-      font-weight: 500;
-      color: var(--gray-600);
-      transition: color 0.2s;
-    }
-
-    .nav-back:hover { color: var(--green); }
-
-    .nav-back svg { width: 16px; height: 16px; }
 
     /* ───── HERO ───── */
     .page-hero {
@@ -883,36 +858,85 @@
       .modal-header { padding: 1.25rem 1.25rem 0.85rem; }
       .input-panel, .results-panel { padding: 1.5rem; }
     }
+
+    /* ───── FULL NAVBAR STYLES ───── */
+    nav {
+      background: white;
+      padding: 0.75rem 1.5rem;
+      border-bottom: 1px solid var(--gray-200);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    nav .nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+
   </style>
 </head>
 
 <body>
 
   <!-- NAVBAR -->
-  <nav>
+  <nav id="main-nav">
     <div class="nav-inner">
-      <a class="logo" href="https://firma7.com">
+      <a href="/" class="logo">
         <svg viewBox="0 0 100 100" fill="currentColor">
-          <circle cx="50" cy="50" r="12"/><circle cx="50" cy="20" r="12"/>
-          <circle cx="50" cy="80" r="12"/><circle cx="24" cy="35" r="12"/>
-          <circle cx="24" cy="65" r="12"/><circle cx="76" cy="35" r="12"/>
+          <circle cx="50" cy="50" r="12"/>
+          <circle cx="50" cy="20" r="12"/>
+          <circle cx="50" cy="80" r="12"/>
+          <circle cx="24" cy="35" r="12"/>
+          <circle cx="24" cy="65" r="12"/>
+          <circle cx="76" cy="35" r="12"/>
           <circle cx="76" cy="65" r="12"/>
         </svg>
         <div class="logo-text">
           <div class="logo-brand">
             <span>SOC</span>
             <div class="divider"></div>
-            <span>FIRMA 7</span>
+            <span style="font-weight:400;">FIRMA 7</span>
           </div>
           <span class="logo-sub">Líderes en Asesoría Financiera</span>
         </div>
       </a>
-      <a class="nav-back" href="https://firma7.com">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M19 12H5M12 5l-7 7 7 7"/>
-        </svg>
-        Volver al sitio principal
+
+      <!-- Desktop Menu -->
+      <div class="desktop-menu">
+        <a href="/#methodology" class="nav-link">Metodología</a>
+        <a href="/alianzas/" class="nav-link">Alianzas</a>
+        <a href="https://calculadora.firma7.com" target="_blank" class="nav-link flex-icon" style="color:var(--green);">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/></svg>
+          Calculadora
+        </a>
+        <a href="/#profiling" class="nav-btn-primary">
+          Diagnóstico Rápido 
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+      </div>
+
+      <!-- Mobile Toggle -->
+      <button class="mobile-toggle" id="mobile-toggle" aria-label="Abrir menú">
+        <svg id="icon-menu" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        <svg id="icon-close" style="display:none;" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <!-- Mobile Menu Container -->
+    <div class="mobile-menu" id="mobile-menu">
+      <a href="/#methodology" class="mobile-nav-link">Metodología</a>
+      <a href="/alianzas/" class="mobile-nav-link">Alianzas</a>
+      <a href="https://calculadora.firma7.com" target="_blank" class="mobile-nav-link flex-icon" style="color:var(--green); background:var(--gray-100);">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/></svg>
+        Calculadora de Crédito
       </a>
+      <a href="/#profiling" class="mobile-nav-btn">Iniciar Diagnóstico</a>
     </div>
   </nav>
 
