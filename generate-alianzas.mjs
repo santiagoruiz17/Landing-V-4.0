@@ -12,13 +12,13 @@ const partners = [
         <p>Fintech mexicana fundada en 2013 y regulada por la CNBV, especializada en impulsar el crecimiento de las PyMEs.</p>
         
         <h3>¿Cómo trabajan?</h3>
-        <p>Proceso 100% digital. Evalúan la salud de tu negocio conectándose de forma segura a tu facturación del SAT, sin exigir garantías hipotecarias ni papeleo interminable.</p>
+        <p>Proceso 100% digital. Evalúan la salud de tu negocio conectándose de forma segura a tu facturación del SAT, sin exigir garantías hipotecarias.</p>
         
         <h3>Tiempo de respuesta</h3>
         <p>Pre-aprobación en cuestión de minutos. Una vez autorizado, el fondeo se deposita entre 24 y 48 horas.</p>
         
         <h3>Ventaja principal</h3>
-        <p>Liquidez rápida y sin fricciones burocráticas para que no pierdas oportunidades de negocio.</p>
+        <p>Liquidez rápida, proceso 100% digital.</p>
         
         <h3>Monto Máximo de financiamiento</h3>
         <p>Hasta $5 millones de pesos</p>
