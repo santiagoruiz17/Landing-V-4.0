@@ -115,7 +115,6 @@ const template = (partner) => `<!DOCTYPE html>
     <div class="partner-logo-container">
       <img src="${partner.logo}" alt="Logo de ${partner.name}" />
     </div>
-    <h1>${partner.name}</h1>
     <p class="subtitle">Conoce los detalles de nuestra red de financiamiento y cómo esta alianza puede impulsar el crecimiento de tu empresa.</p>
     
     <a href="/#profiling" class="contact-btn">
