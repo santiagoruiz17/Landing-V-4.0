@@ -19,6 +19,17 @@ export default defineConfig(({ mode }) => {
       alias: {
         '@': path.resolve(__dirname, '.'),
       }
-    }
+    },
+    build: {
+      rollupOptions: {
+        input: {
+          main:        path.resolve(__dirname, 'index.html'),
+          alianzas:    path.resolve(__dirname, 'alianzas/index.html'),
+          calculadora: path.resolve(__dirname, 'calculadora.html'),
+          aprobado:    path.resolve(__dirname, 'aprobado.html'),
+          espera:      path.resolve(__dirname, 'espera.html'),
+        },
+      },
+    },
   };
 });

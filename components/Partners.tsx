@@ -115,7 +115,7 @@ export const Partners: React.FC = () => {
           transition={{ 
             repeat: Infinity, 
             ease: "linear", 
-            duration: 40 
+            duration: 60 
           }}
         >
           {/* We repeat the list 4 times to ensure seamless infinite scrolling on all screen sizes */}
