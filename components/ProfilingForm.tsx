@@ -1,5 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 
+// ─── N8N Webhook ──────────────────────────────────────────────────────────────
+const N8N_WEBHOOK_URL = 'https://santiagor17.app.n8n.cloud/webhook-test/956ed48a-8870-4b82-b74b-579b22e8c073';
+
+function sendToN8N(data: FormData, calificado: boolean): void {
+  const payload = {
+    ...data,
+    calificado,
+    timestamp: new Date().toISOString(),
+  };
+  fetch(N8N_WEBHOOK_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  }).catch(() => { /* fire-and-forget: silently ignore errors */ });
+}
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface FormData {
   nombreCompleto: string;
@@ -274,6 +290,7 @@ export const ProfilingForm: React.FC = () => {
   const next = () => {
     if (!validate()) return;
     if (isDescarte({ ...data })) {
+      sendToN8N(data, false);
       window.location.href = '/espera.html';
       return;
     }
@@ -285,6 +302,7 @@ export const ProfilingForm: React.FC = () => {
   // ─── Submit – last step: show celebration, then user clicks WA ─────────────
   const submit = () => {
     if (!validate()) return;
+    sendToN8N(data, true);
     setCalificado(true);
   };
 
