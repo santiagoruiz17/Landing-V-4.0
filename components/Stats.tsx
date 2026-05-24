@@ -35,7 +35,7 @@ export const Stats: React.FC = () => {
         <div className="text-center mb-16">
           <span className="text-firma-green font-semibold tracking-wider uppercase text-xs">Nuestra Trayectoria</span>
           <h2 className="mt-3 text-3xl md:text-4xl font-serif text-charcoal">
-            Resultados que construyen confianza
+            +300 empresas con crédito empresarial en México
           </h2>
         </div>
 

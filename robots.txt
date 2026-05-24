@@ -1,0 +1,14 @@
+# robots.txt — SOC · Firma 7
+# https://firma7.com/robots.txt
+
+User-agent: *
+Allow: /
+Disallow: /aprobado
+Disallow: /espera
+
+# Páginas privadas de leads — no indexar
+Disallow: /aprobado.html
+Disallow: /espera.html
+Disallow: /index-aprobado.html
+
+Sitemap: https://firma7.com/sitemap.xml

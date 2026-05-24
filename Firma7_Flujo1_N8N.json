@@ -1,0 +1,424 @@
+{
+  "name": "Firma7 — Flujo 1: Lead Notificacion Asesor",
+  "nodes": [
+    {
+      "id": "f7-001",
+      "name": "🔔 Recibir Lead Firma7",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        240,
+        320
+      ],
+      "webhookId": "firma7-leads-001",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "firma7-leads",
+        "responseMode": "onReceived",
+        "options": {}
+      }
+    },
+    {
+      "id": "f7-002",
+      "name": "⇄ Switch por Evento",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        480,
+        320
+      ],
+      "parameters": {
+        "mode": "rules",
+        "options": {},
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "c-001",
+                    "leftValue": "={{ $json.evento }}",
+                    "rightValue": "lead_capturado",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "A: Capturado"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "c-002",
+                    "leftValue": "={{ $json.evento }}",
+                    "rightValue": "lead_descartado",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "B: Descartado"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "c-003",
+                    "leftValue": "={{ $json.evento }}",
+                    "rightValue": "lead_calificado",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "C: Calificado"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "f7-003",
+      "name": "🟡 Preparar Datos Capturado",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        100
+      ],
+      "parameters": {
+        "jsCode": "// RAMA A — lead_capturado (solo paso 0: nombre, teléfono, correo)\nconst d = $input.first().json;\nconst fecha = new Date(d.timestamp).toLocaleString('es-MX', {timeZone: 'America/Mexico_City'});\n\nreturn [{\n  json: {\n    supabase_body: JSON.stringify({\n      name: d.nombreCompleto || '',\n      email: d.correo || '',\n      phone: d.numero || '',\n      source: 'formulario_web',\n      tags: ['capturado_incompleto'],\n      priority: 1,\n      internal_notes: 'Lead capturado en paso 0. No completó el formulario. Fecha: ' + fecha\n    })\n  }\n}];"
+      }
+    },
+    {
+      "id": "f7-004",
+      "name": "🟡 Supabase INSERT Capturado",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        100
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://xhlssiypzeakrqrzhirx.supabase.co/rest/v1/clients",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "sb_publishable_nuKCSWV_c5rpICg_3Puasw_QOhVxdYs"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer sb_publishable_nuKCSWV_c5rpICg_3Puasw_QOhVxdYs"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=minimal"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ $json.supabase_body }}"
+      }
+    },
+    {
+      "id": "f7-005",
+      "name": "🔴 Preparar Datos Descartado",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        320
+      ],
+      "parameters": {
+        "jsCode": "// RAMA B — lead_descartado (no califica por filtro automático)\nconst d = $input.first().json;\n\nlet motivo = 'Motivo no determinado';\nif (d.ingresos === 'Menor a 150 mil pesos') {\n  motivo = 'Ingresos insuficientes (< $150k MXN/mes)';\n} else if (d.antiguedad === 'Menor a 6 meses') {\n  motivo = 'Antigüedad insuficiente (< 6 meses)';\n} else if (d.constitucion === 'Persona Física con Actividad Empresarial' && d.buroPF === 'Malo') {\n  motivo = 'Buró malo — Persona Física';\n} else if (d.buroPMEmpresa === 'Malo') {\n  motivo = 'Buró malo — Empresa';\n} else if (d.buroPMAccionista === 'Malo') {\n  motivo = 'Buró malo — Accionista principal';\n}\n\nconst clientType = d.constitucion === 'Persona Moral' ? 'persona_moral' : 'persona_fisica';\nconst fecha = new Date(d.timestamp).toLocaleString('es-MX', {timeZone: 'America/Mexico_City'});\n\nconst waMsg =\n  '🔴 *LEAD EN ESPERA — FIRMA 7*\\n\\n' +\n  '• Nombre: ' + d.nombreCompleto + '\\n' +\n  '• WhatsApp: ' + d.numero + '\\n' +\n  '• Correo: ' + d.correo + '\\n' +\n  '• Motivo: ' + motivo + '\\n\\n' +\n  'Lead redirigido a espera.html automáticamente.\\n' +\n  '⏰ ' + fecha;\n\nreturn [{\n  json: {\n    supabase_body: JSON.stringify({\n      name: d.nombreCompleto || '',\n      email: d.correo || '',\n      phone: d.numero || '',\n      source: 'formulario_web',\n      client_type: clientType,\n      tags: ['descartado', 'filtro_automatico'],\n      priority: 1,\n      is_archived: false,\n      internal_notes: 'DESCARTADO: ' + motivo\n    }),\n    wa_body: JSON.stringify({\n      messaging_product: 'whatsapp',\n      to: '525525069817',\n      type: 'text',\n      text: { body: waMsg }\n    })\n  }\n}];"
+      }
+    },
+    {
+      "id": "f7-006",
+      "name": "🔴 Supabase UPSERT Descartado",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        320
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://xhlssiypzeakrqrzhirx.supabase.co/rest/v1/clients?on_conflict=email",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "sb_publishable_nuKCSWV_c5rpICg_3Puasw_QOhVxdYs"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer sb_publishable_nuKCSWV_c5rpICg_3Puasw_QOhVxdYs"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates,return=minimal"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ $json.supabase_body }}"
+      }
+    },
+    {
+      "id": "f7-007",
+      "name": "🔴 WhatsApp Asesor — Descarte",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1200,
+        320
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/1132603649938601/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAAaS3SyAY1UBRdHwnZCj28FR8gp4FSRuSjnWenWaimj2RZBbCOwYtDhwPzVVGvaXHC39DmKpUqGuM6GGAFSUnPLQQLFZC23k39MTdO8v38Iyu1hFvDLJ8t0sK4lFS4EA5hE5a30C7HbZBNJNvIRPwo8JZAZC2Al9Lr4PrtoYRcHv2UvaN92anDuqMZB7jSLoEXmzAZDZD"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ $json.wa_body }}"
+      }
+    },
+    {
+      "id": "f7-008",
+      "name": "🟢 Preparar Datos Calificado",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        540
+      ],
+      "parameters": {
+        "jsCode": "// RAMA C — lead_calificado (formulario completo, alta prioridad)\nconst d = $input.first().json;\n\nconst clientType = d.constitucion === 'Persona Moral' ? 'persona_moral' : 'persona_fisica';\nconst monto = parseInt((d.monto || '0').replace(/,/g, ''), 10);\nconst montoFmt = monto.toLocaleString('es-MX');\nconst fecha = new Date(d.timestamp).toLocaleString('es-MX', {timeZone: 'America/Mexico_City'});\n\nconst tags = ['calificado_web'];\nif (clientType === 'persona_moral') tags.push('persona_moral'); else tags.push('pfae');\nif (d.garantia === 'Sí') tags.push('con_garantia'); else tags.push('sin_garantia');\n\nlet buroInfo = '';\nif (d.constitucion === 'Persona Moral') {\n  buroInfo = '• Buró empresa: ' + (d.buroPMEmpresa || '—') + '\\n• Buró accionista: ' + (d.buroPMAccionista || '—') + '\\n';\n} else {\n  buroInfo = '• Buró: ' + (d.buroPF || '—') + '\\n';\n}\n\nconst notas = 'Ingresos: ' + d.ingresos +\n  ' | Antigüedad: ' + d.antiguedad +\n  ' | Cargo: ' + (d.cargo || '—') +\n  ' | Destino: ' + d.destino +\n  ' | Garantía: ' + d.garantia;\n\nconst waMsg =\n  '🟢 *LEAD CALIFICADO — FIRMA 7*\\n\\n' +\n  '📋 *SOLICITUD RECIBIDA*\\n' +\n  '• Nombre: ' + d.nombreCompleto + '\\n' +\n  '• WhatsApp: ' + d.numero + '\\n' +\n  '• Correo: ' + d.correo + '\\n' +\n  '• RFC: ' + (d.rfc || '—') + '\\n' +\n  '• Cargo: ' + (d.cargo || '—') + '\\n\\n' +\n  '🏢 *EMPRESA*\\n' +\n  '• Constitución: ' + d.constitucion + '\\n' +\n  '• Antigüedad: ' + d.antiguedad + '\\n' +\n  '• Ingresos: ' + d.ingresos + '\\n' +\n  buroInfo + '\\n' +\n  '💰 *CRÉDITO SOLICITADO*\\n' +\n  '• Monto: $' + montoFmt + ' MXN\\n' +\n  '• Destino: ' + d.destino + '\\n' +\n  '• Garantía: ' + d.garantia + '\\n\\n' +\n  '⏰ ' + fecha + '\\n\\n' +\n  '_Contáctar en las próximas 2 horas para maximizar conversión._';\n\nreturn [{\n  json: {\n    supabase_body: JSON.stringify({\n      name: d.nombreCompleto || '',\n      email: d.correo || '',\n      phone: d.numero || '',\n      rfc: d.rfc || null,\n      source: 'formulario_web',\n      client_type: clientType,\n      credit_amount_requested: monto,\n      tags: tags,\n      priority: 2,\n      is_archived: false,\n      internal_notes: notas\n    }),\n    wa_body: JSON.stringify({\n      messaging_product: 'whatsapp',\n      to: '525525069817',\n      type: 'text',\n      text: { body: waMsg }\n    })\n  }\n}];"
+      }
+    },
+    {
+      "id": "f7-009",
+      "name": "🟢 Supabase UPSERT Calificado",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        540
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://xhlssiypzeakrqrzhirx.supabase.co/rest/v1/clients?on_conflict=email",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "sb_publishable_nuKCSWV_c5rpICg_3Puasw_QOhVxdYs"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer sb_publishable_nuKCSWV_c5rpICg_3Puasw_QOhVxdYs"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates,return=minimal"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ $json.supabase_body }}"
+      }
+    },
+    {
+      "id": "f7-010",
+      "name": "🟢 WhatsApp Asesor — Lead Calificado",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1200,
+        540
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/1132603649938601/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAAaS3SyAY1UBRdHwnZCj28FR8gp4FSRuSjnWenWaimj2RZBbCOwYtDhwPzVVGvaXHC39DmKpUqGuM6GGAFSUnPLQQLFZC23k39MTdO8v38Iyu1hFvDLJ8t0sK4lFS4EA5hE5a30C7HbZBNJNvIRPwo8JZAZC2Al9Lr4PrtoYRcHv2UvaN92anDuqMZB7jSLoEXmzAZDZD"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ $json.wa_body }}"
+      }
+    }
+  ],
+  "connections": {
+    "🔔 Recibir Lead Firma7": {
+      "main": [
+        [
+          {
+            "node": "⇄ Switch por Evento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⇄ Switch por Evento": {
+      "main": [
+        [
+          {
+            "node": "🟡 Preparar Datos Capturado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "🔴 Preparar Datos Descartado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "🟢 Preparar Datos Calificado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🟡 Preparar Datos Capturado": {
+      "main": [
+        [
+          {
+            "node": "🟡 Supabase INSERT Capturado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔴 Preparar Datos Descartado": {
+      "main": [
+        [
+          {
+            "node": "🔴 Supabase UPSERT Descartado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔴 Supabase UPSERT Descartado": {
+      "main": [
+        [
+          {
+            "node": "🔴 WhatsApp Asesor — Descarte",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🟢 Preparar Datos Calificado": {
+      "main": [
+        [
+          {
+            "node": "🟢 Supabase UPSERT Calificado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🟢 Supabase UPSERT Calificado": {
+      "main": [
+        [
+          {
+            "node": "🟢 WhatsApp Asesor — Lead Calificado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

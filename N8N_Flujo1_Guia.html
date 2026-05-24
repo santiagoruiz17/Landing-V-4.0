@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>N8N Flujo 1 — Guía de Configuración · Firma 7</title>
+<style>
+  :root {
+    --green: #006d4e;
+    --green-light: #eafaf1;
+    --green-mid: #00a86b;
+    --charcoal: #1A1A1A;
+    --gray-bg: #f9fafb;
+    --gray-border: #e5e7eb;
+    --red: #dc2626;
+    --red-bg: #fef2f2;
+    --orange: #d97706;
+    --orange-bg: #fffbeb;
+    --blue: #2563eb;
+    --blue-bg: #eff6ff;
+    --purple: #7c3aed;
+    --purple-bg: #f5f3ff;
+    --dark: #111827;
+    --wa-green: #25D366;
+    --supabase-green: #3ecf8e;
+    --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    --mono: 'Consolas', 'SF Mono', 'Fira Code', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font);
+    background: var(--gray-bg);
+    color: var(--charcoal);
+    line-height: 1.6;
+    padding: 0;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--charcoal);
+    color: white;
+    padding: 32px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 4px;
+    background: linear-gradient(90deg, var(--green), var(--green-mid));
+  }
+  .header .logo { font-size: 12px; font-weight: 800; letter-spacing: 0.15em; color: #9ca3af; text-transform: uppercase; margin-bottom: 8px; }
+  .header h1 { font-size: 26px; font-weight: 700; margin-bottom: 6px; }
+  .header p { color: #9ca3af; font-size: 14px; }
+  .header .badges { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 100px; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; }
+  .badge-green { background: rgba(0,109,78,0.25); color: #4ade80; border: 1px solid rgba(0,109,78,0.4); }
+  .badge-gray { background: rgba(255,255,255,0.08); color: #9ca3af; border: 1px solid rgba(255,255,255,0.12); }
+
+  /* ── LAYOUT ── */
+  .container { max-width: 860px; margin: 0 auto; padding: 32px 24px 60px; }
+
+  /* ── SECTION ── */
+  .section { margin-bottom: 40px; }
+  .section-title {
+    font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--green); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+  }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--gray-border); }
+
+  /* ── NODE CARD ── */
+  .node {
+    border-radius: 12px;
+    border: 1.5px solid var(--gray-border);
+    background: white;
+    margin-bottom: 16px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+
+  .node-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--gray-border);
+  }
+
+  .node-num {
+    width: 28px; height: 28px; border-radius: 50%;
+    font-size: 12px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .node-type-badge {
+    font-size: 9px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 4px; flex-shrink: 0;
+  }
+
+  .node-name { font-size: 15px; font-weight: 700; flex: 1; }
+  .node-hint { font-size: 11px; color: #6b7280; }
+
+  .node-body { padding: 16px 18px; }
+
+  /* Color variants */
+  .node-webhook .node-header { background: #0f172a; }
+  .node-webhook .node-num { background: #1e40af; color: white; }
+  .node-webhook .node-type-badge { background: #1e3a8a; color: #60a5fa; }
+  .node-webhook .node-name { color: white; }
+  .node-webhook .node-hint { color: #64748b; }
+
+  .node-switch .node-header { background: var(--purple-bg); border-bottom-color: #ddd6fe; }
+  .node-switch .node-num { background: var(--purple); color: white; }
+  .node-switch .node-type-badge { background: #ddd6fe; color: var(--purple); }
+
+  .node-supabase .node-header { background: #022c22; }
+  .node-supabase .node-num { background: var(--supabase-green); color: #022c22; }
+  .node-supabase .node-type-badge { background: rgba(62,207,142,0.15); color: var(--supabase-green); }
+  .node-supabase .node-name { color: white; }
+  .node-supabase .node-hint { color: #4b5563; }
+
+  .node-wa .node-header { background: #064e3b; }
+  .node-wa .node-num { background: var(--wa-green); color: #064e3b; }
+  .node-wa .node-type-badge { background: rgba(37,211,102,0.15); color: var(--wa-green); }
+  .node-wa .node-name { color: white; }
+  .node-wa .node-hint { color: #4b5563; }
+
+  /* ── FIELD TABLE ── */
+  .field-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .field-table th {
+    text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; color: #6b7280; padding: 6px 10px;
+    background: #f9fafb; border-bottom: 1px solid var(--gray-border);
+  }
+  .field-table td { padding: 8px 10px; border-bottom: 1px solid #f3f4f6; vertical-align: top; }
+  .field-table tr:last-child td { border-bottom: none; }
+  .field-table td:first-child { font-weight: 600; white-space: nowrap; color: #374151; width: 200px; }
+  .field-table td:last-child { color: #111827; }
+
+  /* ── CODE ── */
+  code {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    background: #f1f5f9;
+    color: #0f172a;
+    padding: 1px 5px;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+  }
+
+  pre {
+    background: #0f172a;
+    color: #e2e8f0;
+    border-radius: 10px;
+    padding: 16px;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.6;
+    overflow-x: auto;
+    margin-top: 10px;
+    border: 1px solid #1e293b;
+  }
+  pre .comment { color: #64748b; }
+  pre .key { color: #7dd3fc; }
+  pre .string { color: #86efac; }
+  pre .expr { color: #c084fc; }
+  pre .num { color: #fbbf24; }
+
+  /* ── CALLOUT ── */
+  .callout {
+    border-radius: 8px; padding: 12px 14px; font-size: 12.5px; line-height: 1.5;
+    margin: 12px 0; display: flex; gap: 10px; align-items: flex-start;
+  }
+  .callout-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .callout-green { background: var(--green-light); border: 1px solid #bbf7d0; color: #14532d; }
+  .callout-orange { background: var(--orange-bg); border: 1px solid #fed7aa; color: #92400e; }
+  .callout-blue { background: var(--blue-bg); border: 1px solid #bfdbfe; color: #1e3a8a; }
+  .callout-red { background: var(--red-bg); border: 1px solid #fecaca; color: #7f1d1d; }
+
+  /* ── BRANCH HEADER ── */
+  .branch-header {
+    border-radius: 8px; padding: 8px 14px; font-size: 12px; font-weight: 700;
+    margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+  }
+  .branch-a { background: #fffbeb; border: 1.5px solid #fbbf24; color: #92400e; }
+  .branch-b { background: var(--red-bg); border: 1.5px solid #fca5a5; color: #7f1d1d; }
+  .branch-c { background: var(--green-light); border: 1.5px solid #86efac; color: #14532d; }
+
+  /* ── MESSAGE TEMPLATE ── */
+  .msg-template {
+    background: #0f172a;
+    border-radius: 10px;
+    padding: 16px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    line-height: 1.7;
+    color: #e2e8f0;
+    border: 1px solid #1e293b;
+    margin-top: 10px;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .msg-template .wa-expr { color: #c084fc; }
+  .msg-template .wa-bold { color: #fbbf24; }
+
+  /* ── STEP INDICATOR ── */
+  .steps-nav { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+  .step-pill { padding: 5px 12px; border-radius: 100px; font-size: 11px; font-weight: 700;
+    background: white; border: 1.5px solid var(--gray-border); color: #6b7280; cursor: default; }
+  .step-pill.active { background: var(--green); border-color: var(--green); color: white; }
+
+  /* ── CREDENTIAL BOX ── */
+  .cred-box { background: #0f172a; border-radius: 10px; padding: 14px 16px; margin-top: 10px; border: 1px solid #1e293b; }
+  .cred-row { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid #1e293b; font-size: 12px; }
+  .cred-row:last-child { border-bottom: none; }
+  .cred-key { color: #7dd3fc; font-family: var(--mono); width: 200px; flex-shrink: 0; }
+  .cred-val { color: #86efac; font-family: var(--mono); }
+  .cred-note { color: #94a3b8; font-size: 10px; }
+
+  /* ── CHECKLIST ── */
+  .checklist { list-style: none; }
+  .checklist li { display: flex; gap: 8px; align-items: flex-start; padding: 6px 0; font-size: 13px; border-bottom: 1px solid #f3f4f6; }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist .check { color: var(--green); font-size: 16px; flex-shrink: 0; line-height: 1.3; }
+
+  /* TOC */
+  .toc { background: white; border-radius: 12px; border: 1px solid var(--gray-border); padding: 16px 20px; margin-bottom: 32px; }
+  .toc h3 { font-size: 12px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #6b7280; margin-bottom: 10px; }
+  .toc ol { list-style: none; }
+  .toc li { padding: 4px 0; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+  .toc li::before { content: attr(data-n); width: 20px; height: 20px; background: var(--green); color: white; border-radius: 50%; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+  hr { border: none; border-top: 1px solid var(--gray-border); margin: 24px 0; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">Firma 7 · Automatización N8N</div>
+  <h1>Flujo 1 — Lead → Notificación al Asesor</h1>
+  <p>Guía de configuración nodo a nodo. Abre esta página mientras configuras N8N.</p>
+  <div class="badges">
+    <span class="badge badge-green">3 rutas de eventos</span>
+    <span class="badge badge-gray">Supabase · tabla clients</span>
+    <span class="badge badge-gray">WhatsApp Business API</span>
+    <span class="badge badge-gray">Proyecto: xhlssiypzeakrqrzhirx</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="toc">
+    <h3>Contenido</h3>
+    <ol>
+      <li data-n="1">Credenciales necesarias antes de empezar</li>
+      <li data-n="2">Nodo 1 · Webhook (trigger)</li>
+      <li data-n="3">Nodo 2 · Switch por evento</li>
+      <li data-n="4">Rama A · lead_capturado → Supabase INSERT</li>
+      <li data-n="5">Rama B · lead_descartado → Supabase + WhatsApp alerta</li>
+      <li data-n="6">Rama C · lead_calificado → Supabase + WhatsApp lead completo</li>
+      <li data-n="7">Templates de mensajes WhatsApp</li>
+      <li data-n="8">Activar flujo y conectar ProfilingForm.tsx</li>
+    </ol>
+  </div>
+
+  <!-- ──────────────────────────────────────────────
+       SECCIÓN 1 — CREDENCIALES
+  ─────────────────────────────────────────────── -->
+  <div class="section">
+    <div class="section-title">1 · Credenciales necesarias antes de empezar</div>
+
+    <div class="callout callout-orange">
+      <span class="callout-icon">⚠️</span>
+      <div>Configura estas credenciales en N8N (<strong>Settings → Credentials</strong>) antes de construir el flujo. Si ya tienes alguna guardada, solo referénciala al crear el nodo.</div>
+    </div>
+
+    <div class="node">
+      <div class="node-header node-supabase" style="background:#022c22;">
+        <div class="node-num" style="background:#3ecf8e;color:#022c22;">SB</div>
+        <span class="node-type-badge" style="background:rgba(62,207,142,0.15);color:#3ecf8e;">Credencial</span>
+        <span class="node-name" style="color:white;">Supabase · Header Auth</span>
+      </div>
+      <div class="node-body">
+        <p style="font-size:12.5px;color:#6b7280;margin-bottom:10px;">En N8N usa <strong>HTTP Request</strong> con autenticación tipo <strong>Header Auth</strong>:</p>
+        <div class="cred-box">
+          <div class="cred-row">
+            <span class="cred-key">Name (header)</span>
+            <span class="cred-val">apikey</span>
+          </div>
+          <div class="cred-row">
+            <span class="cred-key">Value</span>
+            <span class="cred-val">[tu anon key de Supabase]</span>
+            <span class="cred-note">Dashboard → Settings → API</span>
+          </div>
+        </div>
+        <p style="font-size:11px;color:#9ca3af;margin-top:8px;">También agrega el header <code>Authorization: Bearer [anon key]</code> manualmente en cada nodo Supabase.</p>
+        <p style="font-size:11px;color:#9ca3af;margin-top:4px;"><strong style="color:#6b7280;">Project URL:</strong> <code>https://xhlssiypzeakrqrzhirx.supabase.co</code></p>
+      </div>
+    </div>
+
+    <div class="node">
+      <div class="node-header" style="background:#064e3b;">
+        <div class="node-num" style="background:#25D366;color:#064e3b;">WA</div>
+        <span class="node-type-badge" style="background:rgba(37,211,102,0.15);color:#25D366;">Credencial</span>
+        <span class="node-name" style="color:white;">WhatsApp Business · HTTP Header Auth</span>
+      </div>
+      <div class="node-body">
+        <p style="font-size:12.5px;color:#6b7280;margin-bottom:10px;">Usa <strong>HTTP Request</strong> con Header Auth:</p>
+        <div class="cred-box">
+          <div class="cred-row">
+            <span class="cred-key">Name (header)</span>
+            <span class="cred-val">Authorization</span>
+          </div>
+          <div class="cred-row">
+            <span class="cred-key">Value</span>
+            <span class="cred-val">Bearer [EAABs...tu token de Meta]</span>
+            <span class="cred-note">Meta Developers → WhatsApp → Access Token</span>
+          </div>
+        </div>
+        <div class="callout callout-blue" style="margin-top:10px;">
+          <span class="callout-icon">📱</span>
+          <div><strong>Phone Number ID:</strong> Lo encuentras en Meta Developers → Tu App → WhatsApp → API Setup. Lo necesitas en la URL: <code>https://graph.facebook.com/v19.0/<strong>{PHONE_NUMBER_ID}</strong>/messages</code></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────────────
+       NODO 1 — WEBHOOK
+  ─────────────────────────────────────────────── -->
+  <div class="section">
+    <div class="section-title">2 · Nodo 1 · Webhook (Trigger)</div>
+
+    <div class="node node-webhook">
+      <div class="node-header">
+        <div class="node-num">1</div>
+        <span class="node-type-badge">Webhook</span>
+        <span class="node-name">Recibir leads desde Firma 7</span>
+        <span class="node-hint">Trigger · HTTP POST</span>
+      </div>
+      <div class="node-body">
+        <table class="field-table">
+          <tr><th>Campo</th><th>Valor</th></tr>
+          <tr><td>HTTP Method</td><td><code>POST</code></td></tr>
+          <tr><td>Path</td><td><code>firma7-leads</code> (o lo que prefieras — N8N genera la URL)</td></tr>
+          <tr><td>Authentication</td><td><code>None</code> (el endpoint es privado — solo la landing lo llama)</td></tr>
+          <tr><td>Response Mode</td><td><code>Respond with → Using "Respond to Webhook" node</code> <em>o</em> <code>Immediately</code></td></tr>
+        </table>
+
+        <div class="callout callout-green" style="margin-top:14px;">
+          <span class="callout-icon">✅</span>
+          <div>
+            <strong>URL que N8N te da:</strong> Hay dos URLs:<br>
+            • <strong>Test:</strong> <code>https://santiagor17.app.n8n.cloud/webhook-test/{id}</code> — solo funciona con el flujo en modo TEST<br>
+            • <strong>Production:</strong> <code>https://santiagor17.app.n8n.cloud/webhook/{id}</code> — funciona con el flujo ACTIVO<br><br>
+            Copia la URL de <strong>Production</strong> y pégala en <code>ProfilingForm.tsx</code> en la variable <code>N8N_WEBHOOK_URL_PROD</code>.
+          </div>
+        </div>
+
+        <p style="font-size:12px;color:#6b7280;margin-top:10px;"><strong>Datos que llegan en el body (JSON):</strong></p>
+        <pre><span class="comment">// Todos los campos que puede recibir el webhook:</span>
+{
+  <span class="key">"nombreCompleto"</span>: <span class="string">"Juan García Pérez"</span>,
+  <span class="key">"numero"</span>:         <span class="string">"5512345678"</span>,
+  <span class="key">"correo"</span>:         <span class="string">"juan@empresa.com"</span>,
+  <span class="key">"rfc"</span>:            <span class="string">"GAEJ800101ABC"</span>,    <span class="comment">// vacío en lead_capturado y a veces lead_descartado</span>
+  <span class="key">"cargo"</span>:          <span class="string">"Director General"</span>,
+  <span class="key">"ingresos"</span>:       <span class="string">"Más de 500 mil pesos"</span>,
+  <span class="key">"antiguedad"</span>:     <span class="string">"Más de 2 años"</span>,
+  <span class="key">"constitucion"</span>:   <span class="string">"Persona Moral"</span>,   <span class="comment">// o "Persona Física con Actividad Empresarial"</span>
+  <span class="key">"buroPF"</span>:         <span class="string">""</span>,
+  <span class="key">"buroPFDetalle"</span>:  <span class="string">""</span>,
+  <span class="key">"buroPMEmpresa"</span>:  <span class="string">"Bueno"</span>,
+  <span class="key">"buroPMAccionista"</span>:<span class="string">"Bueno"</span>,
+  <span class="key">"monto"</span>:          <span class="string">"1,500,000"</span>,       <span class="comment">// con comas — parsear como número</span>
+  <span class="key">"destino"</span>:        <span class="string">"Capital de trabajo para inventario"</span>,
+  <span class="key">"garantia"</span>:       <span class="string">"Sí"</span>,
+  <span class="key">"calificado"</span>:     <span class="num">true</span>,              <span class="comment">// boolean</span>
+  <span class="key">"evento"</span>:         <span class="string">"lead_calificado"</span>, <span class="comment">// "lead_capturado" | "lead_descartado" | "lead_calificado"</span>
+  <span class="key">"timestamp"</span>:      <span class="string">"2026-05-21T15:30:00.000Z"</span>
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────────────
+       NODO 2 — SWITCH
+  ─────────────────────────────────────────────── -->
+  <div class="section">
+    <div class="section-title">3 · Nodo 2 · Switch por evento</div>
+
+    <div class="node node-switch">
+      <div class="node-header">
+        <div class="node-num">2</div>
+        <span class="node-type-badge">Switch</span>
+        <span class="node-name">Enrutar por tipo de evento</span>
+        <span class="node-hint">Separar las 3 rutas</span>
+      </div>
+      <div class="node-body">
+        <p style="font-size:12.5px;color:#6b7280;margin-bottom:12px;">Agrega el nodo <strong>Switch</strong> (Core Nodes) y configura estas 3 reglas:</p>
+        <table class="field-table">
+          <tr><th>Salida (Output)</th><th>Condición</th><th>Valor</th></tr>
+          <tr>
+            <td>Output 1 → Rama A</td>
+            <td><code>{{ $json.evento }}</code> equals</td>
+            <td><code>lead_capturado</code></td>
+          </tr>
+          <tr>
+            <td>Output 2 → Rama B</td>
+            <td><code>{{ $json.evento }}</code> equals</td>
+            <td><code>lead_descartado</code></td>
+          </tr>
+          <tr>
+            <td>Output 3 → Rama C</td>
+            <td><code>{{ $json.evento }}</code> equals</td>
+            <td><code>lead_calificado</code></td>
+          </tr>
+        </table>
+        <div class="callout callout-blue" style="margin-top:12px;">
+          <span class="callout-icon">ℹ️</span>
+          <div>En N8N el nodo Switch separa el flujo en outputs. Conecta cada output al primer nodo de su rama correspondiente.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────────────
+       RAMA A — LEAD CAPTURADO
+  ─────────────────────────────────────────────── -->
+  <div class="section">
+    <div class="section-title">4 · Rama A · lead_capturado</div>
+
+    <div class="branch-header branch-a">🟡 Rama A — lead_capturado · Solo contacto inicial (abandonó antes de calificar)</div>
+
+    <div class="node node-supabase">
+      <div class="node-header">
+        <div class="node-num">3A</div>
+        <span class="node-type-badge">HTTP Request</span>
+        <span class="node-name">Supabase · INSERT contacto parcial</span>
+        <span class="node-hint">tabla: clients</span>
+      </div>
+      <div class="node-body">
+        <table class="field-table">
+          <tr><th>Campo N8N</th><th>Valor</th></tr>
+          <tr><td>Method</td><td><code>POST</code></td></tr>
+          <tr><td>URL</td><td><code>https://xhlssiypzeakrqrzhirx.supabase.co/rest/v1/clients</code></td></tr>
+          <tr><td>Authentication</td><td>Header Auth (la credencial Supabase que creaste)</td></tr>
+        </table>
+
+        <p style="font-size:12px;color:#6b7280;margin:12px 0 6px;"><strong>Headers adicionales (Add Header):</strong></p>
+        <table class="field-table">
+          <tr><th>Header</th><th>Valor</th></tr>
+          <tr><td><code>Authorization</code></td><td><code>Bearer [tu anon key]</code></td></tr>
+          <tr><td><code>Content-Type</code></td><td><code>application/json</code></td></tr>
+          <tr><td><code>Prefer</code></td><td><code>return=minimal</code></td></tr>
+        </table>
+
+        <p style="font-size:12px;color:#6b7280;margin:12px 0 6px;"><strong>Body (JSON):</strong></p>
+        <pre>{
+  <span class="key">"name"</span>:     <span class="expr">{{ $json.nombreCompleto }}</span>,
+  <span class="key">"email"</span>:    <span class="expr">{{ $json.correo }}</span>,
+  <span class="key">"phone"</span>:    <span class="expr">{{ $json.numero }}</span>,
+  <span class="key">"source"</span>:   <span class="string">"formulario_web"</span>,
+  <span class="key">"tags"</span>:     <span class="string">["capturado_incompleto"]</span>,
+  <span class="key">"priority"</span>: <span class="num">1</span>,
+  <span class="key">"internal_notes"</span>: <span class="string">"Lead capturado en paso 0 — no completó el formulario"</span>
+}</pre>
+
+        <div class="callout callout-orange" style="margin-top:10px;">
+          <span class="callout-icon">💡</span>
+          <div>Esta rama <strong>no envía WhatsApp</strong>. Solo guarda el contacto para no perder el dato. Si después completan el formulario, el UPSERT de las ramas B/C lo actualizará.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────────────
+       RAMA B — LEAD DESCARTADO
+  ─────────────────────────────────────────────── -->
+  <div class="section">
+    <div class="section-title">5 · Rama B · lead_descartado</div>
+
+    <div class="branch-header branch-b">🔴 Rama B — lead_descartado · No califica por filtro automático</div>
+
+    <!-- NODO SET — calcular motivo -->
+    <div class="node" style="border-color:#fca5a5;">
+      <div class="node-header" style="background:#fef2f2;border-bottom-color:#fecaca;">
+        <div class="node-num" style="background:#dc2626;color:white;">3B</div>
+        <span class="node-type-badge" style="background:#fecaca;color:#7f1d1d;">Set</span>
+        <span class="node-name">Calcular motivo de descarte</span>
+        <span class="node-hint">Para Supabase y WhatsApp</span>
+      </div>
+      <div class="node-body">
+        <p style="font-size:12.5px;color:#6b7280;margin-bottom:10px;">Agrega un nodo <strong>Set</strong> para detectar el motivo de descarte:</p>
+        <p style="font-size:12px;color:#374151;margin-bottom:6px;"><strong>Variable nueva → Name:</strong> <code>motivoDescarte</code></p>
+        <p style="font-size:12px;color:#374151;margin-bottom:6px;"><strong>Value (Expression):</strong></p>
+        <pre><span class="comment">// Pega esta expresión en el campo Value:</span>
+<span class="expr">{{
+  $json.ingresos === 'Menor a 150 mil pesos'
+    ? 'Ingresos insuficientes (< 150k MXN/mes)'
+    : $json.antiguedad === 'Menor a 6 meses'
+    ? 'Antigüedad insuficiente (< 6 meses)'
+    : $json.constitucion === 'Persona Física con Actividad Empresarial' && $json.buroPF === 'Malo'
+    ? 'Buró malo — Persona Física'
+    : $json.buroPMEmpresa === 'Malo'
+    ? 'Buró malo — Empresa'
+    : $json.buroPMAccionista === 'Malo'
+    ? 'Buró malo — Accionista principal'
+    : 'Motivo no determinado'
+}}</span></pre>
+      </div>
+    </div>
+
+    <!-- NODO SUPABASE B -->
+    <div class="node node-supabase">
+      <div class="node-header">
+        <div class="node-num">4B</div>
+        <span class="node-type-badge">HTTP Request</span>
+        <span class="node-name">Supabase · UPSERT lead descartado</span>
+        <span class="node-hint">tabla: clients · on conflict: email</span>
+      </div>
+      <div class="node-body">
+        <table class="field-table">
+          <tr><th>Campo N8N</th><th>Valor</th></tr>
+          <tr><td>Method</td><td><code>POST</code></td></tr>
+          <tr><td>URL</td><td><code>https://xhlssiypzeakrqrzhirx.supabase.co/rest/v1/clients?on_conflict=email</code></td></tr>
+          <tr><td>Authentication</td><td>Header Auth (credencial Supabase)</td></tr>
+        </table>
+
+        <p style="font-size:12px;color:#6b7280;margin:12px 0 6px;"><strong>Headers:</strong></p>
+        <table class="field-table">
+          <tr><th>Header</th><th>Valor</th></tr>
+          <tr><td><code>Authorization</code></td><td><code>Bearer [anon key]</code></td></tr>
+          <tr><td><code>Content-Type</code></td><td><code>application/json</code></td></tr>
+          <tr><td><code>Prefer</code></td><td><code>resolution=merge-duplicates,return=minimal</code></td></tr>
+        </table>
+
+        <p style="font-size:12px;color:#6b7280;margin:12px 0 6px;"><strong>Body (JSON):</strong></p>
+        <pre>{
+  <span class="key">"name"</span>:          <span class="expr">{{ $json.nombreCompleto }}</span>,
+  <span class="key">"email"</span>:         <span class="expr">{{ $json.correo }}</span>,
+  <span class="key">"phone"</span>:         <span class="expr">{{ $json.numero }}</span>,
+  <span class="key">"source"</span>:        <span class="string">"formulario_web"</span>,
+  <span class="key">"tags"</span>:          <span class="string">["descartado", "filtro_automatico"]</span>,
+  <span class="key">"priority"</span>:      <span class="num">1</span>,
+  <span class="key">"client_type"</span>:   <span class="expr">{{ $json.constitucion === 'Persona Moral' ? 'persona_moral' : 'persona_fisica' }}</span>,
+  <span class="key">"internal_notes"</span>: <span class="expr">{{ 'DESCARTADO: ' + $node["Calcular motivo de descarte"].json.motivoDescarte }}</span>,
+  <span class="key">"is_archived"</span>:   <span class="num">false</span>
+}</pre>
+      </div>
+    </div>
+
+    <!-- NODO WA B -->
+    <div class="node node-wa">
+      <div class="node-header">
+        <div class="node-num">5B</div>
+        <span class="node-type-badge">HTTP Request</span>
+        <span class="node-name">WhatsApp → Asesor · Alerta descarte</span>
+        <span class="node-hint">Notificación rápida</span>
+      </div>
+      <div class="node-body">
+        <table class="field-table">
+          <tr><th>Campo N8N</th><th>Valor</th></tr>
+          <tr><td>Method</td><td><code>POST</code></td></tr>
+          <tr><td>URL</td><td><code>https://graph.facebook.com/v19.0/<strong>[PHONE_NUMBER_ID]</strong>/messages</code></td></tr>
+          <tr><td>Authentication</td><td>Header Auth (credencial WhatsApp)</td></tr>
+        </table>
+
+        <p style="font-size:12px;color:#6b7280;margin:12px 0 6px;"><strong>Body (JSON):</strong></p>
+        <pre>{
+  <span class="key">"messaging_product"</span>: <span class="string">"whatsapp"</span>,
+  <span class="key">"to"</span>:                <span class="string">"525525069817"</span>,  <span class="comment">// número del asesor</span>
+  <span class="key">"type"</span>:              <span class="string">"text"</span>,
+  <span class="key">"text"</span>: {
+    <span class="key">"body"</span>: <span class="expr">{{ "🔴 *LEAD EN ESPERA — FIRMA 7*\n\n" +
+      "• Nombre: " + $json.nombreCompleto + "\n" +
+      "• WhatsApp: " + $json.numero + "\n" +
+      "• Correo: " + $json.correo + "\n" +
+      "• Motivo: " + $node["Calcular motivo de descarte"].json.motivoDescarte + "\n\n" +
+      "El lead fue redirigido a espera.html automáticamente.\n" +
+      "⏰ " + new Date($json.timestamp).toLocaleString('es-MX', {timeZone:'America/Mexico_City'}) }}</span>
+  }
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────────────
+       RAMA C — LEAD CALIFICADO
+  ─────────────────────────────────────────────── -->
+  <div class="section">
+    <div class="section-title">6 · Rama C · lead_calificado ⭐</div>
+
+    <div class="branch-header branch-c">🟢 Rama C — lead_calificado · Completó los 9 pasos · Alta prioridad</div>
+
+    <!-- NODO SUPABASE C -->
+    <div class="node node-supabase">
+      <div class="node-header">
+        <div class="node-num">3C</div>
+        <span class="node-type-badge">HTTP Request</span>
+        <span class="node-name">Supabase · UPSERT lead calificado completo</span>
+        <span class="node-hint">tabla: clients · on conflict: email</span>
+      </div>
+      <div class="node-body">
+        <table class="field-table">
+          <tr><th>Campo N8N</th><th>Valor</th></tr>
+          <tr><td>Method</td><td><code>POST</code></td></tr>
+          <tr><td>URL</td><td><code>https://xhlssiypzeakrqrzhirx.supabase.co/rest/v1/clients?on_conflict=email</code></td></tr>
+          <tr><td>Authentication</td><td>Header Auth (credencial Supabase)</td></tr>
+        </table>
+
+        <p style="font-size:12px;color:#6b7280;margin:12px 0 6px;"><strong>Headers:</strong></p>
+        <table class="field-table">
+          <tr><th>Header</th><th>Valor</th></tr>
+          <tr><td><code>Authorization</code></td><td><code>Bearer [anon key]</code></td></tr>
+          <tr><td><code>Content-Type</code></td><td><code>application/json</code></td></tr>
+          <tr><td><code>Prefer</code></td><td><code>resolution=merge-duplicates,return=minimal</code></td></tr>
+        </table>
+
+        <p style="font-size:12px;color:#6b7280;margin:12px 0 6px;"><strong>Body (JSON):</strong></p>
+        <pre>{
+  <span class="key">"name"</span>:                    <span class="expr">{{ $json.nombreCompleto }}</span>,
+  <span class="key">"email"</span>:                   <span class="expr">{{ $json.correo }}</span>,
+  <span class="key">"phone"</span>:                   <span class="expr">{{ $json.numero }}</span>,
+  <span class="key">"rfc"</span>:                     <span class="expr">{{ $json.rfc }}</span>,
+  <span class="key">"source"</span>:                  <span class="string">"formulario_web"</span>,
+  <span class="key">"client_type"</span>:            <span class="expr">{{ $json.constitucion === 'Persona Moral' ? 'persona_moral' : 'persona_fisica' }}</span>,
+  <span class="key">"credit_amount_requested"</span>: <span class="expr">{{ parseInt($json.monto.replace(/,/g, '')) }}</span>,
+  <span class="key">"tags"</span>:                    <span class="expr">{{ ["calificado_web", $json.constitucion === 'Persona Moral' ? 'persona_moral' : 'pfae', $json.garantia === 'Sí' ? 'con_garantia' : 'sin_garantia'] }}</span>,
+  <span class="key">"priority"</span>:               <span class="num">2</span>,
+  <span class="key">"is_archived"</span>:            <span class="num">false</span>,
+  <span class="key">"internal_notes"</span>:         <span class="expr">{{ "Ingresos: " + $json.ingresos + " | Antigüedad: " + $json.antiguedad + " | Cargo: " + $json.cargo + " | Destino: " + $json.destino + " | Garantía: " + $json.garantia }}</span>
+}</pre>
+
+        <div class="callout callout-blue" style="margin-top:10px;">
+          <span class="callout-icon">📌</span>
+          <div><strong>pipeline_stage_id:</strong> Si quieres asignarlo, busca el UUID de la etapa "Contacto inicial" corriendo en Supabase: <code>SELECT id, name FROM pipeline_stages ORDER BY order_index;</code> y pega el UUID como string en el body.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NODO WA C -->
+    <div class="node node-wa">
+      <div class="node-header">
+        <div class="node-num">4C</div>
+        <span class="node-type-badge">HTTP Request</span>
+        <span class="node-name">WhatsApp → Asesor · Lead calificado completo</span>
+        <span class="node-hint">Mensaje con ficha completa</span>
+      </div>
+      <div class="node-body">
+        <table class="field-table">
+          <tr><th>Campo N8N</th><th>Valor</th></tr>
+          <tr><td>Method</td><td><code>POST</code></td></tr>
+          <tr><td>URL</td><td><code>https://graph.facebook.com/v19.0/<strong>[PHONE_NUMBER_ID]</strong>/messages</code></td></tr>
+          <tr><td>Authentication</td><td>Header Auth (credencial WhatsApp)</td></tr>
+        </table>
+
+        <p style="font-size:12px;color:#6b7280;margin:12px 0 6px;"><strong>Body (JSON):</strong></p>
+        <pre>{
+  <span class="key">"messaging_product"</span>: <span class="string">"whatsapp"</span>,
+  <span class="key">"to"</span>:                <span class="string">"525525069817"</span>,
+  <span class="key">"type"</span>:              <span class="string">"text"</span>,
+  <span class="key">"text"</span>: {
+    <span class="key">"body"</span>: <span class="expr">{{ "🟢 *LEAD CALIFICADO — FIRMA 7*\n\n" +
+      "📋 *SOLICITUD RECIBIDA*\n" +
+      "• Nombre: " + $json.nombreCompleto + "\n" +
+      "• WhatsApp: " + $json.numero + "\n" +
+      "• Correo: " + $json.correo + "\n" +
+      "• RFC: " + ($json.rfc || "—") + "\n" +
+      "• Cargo: " + $json.cargo + "\n\n" +
+      "🏢 *EMPRESA*\n" +
+      "• Constitución: " + $json.constitucion + "\n" +
+      "• Antigüedad: " + $json.antiguedad + "\n" +
+      "• Ingresos: " + $json.ingresos + "\n" +
+      ($json.constitucion === 'Persona Moral'
+        ? "• Buró empresa: " + $json.buroPMEmpresa + "\n• Buró accionista: " + $json.buroPMAccionista + "\n"
+        : "• Buró: " + $json.buroPF + "\n") +
+      "\n💰 *CRÉDITO SOLICITADO*\n" +
+      "• Monto: $" + parseInt($json.monto.replace(/,/g,''), 10).toLocaleString('es-MX') + " MXN\n" +
+      "• Destino: " + $json.destino + "\n" +
+      "• Garantía: " + $json.garantia + "\n\n" +
+      "⏰ " + new Date($json.timestamp).toLocaleString('es-MX', {timeZone:'America/Mexico_City'}) + "\n\n" +
+      "_Contáctar en las próximas 2 horas para maximizar conversión._" }}</span>
+  }
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────────────
+       MENSAJES WA — PREVIEW
+  ─────────────────────────────────────────────── -->
+  <div class="section">
+    <div class="section-title">7 · Preview de mensajes WhatsApp</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+
+      <div>
+        <div class="branch-header branch-b" style="margin-bottom:8px;">🔴 Mensaje descarte (Rama B)</div>
+        <div class="msg-template">🔴 <span class="wa-bold">*LEAD EN ESPERA — FIRMA 7*</span>
+
+• Nombre: Juan García Pérez
+• WhatsApp: 5512345678
+• Correo: juan@empresa.com
+• Motivo: Ingresos insuficientes (< 150k MXN/mes)
+
+El lead fue redirigido a espera.html automáticamente.
+⏰ 21/05/2026, 10:30 AM</div>
+      </div>
+
+      <div>
+        <div class="branch-header branch-c" style="margin-bottom:8px;">🟢 Mensaje calificado (Rama C)</div>
+        <div class="msg-template">🟢 <span class="wa-bold">*LEAD CALIFICADO — FIRMA 7*</span>
+
+📋 <span class="wa-bold">*SOLICITUD RECIBIDA*</span>
+• Nombre: María López Torres
+• WhatsApp: 5598765432
+• Correo: maria@constructora.mx
+• RFC: LOTM850315ABC
+• Cargo: Directora General
+
+🏢 <span class="wa-bold">*EMPRESA*</span>
+• Constitución: Persona Moral
+• Antigüedad: Más de 2 años
+• Ingresos: Más de 500 mil pesos
+• Buró empresa: Bueno
+• Buró accionista: Excelente
+
+💰 <span class="wa-bold">*CRÉDITO SOLICITADO*</span>
+• Monto: $2,500,000 MXN
+• Destino: Compra de maquinaria
+• Garantía: Sí
+
+⏰ 21/05/2026, 10:35 AM
+
+<span style="color:#94a3b8;">_Contáctar en las próximas 2 horas para maximizar conversión._</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────────────
+       SECCIÓN 8 — ACTIVAR Y CONECTAR
+  ─────────────────────────────────────────────── -->
+  <div class="section">
+    <div class="section-title">8 · Activar el flujo y conectar ProfilingForm.tsx</div>
+
+    <ul class="checklist">
+      <li><span class="check">①</span>En N8N, haz clic en el toggle <strong>"Inactive → Active"</strong> arriba a la derecha del editor del flujo.</li>
+      <li><span class="check">②</span>Copia la URL de producción del nodo Webhook (pestaña <strong>"Production URL"</strong>). Tiene el formato: <code>https://santiagor17.app.n8n.cloud/webhook/[ID]</code></li>
+      <li><span class="check">③</span>Abre <code>components/ProfilingForm.tsx</code> y reemplaza la línea:<br><br>
+        <pre style="margin:0;"><span class="comment">// Antes:</span>
+const N8N_WEBHOOK_URL_PROD = '';
+
+<span class="comment">// Después (pega tu URL real):</span>
+const N8N_WEBHOOK_URL_PROD = <span class="string">'https://santiagor17.app.n8n.cloud/webhook/[ID-REAL]'</span>;</pre>
+      </li>
+      <li><span class="check">④</span>Prueba llenando el formulario en local (<code>npm run dev</code>) hasta el paso 0 → verifica en N8N que llega el evento <strong>lead_capturado</strong>.</li>
+      <li><span class="check">⑤</span>Completa el formulario hasta el final con datos que califiquen → verifica evento <strong>lead_calificado</strong> + mensaje WhatsApp + registro en Supabase.</li>
+      <li><span class="check">⑥</span>Prueba con datos que no califiquen (ej: ingresos "Menor a 150 mil pesos") → verifica evento <strong>lead_descartado</strong>.</li>
+      <li><span class="check">⑦</span>Cuando todo funcione: <code>npm run build</code> → subir carpeta <code>dist/</code> a Hostinger <code>public_html/</code></li>
+    </ul>
+
+    <div class="callout callout-orange" style="margin-top:16px;">
+      <span class="callout-icon">⚠️</span>
+      <div>
+        <strong>Meta test number:</strong> Con el número de prueba de Meta, WhatsApp solo envía mensajes a los números que hayas verificado en la consola de Meta Developers (máx 5 números en modo sandbox). El número del asesor debe estar en esa lista. Cuando tengas un número oficial, solo cambia <code>"to": "52..."</code> en los nodos de WhatsApp.
+      </div>
+    </div>
+
+    <div class="callout callout-green" style="margin-top:12px;">
+      <span class="callout-icon">🚀</span>
+      <div>
+        <strong>Próximos flujos a implementar:</strong><br>
+        • <strong>Flujo 2</strong> — Lead calificado → WhatsApp de confirmación automática al lead<br>
+        • <strong>Flujo 3</strong> — Cada 4h → Recordatorio al asesor de leads no contactados<br>
+        • <strong>Flujo 4</strong> — Lunes → Reactivar leads descartados hace 30/60/90 días
+      </div>
+    </div>
+  </div>
+
+  <hr>
+  <p style="font-size:11px;color:#9ca3af;text-align:center;">Firma 7 · N8N Flujo 1 · Generado el 21/05/2026 · Proyecto Supabase: xhlssiypzeakrqrzhirx</p>
+
+</div>
+</body>
+</html>

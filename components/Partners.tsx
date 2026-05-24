@@ -127,10 +127,12 @@ export const Partners: React.FC = () => {
             >
               {/* Fixed container size for consistency */}
               <div className="h-24 w-48 flex items-center justify-center">
-                <img 
-                  src={partner.url} 
-                  alt={partner.name} 
-                  className={`max-h-full max-w-full object-contain mix-blend-multiply transition-transform duration-300 ${partner.sizeClass || ''}`} 
+                <img
+                  src={partner.url}
+                  alt={`Logo ${partner.name} — institución financiera aliada de Firma 7`}
+                  loading="lazy"
+                  decoding="async"
+                  className={`max-h-full max-w-full object-contain mix-blend-multiply transition-transform duration-300 ${partner.sizeClass || ''}`}
                 />
               </div>
             </motion.div>

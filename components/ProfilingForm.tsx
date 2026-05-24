@@ -1,12 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 // ─── N8N Webhook ──────────────────────────────────────────────────────────────
-const N8N_WEBHOOK_URL = 'https://santiagor17.app.n8n.cloud/webhook-test/956ed48a-8870-4b82-b74b-579b22e8c073';
+// ⚠️  PENDIENTE: Reemplazar con la URL de producción cuando el flujo N8N esté listo.
+//     URL actual = endpoint de PRUEBA (webhook-test). Los datos llegan solo si el
+//     workflow está activo en modo "test" en N8N. Para producción, el path debe ser:
+//     https://santiagor17.app.n8n.cloud/webhook/[ID-DEL-FLUJO]
+//     (sin "webhook-test/" — solo "webhook/")
+const N8N_WEBHOOK_URL_TEST    = 'https://santiagor17.app.n8n.cloud/webhook-test/956ed48a-8870-4b82-b74b-579b22e8c073';
+const N8N_WEBHOOK_URL_PROD    = 'https://n8n1.apexdigital.com.mx/webhook/firma7-leads';
+const N8N_WEBHOOK_URL = N8N_WEBHOOK_URL_PROD || N8N_WEBHOOK_URL_TEST;
 
-function sendToN8N(data: FormData, calificado: boolean): void {
+function sendToN8N(data: FormData, calificado: boolean, evento?: string): void {
   const payload = {
     ...data,
     calificado,
+    evento: evento ?? (calificado ? 'lead_calificado' : 'lead_descartado'),
     timestamp: new Date().toISOString(),
   };
   fetch(N8N_WEBHOOK_URL, {
@@ -249,17 +257,16 @@ export const ProfilingForm: React.FC = () => {
   const set = (field: keyof FormData, value: string) =>
     setData(prev => ({ ...prev, [field]: value }));
 
-  const STEPS = ['Datos', 'Ingresos', 'Antigüedad', 'Constitución', 'Buró', 'Monto', 'Destino', 'Garantía'];
+  const STEPS = ['Contacto', 'Ingresos', 'Antigüedad', 'Constitución', 'Buró', 'Empresa', 'Monto', 'Destino', 'Garantía'];
 
   // ─── Validate ──────────────────────────────────────────────────────────────
+  // Paso 0: solo contacto (nombre, teléfono, correo) — RFC y cargo se piden en paso 5
   const validate = (): boolean => {
     const e: Record<string, string> = {};
     if (step === 0) {
       if (!data.nombreCompleto.trim()) e.nombreCompleto = 'Requerido';
       if (!data.numero.trim()) e.numero = 'Requerido';
       if (!data.correo.trim() || !/\S+@\S+\.\S+/.test(data.correo)) e.correo = 'Correo inválido';
-      if (!data.rfc.trim()) e.rfc = 'Requerido';
-      if (!data.cargo.trim()) e.cargo = 'Requerido';
     }
     if (step === 1 && !data.ingresos) e.ingresos = 'Selecciona una opción';
     if (step === 2 && !data.antiguedad) e.antiguedad = 'Selecciona una opción';
@@ -276,12 +283,17 @@ export const ProfilingForm: React.FC = () => {
         if (data.buroPMAccionista === 'Regular' && !data.buroPMAccionistaDetalle.trim()) e.buroPMAccionistaDetalle = 'Por favor detalla el monto y acreedor';
       }
     }
+    // Paso 5 — RFC y Cargo (empresa)
     if (step === 5) {
+      if (!data.rfc.trim()) e.rfc = 'Requerido';
+      if (!data.cargo.trim()) e.cargo = 'Requerido';
+    }
+    if (step === 6) {
       if (!data.monto.trim()) e.monto = 'Requerido';
       else if (!/^\d[\d,]*$/.test(data.monto.replace(/\s/g, ''))) e.monto = 'Solo números';
     }
-    if (step === 6 && !data.destino.trim()) e.destino = 'Por favor describe el destino del crédito';
-    if (step === 7 && !data.garantia) e.garantia = 'Selecciona una opción';
+    if (step === 7 && !data.destino.trim()) e.destino = 'Por favor describe el destino del crédito';
+    if (step === 8 && !data.garantia) e.garantia = 'Selecciona una opción';
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -289,8 +301,12 @@ export const ProfilingForm: React.FC = () => {
   // ─── Navigation ────────────────────────────────────────────────────────────
   const next = () => {
     if (!validate()) return;
+    // Captura temprana: al completar paso 0 ya tenemos nombre/teléfono/correo
+    if (step === 0) {
+      sendToN8N(data, false, 'lead_capturado');
+    }
     if (isDescarte({ ...data })) {
-      sendToN8N(data, false);
+      sendToN8N(data, false, 'lead_descartado');
       window.location.href = '/espera.html';
       return;
     }
@@ -358,9 +374,11 @@ export const ProfilingForm: React.FC = () => {
   // ─── Step content ──────────────────────────────────────────────────────────
   const renderStep = () => {
     switch (step) {
+      // Paso 0 — Solo contacto (RFC y Cargo se piden en paso 5, ya casi calificados)
       case 0:
         return (
           <div className="space-y-4">
+            <p className="text-sm text-gray-500 mb-2">Solo toma 2 minutos. Empieza con tus datos de contacto.</p>
             <div>
               <label className="field-label">Nombre completo</label>
               <input id="f-nombre" className={inputClass('nombreCompleto')} placeholder="Juan García Pérez" value={data.nombreCompleto} onChange={e => set('nombreCompleto', e.target.value)} />
@@ -368,7 +386,7 @@ export const ProfilingForm: React.FC = () => {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="field-label">Número de teléfono</label>
+                <label className="field-label">Número de teléfono / WhatsApp</label>
                 <input id="f-numero" type="tel" className={inputClass('numero')} placeholder="55 1234 5678" value={data.numero} onChange={e => set('numero', e.target.value)} />
                 {errors.numero && <p className="field-error">{errors.numero}</p>}
               </div>
@@ -376,18 +394,6 @@ export const ProfilingForm: React.FC = () => {
                 <label className="field-label">Correo electrónico</label>
                 <input id="f-correo" type="email" className={inputClass('correo')} placeholder="correo@empresa.com" value={data.correo} onChange={e => set('correo', e.target.value)} />
                 {errors.correo && <p className="field-error">{errors.correo}</p>}
-              </div>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="field-label">RFC de la empresa</label>
-                <input id="f-rfc" className={inputClass('rfc')} placeholder="XAXX010101000" value={data.rfc} onChange={e => set('rfc', e.target.value.toUpperCase())} maxLength={13} />
-                {errors.rfc && <p className="field-error">{errors.rfc}</p>}
-              </div>
-              <div>
-                <label className="field-label">Cargo</label>
-                <input id="f-cargo" className={inputClass('cargo')} placeholder="Director, Gerente, etc." value={data.cargo} onChange={e => set('cargo', e.target.value)} />
-                {errors.cargo && <p className="field-error">{errors.cargo}</p>}
               </div>
             </div>
           </div>
@@ -454,7 +460,27 @@ export const ProfilingForm: React.FC = () => {
       case 4:
         return renderBuroStep();
 
+      // Paso 5 — RFC y Cargo (movidos aquí: el lead ya pasó la calificación básica)
       case 5:
+        return (
+          <div className="space-y-4">
+            <p className="text-sm text-gray-500 mb-2">¡Vas muy bien! Necesitamos los datos formales de tu empresa.</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="field-label">RFC de la empresa</label>
+                <input id="f-rfc" className={inputClass('rfc')} placeholder="XAXX010101000" value={data.rfc} onChange={e => set('rfc', e.target.value.toUpperCase())} maxLength={13} />
+                {errors.rfc && <p className="field-error">{errors.rfc}</p>}
+              </div>
+              <div>
+                <label className="field-label">Tu cargo en la empresa</label>
+                <input id="f-cargo" className={inputClass('cargo')} placeholder="Director, Gerente, etc." value={data.cargo} onChange={e => set('cargo', e.target.value)} />
+                {errors.cargo && <p className="field-error">{errors.cargo}</p>}
+              </div>
+            </div>
+          </div>
+        );
+
+      case 6:
         return (
           <div className="space-y-4">
             <p className="text-sm text-gray-500">Ingresa el monto de crédito que deseas solicitar (solo números).</p>
@@ -478,7 +504,7 @@ export const ProfilingForm: React.FC = () => {
           </div>
         );
 
-      case 6:
+      case 7:
         return (
           <div className="space-y-4">
             <p className="text-sm text-gray-500">¿Para qué se va a utilizar el crédito? Brinda una breve explicación.</p>
@@ -495,7 +521,7 @@ export const ProfilingForm: React.FC = () => {
           </div>
         );
 
-      case 7:
+      case 8:
         return (
           <div className="space-y-4">
             <p className="text-sm text-gray-500">En caso de requerirse, ¿cuenta con garantía?</p>
@@ -519,9 +545,15 @@ export const ProfilingForm: React.FC = () => {
   };
 
   const stepTitles = [
-    'Datos del Solicitante', 'Ingresos Mensuales', 'Antigüedad de la Empresa', 'Constitución',
+    'Datos de Contacto',
+    'Ingresos Mensuales',
+    'Antigüedad de la Empresa',
+    'Constitución',
     data.constitucion === 'Persona Moral' ? 'Buró de Crédito (Empresa y Accionista)' : 'Buró de Crédito',
-    'Monto de Crédito', 'Destino del Crédito', 'Garantía',
+    'Datos de la Empresa',
+    'Monto de Crédito',
+    'Destino del Crédito',
+    'Garantía',
   ];
 
   // ─── Celebration / Qualify screen ──────────────────────────────────────────
@@ -630,7 +662,7 @@ export const ProfilingForm: React.FC = () => {
   }
 
   // ─── Main form ─────────────────────────────────────────────────────────────
-  const isLastStep = step === STEPS.length - 1;
+  const isLastStep = step === STEPS.length - 1; // paso 8 = Garantía
   const progress = (step / (STEPS.length - 1)) * 100;
 
   return (

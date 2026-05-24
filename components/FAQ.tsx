@@ -44,10 +44,10 @@ export const FAQ: React.FC = () => {
             <HelpCircle className="w-6 h-6 text-firma-green" />
           </div>
           <h2 className="text-3xl md:text-4xl font-serif text-charcoal mb-4">
-            Preguntas Frecuentes
+            Preguntas sobre crédito empresarial y financiamiento PyME
           </h2>
           <p className="text-gray-500">
-            Resolvemos las dudas más comunes antes de iniciar tu estrategia.
+            Resolvemos las dudas más comunes antes de iniciar tu proceso de financiamiento.
           </p>
         </div>
 

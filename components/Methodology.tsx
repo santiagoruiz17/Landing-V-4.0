@@ -32,7 +32,7 @@ export const Methodology: React.FC = () => {
           <div>
             <span className="text-firma-green font-medium tracking-wider uppercase text-sm font-sans bg-firma-green/5 px-2 py-1 rounded">Nuestro Enfoque</span>
             <h2 className="mt-4 text-4xl font-serif text-charcoal mb-6">
-              Más que un broker, somos tu brazo estratégico.
+              Asesoría financiera empresarial que va más allá del crédito
             </h2>
             <p className="text-gray-600 text-lg leading-relaxed mb-8">
               En Firma 7 entendemos que el capital es solo combustible. Lo que realmente mueve a una empresa es la estrategia detrás de cada peso invertido.
