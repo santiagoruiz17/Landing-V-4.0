@@ -4,20 +4,13 @@ import { Hero } from './components/Hero';
 import { Partners } from './components/Partners';
 import { Methodology } from './components/Methodology';
 import { ProfilingForm } from './components/ProfilingForm';
-import { AlianzasPortal } from './components/AlianzasPortal';
 
 // import { AISimulator } from './components/AISimulator';
 import { Stats } from './components/Stats';
 import { FAQ } from './components/FAQ';
 import { Footer } from './components/Footer';
 
-const isAlianzasRoute = window.location.pathname.startsWith('/alianzas');
-
 function App() {
-  if (isAlianzasRoute) {
-    return <AlianzasPortal />;
-  }
-
   return (
     <div className="min-h-screen bg-white text-charcoal font-sans">
       <Navbar />
