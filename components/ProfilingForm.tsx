@@ -689,7 +689,7 @@ export const ProfilingForm: React.FC = () => {
               Acceso a más de 20 instituciones financieras
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
-              {['BBVA', 'Banorte', 'Konfío', 'Creze', 'Hey Banco', 'Covalto', 'Finsus', 'Finkargo'].map(name => (
+              {['Axionex', 'Xepelin', 'Konfío', 'Creze', 'Hey Banco', 'Covalto', 'Finsus', 'Finkargo'].map(name => (
                 <span
                   key={name}
                   className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-semibold text-gray-500 shadow-sm"
