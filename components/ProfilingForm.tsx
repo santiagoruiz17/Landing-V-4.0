@@ -682,6 +682,26 @@ export const ProfilingForm: React.FC = () => {
           <p className="text-gray-600 max-w-2xl mx-auto text-lg font-light">
             Completa el formulario para recibir un análisis detallado por parte de nuestros socios directores.
           </p>
+
+          {/* Trust badges */}
+          <div className="mt-8 mb-2">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">
+              Acceso a más de 20 instituciones financieras
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              {['BBVA', 'Banorte', 'Konfío', 'Creze', 'Hey Banco', 'Covalto', 'Finsus', 'Finkargo'].map(name => (
+                <span
+                  key={name}
+                  className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-semibold text-gray-500 shadow-sm"
+                >
+                  {name}
+                </span>
+              ))}
+              <span className="px-3 py-1.5 bg-firma-green/5 border border-firma-green/20 rounded-lg text-xs font-semibold text-firma-green">
+                +12 más
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* Card */}
