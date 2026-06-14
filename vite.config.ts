@@ -44,10 +44,7 @@ export default defineConfig(({ mode }) => {
     build: {
       rollupOptions: {
         input: {
-          main:        path.resolve(__dirname, 'index.html'),
-          calculadora: path.resolve(__dirname, 'calculadora.html'),
-          aprobado:    path.resolve(__dirname, 'aprobado.html'),
-          espera:      path.resolve(__dirname, 'espera.html'),
+          main: path.resolve(__dirname, 'index.html'),
           ...getAlianzasInputs()
         },
       },

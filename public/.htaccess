@@ -1,0 +1,14 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Servir archivos y directorios existentes directamente
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+
+  # No redirigir rutas de alianzas (tienen su propio HTML)
+  RewriteCond %{REQUEST_URI} !^/alianzas/
+
+  # Todo lo demás va a index.html (React Router SPA)
+  RewriteRule ^ /index.html [L]
+</IfModule>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 // ─── N8N Webhook ──────────────────────────────────────────────────────────────
 // ⚠️  PENDIENTE: Reemplazar con la URL de producción cuando el flujo N8N esté listo.
@@ -248,6 +249,7 @@ const BuroSection: React.FC<{
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export const ProfilingForm: React.FC = () => {
+  const navigate = useNavigate();
   const [data, setData] = useState<FormData>(INITIAL);
   const [step, setStep] = useState(0);
   const [calificado, setCalificado] = useState(false);
@@ -307,7 +309,7 @@ export const ProfilingForm: React.FC = () => {
     }
     if (isDescarte({ ...data })) {
       sendToN8N(data, false, 'lead_descartado');
-      window.location.href = '/espera.html';
+      navigate('/espera');
       return;
     }
     setStep(s => s + 1);
