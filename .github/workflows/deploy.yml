@@ -39,6 +39,6 @@ jobs:
           set net:timeout 30;
           set net:max-retries 3;
           open -u '${{ secrets.FTP_USERNAME }}','${{ secrets.FTP_PASSWORD }}' ftp://${{ secrets.FTP_SERVER }};
-          mirror --reverse --delete --verbose ./dist/ /public_html/;
+          mirror --reverse --delete --ignore-errors --verbose --exclude-glob '.builds' --exclude-glob '.htpasswd' ./dist/ /public_html/;
           bye
         "
