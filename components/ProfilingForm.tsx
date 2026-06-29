@@ -1,29 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
 
 // ─── N8N Webhook ──────────────────────────────────────────────────────────────
-// ⚠️  PENDIENTE: Reemplazar con la URL de producción cuando el flujo N8N esté listo.
-//     URL actual = endpoint de PRUEBA (webhook-test). Los datos llegan solo si el
-//     workflow está activo en modo "test" en N8N. Para producción, el path debe ser:
-//     https://santiagor17.app.n8n.cloud/webhook/[ID-DEL-FLUJO]
-//     (sin "webhook-test/" — solo "webhook/")
-const N8N_WEBHOOK_URL_TEST    = 'https://santiagor17.app.n8n.cloud/webhook-test/956ed48a-8870-4b82-b74b-579b22e8c073';
-const N8N_WEBHOOK_URL_PROD    = 'https://n8n1.apexdigital.com.mx/webhook/firma7-leads';
+const N8N_WEBHOOK_URL_PROD = 'https://n8n1.apexdigital.com.mx/webhook/firma7-leads';
+const N8N_WEBHOOK_URL_TEST = 'https://santiagor17.app.n8n.cloud/webhook-test/956ed48a-8870-4b82-b74b-579b22e8c073';
 const N8N_WEBHOOK_URL = N8N_WEBHOOK_URL_PROD || N8N_WEBHOOK_URL_TEST;
 
-function sendToN8N(data: FormData, calificado: boolean, evento?: string): void {
-  const payload = {
-    ...data,
-    calificado,
-    evento: evento ?? (calificado ? 'lead_calificado' : 'lead_descartado'),
-    timestamp: new Date().toISOString(),
-  };
-  fetch(N8N_WEBHOOK_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  }).catch(() => { /* fire-and-forget: silently ignore errors */ });
-}
+// ─── GHL Webhook ─────────────────────────────────────────────────────────────
+const GHL_WEBHOOK_URL = import.meta.env.VITE_GHL_WEBHOOK_URL as string | undefined;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface FormData {
@@ -41,6 +26,7 @@ interface FormData {
   buroPMEmpresaDetalle: string;
   buroPMAccionista: string;
   buroPMAccionistaDetalle: string;
+  giro: string;
   monto: string;
   destino: string;
   garantia: string;
@@ -52,7 +38,7 @@ const INITIAL: FormData = {
   buroPF: '', buroPFDetalle: '',
   buroPMEmpresa: '', buroPMEmpresaDetalle: '',
   buroPMAccionista: '', buroPMAccionistaDetalle: '',
-  monto: '', destino: '', garantia: '',
+  giro: '', monto: '', destino: '', garantia: '',
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -76,6 +62,8 @@ function buildWhatsAppMessage(data: FormData): string {
     `• Correo: ${data.correo}`,
     `• RFC: ${data.rfc}`,
     `• Cargo: ${data.cargo}`, '',
+    '🏭 *GIRO DEL NEGOCIO*',
+    `• ${data.giro}`, '',
     '💰 *INGRESOS MENSUALES DE LA EMPRESA*',
     `• ${data.ingresos}`, '',
     '📅 *ANTIGÜEDAD DE LA EMPRESA*',
@@ -108,6 +96,68 @@ function buildWhatsAppMessage(data: FormData): string {
   lines.push('🏠 *GARANTÍA*');
   lines.push(`• ${data.garantia}`);
   return lines.join('\n');
+}
+
+// ─── Integrations ─────────────────────────────────────────────────────────────
+function sendToN8N(data: FormData, calificado: boolean, evento?: string): void {
+  const payload = {
+    ...data,
+    calificado,
+    evento: evento ?? (calificado ? 'lead_calificado' : 'lead_descartado'),
+    timestamp: new Date().toISOString(),
+  };
+  fetch(N8N_WEBHOOK_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  }).catch(() => {});
+}
+
+function sendToSupabase(data: FormData, calificado: boolean, evento?: string): void {
+  const eventoFinal = evento ?? (calificado ? 'lead_calificado' : 'lead_descartado');
+  supabase.from('leads').insert({
+    nombre_completo: data.nombreCompleto,
+    numero: data.numero,
+    correo: data.correo,
+    rfc: data.rfc,
+    cargo: data.cargo,
+    ingresos: data.ingresos,
+    antiguedad: data.antiguedad,
+    constitucion: data.constitucion,
+    buro_pf: data.buroPF,
+    buro_pf_detalle: data.buroPFDetalle,
+    buro_pm_empresa: data.buroPMEmpresa,
+    buro_pm_empresa_detalle: data.buroPMEmpresaDetalle,
+    buro_pm_accionista: data.buroPMAccionista,
+    buro_pm_accionista_detalle: data.buroPMAccionistaDetalle,
+    giro: data.giro,
+    monto: data.monto,
+    destino: data.destino,
+    garantia: data.garantia,
+    calificado,
+    evento: eventoFinal,
+  }).then(() => {});
+}
+
+function sendToGHL(data: FormData, calificado: boolean, evento?: string): void {
+  if (!GHL_WEBHOOK_URL) return;
+  const payload = {
+    ...data,
+    calificado,
+    evento: evento ?? (calificado ? 'lead_calificado' : 'lead_descartado'),
+    timestamp: new Date().toISOString(),
+  };
+  fetch(GHL_WEBHOOK_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  }).catch(() => {});
+}
+
+function sendToAll(data: FormData, calificado: boolean, evento?: string): void {
+  sendToN8N(data, calificado, evento);
+  sendToSupabase(data, calificado, evento);
+  sendToGHL(data, calificado, evento);
 }
 
 // ─── Confetti ─────────────────────────────────────────────────────────────────
@@ -252,17 +302,15 @@ export const ProfilingForm: React.FC = () => {
   const navigate = useNavigate();
   const [data, setData] = useState<FormData>(INITIAL);
   const [step, setStep] = useState(0);
-  const [calificado, setCalificado] = useState(false);
-  const [enviado, setEnviado] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const set = (field: keyof FormData, value: string) =>
     setData(prev => ({ ...prev, [field]: value }));
 
-  const STEPS = ['Contacto', 'Ingresos', 'Antigüedad', 'Constitución', 'Buró', 'Empresa', 'Monto', 'Destino', 'Garantía'];
+  // Paso 0–5 igual que antes; paso 6 = Giro; 7 = Monto; 8 = Destino; 9 = Garantía
+  const STEPS = ['Contacto', 'Ingresos', 'Antigüedad', 'Constitución', 'Buró', 'Empresa', 'Giro', 'Monto', 'Destino', 'Garantía'];
 
   // ─── Validate ──────────────────────────────────────────────────────────────
-  // Paso 0: solo contacto (nombre, teléfono, correo) — RFC y cargo se piden en paso 5
   const validate = (): boolean => {
     const e: Record<string, string> = {};
     if (step === 0) {
@@ -285,17 +333,17 @@ export const ProfilingForm: React.FC = () => {
         if (data.buroPMAccionista === 'Regular' && !data.buroPMAccionistaDetalle.trim()) e.buroPMAccionistaDetalle = 'Por favor detalla el monto y acreedor';
       }
     }
-    // Paso 5 — RFC y Cargo (empresa)
     if (step === 5) {
       if (!data.rfc.trim()) e.rfc = 'Requerido';
       if (!data.cargo.trim()) e.cargo = 'Requerido';
     }
-    if (step === 6) {
+    if (step === 6 && !data.giro.trim()) e.giro = 'Por favor describe a qué se dedica tu empresa';
+    if (step === 7) {
       if (!data.monto.trim()) e.monto = 'Requerido';
       else if (!/^\d[\d,]*$/.test(data.monto.replace(/\s/g, ''))) e.monto = 'Solo números';
     }
-    if (step === 7 && !data.destino.trim()) e.destino = 'Por favor describe el destino del crédito';
-    if (step === 8 && !data.garantia) e.garantia = 'Selecciona una opción';
+    if (step === 8 && !data.destino.trim()) e.destino = 'Por favor describe el destino del crédito';
+    if (step === 9 && !data.garantia) e.garantia = 'Selecciona una opción';
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -303,12 +351,11 @@ export const ProfilingForm: React.FC = () => {
   // ─── Navigation ────────────────────────────────────────────────────────────
   const next = () => {
     if (!validate()) return;
-    // Captura temprana: al completar paso 0 ya tenemos nombre/teléfono/correo
     if (step === 0) {
-      sendToN8N(data, false, 'lead_capturado');
+      sendToAll(data, false, 'lead_capturado');
     }
     if (isDescarte({ ...data })) {
-      sendToN8N(data, false, 'lead_descartado');
+      sendToAll(data, false, 'lead_descartado');
       navigate('/espera');
       return;
     }
@@ -317,17 +364,12 @@ export const ProfilingForm: React.FC = () => {
 
   const prev = () => { setErrors({}); setStep(s => Math.max(0, s - 1)); };
 
-  // ─── Submit – last step: show celebration, then user clicks WA ─────────────
+  // ─── Submit ────────────────────────────────────────────────────────────────
   const submit = () => {
     if (!validate()) return;
-    sendToN8N(data, true);
-    setCalificado(true);
-  };
-
-  const sendWhatsApp = () => {
-    const msg = buildWhatsAppMessage(data);
-    window.open(`https://wa.me/525525069817?text=${encodeURIComponent(msg)}`, '_blank');
-    setEnviado(true);
+    sendToAll(data, true);
+    const tipo = data.constitucion === 'Persona Moral' ? 'moral' : 'fisica';
+    navigate(`/aprobado?tipo=${tipo}&nombre=${encodeURIComponent(data.nombreCompleto.split(' ')[0])}`);
   };
 
   const inputClass = (field: string) =>
@@ -376,7 +418,6 @@ export const ProfilingForm: React.FC = () => {
   // ─── Step content ──────────────────────────────────────────────────────────
   const renderStep = () => {
     switch (step) {
-      // Paso 0 — Solo contacto (RFC y Cargo se piden en paso 5, ya casi calificados)
       case 0:
         return (
           <div className="space-y-4">
@@ -462,7 +503,6 @@ export const ProfilingForm: React.FC = () => {
       case 4:
         return renderBuroStep();
 
-      // Paso 5 — RFC y Cargo (movidos aquí: el lead ya pasó la calificación básica)
       case 5:
         return (
           <div className="space-y-4">
@@ -482,7 +522,32 @@ export const ProfilingForm: React.FC = () => {
           </div>
         );
 
+      // Paso 6 — Giro del negocio (nuevo)
       case 6:
+        return (
+          <div className="space-y-4">
+            <p className="text-sm text-gray-500">
+              Cuéntanos sobre tu empresa: ¿a qué se dedica, qué productos o servicios ofrece y quiénes son sus clientes?
+            </p>
+            <div>
+              <label className="field-label">Descripción del negocio</label>
+              <textarea
+                id="f-giro"
+                value={data.giro}
+                rows={5}
+                onChange={e => { set('giro', e.target.value); setErrors({}); }}
+                placeholder="Ej: Empresa de construcción enfocada en obra civil para el sector público. Contamos con 15 empleados y operamos principalmente en CDMX y Estado de México…"
+                className={`${inputClass('giro')} resize-none`}
+              />
+              {errors.giro && <p className="field-error">{errors.giro}</p>}
+            </div>
+            <p className="text-xs text-gray-400">
+              Esta información nos ayuda a conectarte con las instituciones financieras más adecuadas para tu industria.
+            </p>
+          </div>
+        );
+
+      case 7:
         return (
           <div className="space-y-4">
             <p className="text-sm text-gray-500">Ingresa el monto de crédito que deseas solicitar (solo números).</p>
@@ -506,7 +571,7 @@ export const ProfilingForm: React.FC = () => {
           </div>
         );
 
-      case 7:
+      case 8:
         return (
           <div className="space-y-4">
             <p className="text-sm text-gray-500">¿Para qué se va a utilizar el crédito? Brinda una breve explicación.</p>
@@ -523,7 +588,7 @@ export const ProfilingForm: React.FC = () => {
           </div>
         );
 
-      case 8:
+      case 9:
         return (
           <div className="space-y-4">
             <p className="text-sm text-gray-500">En caso de requerirse, ¿cuenta con garantía?</p>
@@ -553,118 +618,14 @@ export const ProfilingForm: React.FC = () => {
     'Constitución',
     data.constitucion === 'Persona Moral' ? 'Buró de Crédito (Empresa y Accionista)' : 'Buró de Crédito',
     'Datos de la Empresa',
+    'Giro del Negocio',
     'Monto de Crédito',
     'Destino del Crédito',
     'Garantía',
   ];
 
-  // ─── Celebration / Qualify screen ──────────────────────────────────────────
-  if (calificado) {
-    return (
-      <section id="profiling" className="py-24 bg-concrete relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-firma-green/5 rounded-full blur-[100px] -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
-        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-charcoal/5 rounded-full blur-[80px] translate-x-1/3 translate-y-1/3 pointer-events-none" />
-
-        <div className="max-w-2xl mx-auto px-4 relative z-10">
-          <div className="relative bg-white rounded-[2rem] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.15)] border border-gray-100 overflow-hidden">
-            {/* Confetti canvas */}
-            <Confetti />
-
-            {/* Top gradient bar */}
-            <div className="h-2 w-full bg-gradient-to-r from-firma-green/30 via-firma-green to-firma-green/30" />
-
-            <div className="relative z-10 p-10 text-center">
-              {/* Animated badge */}
-              <div className="inline-flex items-center gap-2 bg-firma-green/10 border border-firma-green/20 rounded-full px-5 py-2 mb-6 animate-bounceIn">
-                <span className="text-lg">🎉</span>
-                <span className="text-xs font-bold tracking-widest text-firma-green uppercase">¡Felicitaciones!</span>
-                <span className="text-lg">🎉</span>
-              </div>
-
-              {/* Checkmark icon */}
-              <div className="w-20 h-20 bg-gradient-to-br from-firma-green to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-firma-green/30 animate-scaleIn">
-                <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-
-              <h3 className="text-3xl font-serif text-charcoal mb-3 animate-fadeUp">
-                Tu empresa <span className="italic text-firma-green">califica</span> para un crédito empresarial
-              </h3>
-              <p className="text-gray-500 text-sm leading-relaxed mb-8 max-w-md mx-auto animate-fadeUp" style={{ animationDelay: '0.1s' }}>
-                Tu perfil cumple con los requisitos. Comparte tu solicitud con nuestro equipo por WhatsApp y un asesor especializado te contactará a la brevedad.
-              </p>
-
-              {/* Stars */}
-              <div className="flex justify-center gap-1 mb-8 animate-fadeUp" style={{ animationDelay: '0.2s' }}>
-                {[...Array(5)].map((_, i) => (
-                  <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                ))}
-              </div>
-
-              {!enviado ? (
-                <div className="animate-fadeUp" style={{ animationDelay: '0.3s' }}>
-                  <button
-                    id="whatsapp-send-btn"
-                    onClick={sendWhatsApp}
-                    className="inline-flex items-center gap-3 px-10 py-4 bg-[#25D366] text-white rounded-full text-base font-bold shadow-lg shadow-green-300/40 hover:bg-[#1ebe5c] hover:shadow-xl hover:shadow-green-300/50 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.271-.099-.47-.148-.666.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.296-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-                      <path d="M12 0C5.373 0 0 5.373 0 12c0 2.122.554 4.118 1.523 5.849L.054 23.486a.5.5 0 00.612.608l5.678-1.487A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.944 9.944 0 01-5.076-1.387l-.364-.215-3.769.988.997-3.707-.237-.381A9.944 9.944 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
-                    </svg>
-                    Enviar solicitud por WhatsApp
-                  </button>
-                  <p className="text-xs text-gray-400 mt-3">Se abrirá WhatsApp con toda tu información prellenada</p>
-                </div>
-              ) : (
-                <div className="animate-fadeUp">
-                  <div className="inline-flex items-center gap-2 bg-firma-green/10 border border-firma-green/20 rounded-full px-6 py-3 mb-6">
-                    <svg className="w-4 h-4 text-firma-green" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span className="text-sm font-semibold text-firma-green">¡Solicitud enviada! Un asesor te contactará pronto.</span>
-                  </div>
-                  <br />
-                  <button
-                    onClick={() => { setData(INITIAL); setStep(0); setCalificado(false); setEnviado(false); setErrors({}); }}
-                    className="px-8 py-3 border-2 border-firma-green text-firma-green rounded-full text-sm font-semibold hover:bg-firma-green hover:text-white transition-all duration-200"
-                  >
-                    Nueva solicitud
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <style>{`
-          @keyframes bounceIn {
-            0% { transform: scale(0.5); opacity: 0; }
-            70% { transform: scale(1.05); }
-            100% { transform: scale(1); opacity: 1; }
-          }
-          @keyframes scaleIn {
-            0% { transform: scale(0); opacity: 0; }
-            80% { transform: scale(1.1); }
-            100% { transform: scale(1); opacity: 1; }
-          }
-          @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(16px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
-          .animate-bounceIn { animation: bounceIn 0.6s cubic-bezier(0.68,-0.55,0.27,1.55) both; }
-          .animate-scaleIn { animation: scaleIn 0.5s cubic-bezier(0.68,-0.55,0.27,1.55) 0.2s both; }
-          .animate-fadeUp { animation: fadeUp 0.5s ease-out both; }
-        `}</style>
-      </section>
-    );
-  }
-
   // ─── Main form ─────────────────────────────────────────────────────────────
-  const isLastStep = step === STEPS.length - 1; // paso 8 = Garantía
+  const isLastStep = step === STEPS.length - 1;
   const progress = (step / (STEPS.length - 1)) * 100;
 
   return (
@@ -676,10 +637,10 @@ export const ProfilingForm: React.FC = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <span className="inline-block py-1 px-3 border border-firma-green/20 rounded-full text-[10px] font-bold tracking-widest text-firma-green uppercase mb-4 bg-firma-green/5">
-            Paso Final
+            Pre-Calificación
           </span>
           <h2 className="text-3xl md:text-5xl font-serif text-charcoal mb-6">
-            <span className="italic text-firma-green">Pre-califícate</span> hoy mismo
+            <span className="italic text-firma-green">Perfilate</span> en minutos
           </h2>
           <p className="text-gray-600 max-w-2xl mx-auto text-lg font-light">
             Completa el formulario para recibir un análisis detallado por parte de nuestros socios directores.

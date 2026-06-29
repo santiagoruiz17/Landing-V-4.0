@@ -1,7 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 export const Hero: React.FC = () => {
+  const navigate = useNavigate();
   return (
     <section id="hero" className="relative min-h-screen flex items-center pt-20 overflow-hidden bg-gradient-to-br from-gray-50 via-white to-gray-50">
       {/* Abstract Background Effects */}
@@ -46,7 +48,7 @@ export const Hero: React.FC = () => {
             className="flex flex-col sm:flex-row justify-center gap-4"
           >
             <button
-              onClick={() => document.getElementById('profiling')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => navigate('/perfil')}
               className="bg-charcoal text-white px-8 py-4 text-base font-medium tracking-wide hover:bg-firma-green transition-all duration-300 shadow-xl shadow-gray-200/50 hover:shadow-firma-green/20"
             >
               Iniciar Diagnóstico
