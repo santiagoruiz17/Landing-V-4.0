@@ -94,7 +94,7 @@ export const Navbar: React.FC = () => {
               className="bg-charcoal text-white px-6 py-2.5 rounded-none text-sm font-medium hover:bg-[#006d4e] transition-colors duration-300 flex items-center gap-2 shadow-lg shadow-[#006d4e]/20 cursor-pointer"
               style={{ cursor: 'pointer' }}
             >
-              Diagnóstico Rápido <ArrowRight size={16} />
+              Solicitar Crédito <ArrowRight size={16} />
             </button>
           </div>
 
@@ -153,7 +153,7 @@ export const Navbar: React.FC = () => {
               className="block w-full text-left px-3 py-4 text-base font-medium text-[#006d4e] font-bold bg-green-50 cursor-pointer"
               style={{ cursor: 'pointer' }}
             >
-              Iniciar Diagnóstico
+              Solicitar Crédito
             </button>
           </div>
         </div>

@@ -51,7 +51,7 @@ export const Hero: React.FC = () => {
               onClick={() => navigate('/perfil')}
               className="bg-charcoal text-white px-8 py-4 text-base font-medium tracking-wide hover:bg-firma-green transition-all duration-300 shadow-xl shadow-gray-200/50 hover:shadow-firma-green/20"
             >
-              Iniciar Diagnóstico
+              Solicitar Crédito
             </button>
             <button
               onClick={() => document.getElementById('methodology')?.scrollIntoView({ behavior: 'smooth' })}

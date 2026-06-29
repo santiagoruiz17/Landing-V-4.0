@@ -47,6 +47,14 @@ export default defineConfig(({ mode }) => {
           main: path.resolve(__dirname, 'index.html'),
           ...getAlianzasInputs()
         },
+        output: {
+          manualChunks: {
+            'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+            'vendor-motion': ['framer-motion'],
+            'vendor-supabase': ['@supabase/supabase-js'],
+            'vendor-icons': ['lucide-react'],
+          },
+        },
       },
     },
   };

@@ -4,16 +4,17 @@ import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { SocialProofToast } from './components/SocialProofToast';
 import { ExitIntentPopup } from './components/ExitIntentPopup';
-import { Calculadora } from './pages/Calculadora';
-import { Aprobado } from './pages/Aprobado';
-import { Espera } from './pages/Espera';
-import { Perfil } from './pages/Perfil';
 
 const Partners    = React.lazy(() => import('./components/Partners').then(m => ({ default: m.Partners })));
 const Methodology = React.lazy(() => import('./components/Methodology').then(m => ({ default: m.Methodology })));
 const Stats       = React.lazy(() => import('./components/Stats').then(m => ({ default: m.Stats })));
 const FAQ         = React.lazy(() => import('./components/FAQ').then(m => ({ default: m.FAQ })));
 const Footer      = React.lazy(() => import('./components/Footer').then(m => ({ default: m.Footer })));
+
+const Perfil      = React.lazy(() => import('./pages/Perfil').then(m => ({ default: m.Perfil })));
+const Calculadora = React.lazy(() => import('./pages/Calculadora').then(m => ({ default: m.Calculadora })));
+const Aprobado    = React.lazy(() => import('./pages/Aprobado').then(m => ({ default: m.Aprobado })));
+const Espera      = React.lazy(() => import('./pages/Espera').then(m => ({ default: m.Espera })));
 
 const SectionFallback = () => <div className="py-24 bg-white" />;
 
@@ -98,13 +99,15 @@ function LandingPage() {
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/perfil" element={<Perfil />} />
-        <Route path="/calculadora" element={<Calculadora />} />
-        <Route path="/aprobado" element={<Aprobado />} />
-        <Route path="/espera" element={<Espera />} />
-      </Routes>
+      <Suspense fallback={<div className="min-h-screen bg-gray-50" />}>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/perfil" element={<Perfil />} />
+          <Route path="/calculadora" element={<Calculadora />} />
+          <Route path="/aprobado" element={<Aprobado />} />
+          <Route path="/espera" element={<Espera />} />
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }
