@@ -302,6 +302,8 @@ export const AvisoPrivacidad: React.FC = () => {
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-xs text-white/40">
             © {new Date().getFullYear()} Firma 7 · SOC Asesores · Todos los derechos reservados.
+            {' · '}
+            <a href="/terminos-y-condiciones" className="text-white/40 hover:text-white underline">Términos y Condiciones</a>
           </p>
         </div>
       </footer>

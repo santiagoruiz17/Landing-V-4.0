@@ -382,6 +382,10 @@ export const Calculadora: React.FC = () => {
             <a href="/aviso-de-privacidad" style={{ color: 'rgba(255,255,255,0.4)', textDecoration: 'underline' }}>
               Aviso de Privacidad
             </a>
+            {' · '}
+            <a href="/terminos-y-condiciones" style={{ color: 'rgba(255,255,255,0.4)', textDecoration: 'underline' }}>
+              Términos y Condiciones
+            </a>
           </div>
         </div>
       </footer>

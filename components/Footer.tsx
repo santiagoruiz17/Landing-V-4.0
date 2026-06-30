@@ -63,6 +63,10 @@ export const Footer: React.FC = () => {
               <a href="/aviso-de-privacidad" className="text-gray-400 hover:text-white underline transition-colors">
                 Aviso de Privacidad
               </a>
+              {' · '}
+              <a href="/terminos-y-condiciones" className="text-gray-400 hover:text-white underline transition-colors">
+                Términos y Condiciones
+              </a>
             </p>
           </div>
         </div>
