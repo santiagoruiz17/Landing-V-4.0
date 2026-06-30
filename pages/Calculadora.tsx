@@ -371,6 +371,10 @@ export const Calculadora: React.FC = () => {
           </div>
           <div style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.4)' }}>
             © {new Date().getFullYear()} Firma 7. Todos los derechos reservados. · Av Patria 2085 Piso 1, Puerta de Hierro, Zapopan, Jalisco.
+            {' · '}
+            <a href="/aviso-de-privacidad" style={{ color: 'rgba(255,255,255,0.4)', textDecoration: 'underline' }}>
+              Aviso de Privacidad
+            </a>
           </div>
         </div>
       </footer>

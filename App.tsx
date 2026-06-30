@@ -11,10 +11,11 @@ const Stats       = React.lazy(() => import('./components/Stats').then(m => ({ d
 const FAQ         = React.lazy(() => import('./components/FAQ').then(m => ({ default: m.FAQ })));
 const Footer      = React.lazy(() => import('./components/Footer').then(m => ({ default: m.Footer })));
 
-const Perfil      = React.lazy(() => import('./pages/Perfil').then(m => ({ default: m.Perfil })));
-const Calculadora = React.lazy(() => import('./pages/Calculadora').then(m => ({ default: m.Calculadora })));
-const Aprobado    = React.lazy(() => import('./pages/Aprobado').then(m => ({ default: m.Aprobado })));
-const Espera      = React.lazy(() => import('./pages/Espera').then(m => ({ default: m.Espera })));
+const Perfil          = React.lazy(() => import('./pages/Perfil').then(m => ({ default: m.Perfil })));
+const Calculadora     = React.lazy(() => import('./pages/Calculadora').then(m => ({ default: m.Calculadora })));
+const Aprobado        = React.lazy(() => import('./pages/Aprobado').then(m => ({ default: m.Aprobado })));
+const Espera          = React.lazy(() => import('./pages/Espera').then(m => ({ default: m.Espera })));
+const AvisoPrivacidad = React.lazy(() => import('./pages/AvisoPrivacidad').then(m => ({ default: m.AvisoPrivacidad })));
 
 const SectionFallback = () => <div className="py-24 bg-white" />;
 
@@ -106,6 +107,7 @@ function App() {
           <Route path="/calculadora" element={<Calculadora />} />
           <Route path="/aprobado" element={<Aprobado />} />
           <Route path="/espera" element={<Espera />} />
+          <Route path="/aviso-de-privacidad" element={<AvisoPrivacidad />} />
         </Routes>
       </Suspense>
     </BrowserRouter>

@@ -252,6 +252,8 @@ export const Aprobado: React.FC = () => {
 
         <p className="text-center text-gray-400 text-xs pb-6">
           © {new Date().getFullYear()} Firma 7 · SOC Asesores · Toda tu información está protegida
+          {' · '}
+          <a href="/aviso-de-privacidad" className="text-gray-400 hover:text-[#006d4e] underline">Aviso de Privacidad</a>
         </p>
       </main>
     </div>
