@@ -1,83 +1,10 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Shield, FileText, CheckCircle2 } from 'lucide-react';
-
-// ─── Document checklists ──────────────────────────────────────────────────────
-const DOCS_MORAL_EMPRESA = [
-  'Acta constitutiva con sello de registro público',
-  'Escrituras que contengan modificaciones (en caso de aplicar)',
-  'Constancia de situación fiscal del mes en curso o no mayor a 3 meses',
-  'Declaración anual del último año declarado',
-  'Últimos 6 estados de cuenta bancarios',
-  'Comprobante de domicilio operativo no mayor a 3 meses (agua o luz)',
-  'Comprobante de domicilio fiscal no mayor a 3 meses (si es distinto al operativo)',
-  'Clave CIEC',
-];
-
-const DOCS_MORAL_ACCIONISTA = [
-  'INE del accionista principal',
-  'Comprobante de domicilio no mayor a 3 meses',
-  'Constancia de situación fiscal',
-  'Correo electrónico',
-  'Teléfono',
-  'Porcentaje de acciones',
-];
-
-const DOCS_FISICA = [
-  'INE',
-  'Constancia de situación fiscal del mes en curso o no mayor a 3 meses',
-  'Declaración anual del último año declarado',
-  'Últimos 6 estados de cuenta bancarios',
-  'Comprobante de domicilio operativo no mayor a 3 meses (agua o luz)',
-  'Comprobante de domicilio fiscal no mayor a 3 meses (si es distinto al operativo)',
-  'Clave CIEC',
-  'Teléfono',
-  'Correo electrónico',
-];
+import { ArrowLeft, Shield, FileText } from 'lucide-react';
 
 // ─── GHL document upload forms ─────────────────────────────────────────────────
 const FORM_FISICA = { id: '09uTR2kfDvaEd9HIGT9o', name: 'FORMULARIO DOCUMENTOS PFAE', height: 1900 };
 const FORM_MORAL  = { id: '1Y9mjxUgKcICNapChZuj', name: 'FORMULARIO DOCUMENTOS PM', height: 2461 };
-
-// ─── ChecklistCard ─────────────────────────────────────────────────────────────
-const ChecklistCard: React.FC<{
-  title: string;
-  badge: string;
-  items: string[];
-  accent: 'green' | 'blue';
-}> = ({ title, badge, items, accent }) => {
-  const styles = {
-    green: {
-      wrap: 'bg-[#f0fdf4] border-[#bbf7d0]',
-      badge: 'bg-firma-green/10 text-firma-green border-firma-green/20',
-      icon: 'text-firma-green',
-    },
-    blue: {
-      wrap: 'bg-blue-50 border-blue-100',
-      badge: 'bg-blue-100 text-blue-700 border-blue-200',
-      icon: 'text-blue-500',
-    },
-  }[accent];
-
-  return (
-    <div className={`${styles.wrap} border rounded-2xl p-6`}>
-      <div className="flex flex-wrap items-center gap-3 mb-5">
-        <span className={`px-3 py-1 rounded-full text-[11px] font-bold tracking-widest uppercase border ${styles.badge}`}>
-          {badge}
-        </span>
-        <h3 className="font-semibold text-charcoal text-base">{title}</h3>
-      </div>
-      <ul className="space-y-2.5">
-        {items.map((item, i) => (
-          <li key={i} className="flex items-start gap-3">
-            <CheckCircle2 size={16} className={`${styles.icon} flex-shrink-0 mt-0.5`} />
-            <span className="text-sm text-gray-700 leading-snug">{item}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-};
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export const Aprobado: React.FC = () => {
@@ -95,6 +22,23 @@ export const Aprobado: React.FC = () => {
     document.body.appendChild(script);
     return () => { try { document.body.removeChild(script); } catch {} };
   }, []);
+
+  // Detecta el envío del formulario GHL (postMessage del iframe) y redirige
+  // al inicio mostrando una pantalla de confirmación, en vez de dejar que el
+  // iframe muestre su propio "siguiente paso" (otro formulario).
+  useEffect(() => {
+    const allowedOrigins = ['https://api.leadconnectorhq.com', 'https://link.msgsndr.com', 'https://widgets.leadconnectorhq.com'];
+    const handleMessage = (event: MessageEvent) => {
+      if (!allowedOrigins.includes(event.origin)) return;
+      const raw = event.data;
+      const text = typeof raw === 'string' ? raw : JSON.stringify(raw ?? {});
+      if (/submit/i.test(text)) {
+        navigate('/?docs=enviados');
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [navigate]);
 
   useEffect(() => {
     const script = document.createElement('script');
@@ -173,45 +117,11 @@ export const Aprobado: React.FC = () => {
             <div>
               <h2 className="text-base font-semibold text-charcoal mb-1">Siguiente paso: reunir tu documentación</h2>
               <p className="text-gray-500 text-sm leading-relaxed">
-                Para avanzar con tu solicitud necesitamos verificar algunos documentos. Revisa la lista a continuación,
-                reúne los archivos y súbelos en el formulario de abajo. Nuestro equipo los revisará y te contactará en 24–72 horas.
+                Para avanzar con tu solicitud necesitamos verificar algunos documentos. Completa el formulario de abajo
+                con la información solicitada y adjunta tus archivos. Nuestro equipo los revisará y te contactará en 24–72 horas.
               </p>
             </div>
           </div>
-        </div>
-
-        {/* ── Document checklist ──────────────────────── */}
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-charcoal px-1">
-            Documentos requeridos
-            <span className="ml-2 text-sm font-normal text-gray-400">
-              ({esMoral ? 'Persona Moral' : 'Persona Física con Actividad Empresarial'})
-            </span>
-          </h2>
-
-          {esMoral ? (
-            <>
-              <ChecklistCard
-                title="Documentos de la Empresa"
-                badge="Empresa"
-                items={DOCS_MORAL_EMPRESA}
-                accent="green"
-              />
-              <ChecklistCard
-                title="Documentos del Accionista Principal"
-                badge="Accionista"
-                items={DOCS_MORAL_ACCIONISTA}
-                accent="blue"
-              />
-            </>
-          ) : (
-            <ChecklistCard
-              title="Documentos Requeridos"
-              badge="Persona Física"
-              items={DOCS_FISICA}
-              accent="green"
-            />
-          )}
         </div>
 
         {/* ── Security notice ─────────────────────────── */}

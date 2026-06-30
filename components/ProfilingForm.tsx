@@ -297,12 +297,41 @@ const BuroSection: React.FC<{
   );
 };
 
+// ─── Seguimiento de leads incompletos ──────────────────────────────────────────
+// Si el lead llena sus datos de contacto pero no termina el formulario en este
+// tiempo, se notifica como "no completó" (no como descarte) con lo que haya capturado.
+const FOLLOWUP_DELAY_MS = 10 * 60 * 1000;
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 export const ProfilingForm: React.FC = () => {
   const navigate = useNavigate();
   const [data, setData] = useState<FormData>(INITIAL);
   const [step, setStep] = useState(0);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const dataRef = useRef(data);
+  useEffect(() => { dataRef.current = data; }, [data]);
+
+  const resolvedRef = useRef(false);
+  const timerStartedRef = useRef(false);
+  const followupTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearFollowupTimer = () => {
+    if (followupTimeoutRef.current) {
+      clearTimeout(followupTimeoutRef.current);
+      followupTimeoutRef.current = null;
+    }
+  };
+
+  const scheduleFollowupTimer = () => {
+    followupTimeoutRef.current = setTimeout(() => {
+      if (resolvedRef.current) return;
+      resolvedRef.current = true;
+      sendToAll(dataRef.current, false, 'lead_incompleto');
+    }, FOLLOWUP_DELAY_MS);
+  };
+
+  useEffect(() => () => clearFollowupTimer(), []);
 
   const set = (field: keyof FormData, value: string) =>
     setData(prev => ({ ...prev, [field]: value }));
@@ -351,10 +380,16 @@ export const ProfilingForm: React.FC = () => {
   // ─── Navigation ────────────────────────────────────────────────────────────
   const next = () => {
     if (!validate()) return;
-    if (step === 0) {
-      sendToAll(data, false, 'lead_capturado');
+    if (step === 0 && !timerStartedRef.current) {
+      // Ya tenemos datos de contacto: arrancamos la cuenta regresiva de 10 min.
+      // Si el lead no termina el formulario en ese lapso, se notifica como
+      // "no completó" — no se envía ningún correo todavía.
+      timerStartedRef.current = true;
+      scheduleFollowupTimer();
     }
     if (isDescarte({ ...data })) {
+      resolvedRef.current = true;
+      clearFollowupTimer();
       sendToAll(data, false, 'lead_descartado');
       navigate('/espera');
       return;
@@ -367,6 +402,8 @@ export const ProfilingForm: React.FC = () => {
   // ─── Submit ────────────────────────────────────────────────────────────────
   const submit = () => {
     if (!validate()) return;
+    resolvedRef.current = true;
+    clearFollowupTimer();
     sendToAll(data, true);
     const tipo = data.constitucion === 'Persona Moral' ? 'moral' : 'fisica';
     navigate(`/aprobado?tipo=${tipo}&nombre=${encodeURIComponent(data.nombreCompleto.split(' ')[0])}`);
