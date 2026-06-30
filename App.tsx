@@ -18,6 +18,7 @@ const Aprobado            = React.lazy(() => import('./pages/Aprobado').then(m =
 const Espera              = React.lazy(() => import('./pages/Espera').then(m => ({ default: m.Espera })));
 const AvisoPrivacidad     = React.lazy(() => import('./pages/AvisoPrivacidad').then(m => ({ default: m.AvisoPrivacidad })));
 const DocumentosRecibidos = React.lazy(() => import('./pages/DocumentosRecibidos').then(m => ({ default: m.DocumentosRecibidos })));
+const NotFound            = React.lazy(() => import('./pages/NotFound').then(m => ({ default: m.NotFound })));
 
 const SectionFallback = () => <div className="py-24 bg-white" />;
 
@@ -117,6 +118,7 @@ function App() {
           <Route path="/espera" element={<Espera />} />
           <Route path="/aviso-de-privacidad" element={<AvisoPrivacidad />} />
           <Route path="/documentos-recibidos" element={<DocumentosRecibidos />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
     </BrowserRouter>
