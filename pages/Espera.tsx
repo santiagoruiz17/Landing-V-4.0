@@ -1,8 +1,16 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Clock, TrendingUp, Bookmark } from 'lucide-react';
+import { useSEO } from '../hooks/useSEO';
 
 export const Espera: React.FC = () => {
+  useSEO({
+    title: 'Perfil en Revisión | Firma 7',
+    description: 'Tu perfil fue guardado para una próxima revisión. Te contactaremos cuando mejoren las condiciones o tengamos nuevas opciones de financiamiento.',
+    canonical: 'https://firma7.com/espera',
+    noindex: true,
+  });
+
   const navigate = useNavigate();
 
   return (

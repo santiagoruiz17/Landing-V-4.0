@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import { useSEO } from '../hooks/useSEO';
 
 const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
   <section className="mb-8">
@@ -10,6 +11,12 @@ const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title
 );
 
 export const AvisoPrivacidad: React.FC = () => {
+  useSEO({
+    title: 'Aviso de Privacidad | SOC · Firma 7',
+    description: 'Conoce cómo SINERGIA SOC S.A. de C.V. recaba, utiliza y protege tus datos personales conforme a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares.',
+    canonical: 'https://firma7.com/aviso-de-privacidad',
+  });
+
   const navigate = useNavigate();
 
   return (

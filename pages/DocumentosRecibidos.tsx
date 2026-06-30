@@ -1,8 +1,16 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Clock, CheckCircle2 } from 'lucide-react';
+import { useSEO } from '../hooks/useSEO';
 
 export const DocumentosRecibidos: React.FC = () => {
+  useSEO({
+    title: 'Documentación Recibida | Firma 7',
+    description: 'Tu documentación fue recibida. Nuestro equipo te contactará en un lapso de 24 a 72 horas hábiles.',
+    canonical: 'https://firma7.com/documentos-recibidos',
+    noindex: true,
+  });
+
   const navigate = useNavigate();
 
   return (

@@ -4,6 +4,7 @@ import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { SocialProofToast } from './components/SocialProofToast';
 import { ExitIntentPopup } from './components/ExitIntentPopup';
+import { useSEO } from './hooks/useSEO';
 
 const Partners    = React.lazy(() => import('./components/Partners').then(m => ({ default: m.Partners })));
 const Methodology = React.lazy(() => import('./components/Methodology').then(m => ({ default: m.Methodology })));
@@ -80,6 +81,12 @@ function PerfilCTA() {
 }
 
 function LandingPage() {
+  useSEO({
+    title: 'Crédito Empresarial y Financiamiento para PyMEs en México | SOC · Firma 7',
+    description: 'Obtén crédito empresarial, inyección de capital y financiamiento para tu PyME en México. SOC · Firma 7 compara +20 instituciones financieras para conseguirte la mejor tasa. Respuesta en 24–72 horas, sin burocracia bancaria.',
+    canonical: 'https://firma7.com/',
+  });
+
   return (
     <div className="min-h-screen bg-white text-charcoal font-sans">
       <Navbar />

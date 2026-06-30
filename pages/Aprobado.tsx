@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Shield, FileText } from 'lucide-react';
+import { useSEO } from '../hooks/useSEO';
 
 // ─── GHL document upload forms ─────────────────────────────────────────────────
 const FORM_FISICA = { id: '09uTR2kfDvaEd9HIGT9o', name: 'FORMULARIO DOCUMENTOS PFAE', height: 1900 };
@@ -8,6 +9,13 @@ const FORM_MORAL  = { id: '1Y9mjxUgKcICNapChZuj', name: 'FORMULARIO DOCUMENTOS P
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export const Aprobado: React.FC = () => {
+  useSEO({
+    title: 'Pre-calificación Aprobada | Firma 7',
+    description: 'Tu empresa pre-califica para un crédito empresarial. Sube tu documentación para continuar con tu solicitud.',
+    canonical: 'https://firma7.com/aprobado',
+    noindex: true,
+  });
+
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const tipo = searchParams.get('tipo') || 'fisica';

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSEO } from '../hooks/useSEO';
 
 const GREEN = '#006d4e';
 const CHARCOAL = '#1A1A1A';
@@ -28,6 +29,12 @@ function autoTerms(year: number) {
 }
 
 export const Calculadora: React.FC = () => {
+  useSEO({
+    title: 'Calculadora de Crédito Empresarial y Automotriz | Firma 7',
+    description: 'Simula tu pago mensual de crédito empresarial o automotriz. Calcula tasas, plazos y montos antes de solicitar tu financiamiento con Firma 7.',
+    canonical: 'https://firma7.com/calculadora',
+  });
+
   const navigate = useNavigate();
   const [type, setType] = useState<'empresarial' | 'automotriz'>('empresarial');
   const [modalOpen, setModalOpen] = useState(false);
