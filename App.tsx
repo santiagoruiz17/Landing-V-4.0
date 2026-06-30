@@ -1,6 +1,5 @@
-import React, { Suspense, useState } from 'react';
-import { BrowserRouter, Routes, Route, useNavigate, useSearchParams } from 'react-router-dom';
-import { Clock, X } from 'lucide-react';
+import React, { Suspense } from 'react';
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { SocialProofToast } from './components/SocialProofToast';
@@ -12,11 +11,12 @@ const Stats       = React.lazy(() => import('./components/Stats').then(m => ({ d
 const FAQ         = React.lazy(() => import('./components/FAQ').then(m => ({ default: m.FAQ })));
 const Footer      = React.lazy(() => import('./components/Footer').then(m => ({ default: m.Footer })));
 
-const Perfil          = React.lazy(() => import('./pages/Perfil').then(m => ({ default: m.Perfil })));
-const Calculadora     = React.lazy(() => import('./pages/Calculadora').then(m => ({ default: m.Calculadora })));
-const Aprobado        = React.lazy(() => import('./pages/Aprobado').then(m => ({ default: m.Aprobado })));
-const Espera          = React.lazy(() => import('./pages/Espera').then(m => ({ default: m.Espera })));
-const AvisoPrivacidad = React.lazy(() => import('./pages/AvisoPrivacidad').then(m => ({ default: m.AvisoPrivacidad })));
+const Perfil              = React.lazy(() => import('./pages/Perfil').then(m => ({ default: m.Perfil })));
+const Calculadora         = React.lazy(() => import('./pages/Calculadora').then(m => ({ default: m.Calculadora })));
+const Aprobado            = React.lazy(() => import('./pages/Aprobado').then(m => ({ default: m.Aprobado })));
+const Espera              = React.lazy(() => import('./pages/Espera').then(m => ({ default: m.Espera })));
+const AvisoPrivacidad     = React.lazy(() => import('./pages/AvisoPrivacidad').then(m => ({ default: m.AvisoPrivacidad })));
+const DocumentosRecibidos = React.lazy(() => import('./pages/DocumentosRecibidos').then(m => ({ default: m.DocumentosRecibidos })));
 
 const SectionFallback = () => <div className="py-24 bg-white" />;
 
@@ -79,51 +79,10 @@ function PerfilCTA() {
   );
 }
 
-function DocsSubmittedModal({ onClose }: { onClose: () => void }) {
-  return (
-    <div className="fixed inset-0 z-[100] bg-charcoal/60 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl max-w-md w-full p-8 text-center shadow-2xl relative">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-charcoal transition-colors"
-          aria-label="Cerrar"
-        >
-          <X size={20} />
-        </button>
-        <div className="w-16 h-16 bg-firma-green/10 rounded-full flex items-center justify-center mx-auto mb-5">
-          <Clock size={28} className="text-firma-green" />
-        </div>
-        <h2 className="font-serif text-2xl text-charcoal mb-3">¡Documentación recibida!</h2>
-        <p className="text-gray-500 text-sm leading-relaxed mb-6">
-          Ya estamos trabajando en tu caso. Nuestro equipo revisará tu información y te dará una respuesta
-          en un lapso de <strong className="text-charcoal">24 a 72 horas hábiles</strong>.
-        </p>
-        <button
-          onClick={onClose}
-          className="px-8 py-3 bg-firma-green text-white rounded-full text-sm font-semibold hover:bg-emerald-600 transition-colors"
-        >
-          Entendido
-        </button>
-      </div>
-    </div>
-  );
-}
-
 function LandingPage() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [showDocsModal, setShowDocsModal] = useState(searchParams.get('docs') === 'enviados');
-
-  const closeDocsModal = () => {
-    setShowDocsModal(false);
-    const next = new URLSearchParams(searchParams);
-    next.delete('docs');
-    setSearchParams(next, { replace: true });
-  };
-
   return (
     <div className="min-h-screen bg-white text-charcoal font-sans">
       <Navbar />
-      {showDocsModal && <DocsSubmittedModal onClose={closeDocsModal} />}
       <ExitIntentPopup />
       <SocialProofToast />
       <main>
@@ -150,6 +109,7 @@ function App() {
           <Route path="/aprobado" element={<Aprobado />} />
           <Route path="/espera" element={<Espera />} />
           <Route path="/aviso-de-privacidad" element={<AvisoPrivacidad />} />
+          <Route path="/documentos-recibidos" element={<DocumentosRecibidos />} />
         </Routes>
       </Suspense>
     </BrowserRouter>

@@ -33,7 +33,7 @@ export const Aprobado: React.FC = () => {
       const raw = event.data;
       const text = typeof raw === 'string' ? raw : JSON.stringify(raw ?? {});
       if (/submit/i.test(text)) {
-        navigate('/?docs=enviados');
+        navigate('/documentos-recibidos');
       }
     };
     window.addEventListener('message', handleMessage);
