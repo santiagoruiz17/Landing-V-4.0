@@ -35,6 +35,10 @@ const DOCS_FISICA = [
   'Correo electrónico',
 ];
 
+// ─── GHL document upload forms ─────────────────────────────────────────────────
+const FORM_FISICA = { id: '09uTR2kfDvaEd9HIGT9o', name: 'FORMULARIO DOCUMENTOS PFAE', height: 1900 };
+const FORM_MORAL  = { id: '1Y9mjxUgKcICNapChZuj', name: 'FORMULARIO DOCUMENTOS PM', height: 2461 };
+
 // ─── ChecklistCard ─────────────────────────────────────────────────────────────
 const ChecklistCard: React.FC<{
   title: string;
@@ -82,6 +86,15 @@ export const Aprobado: React.FC = () => {
   const tipo = searchParams.get('tipo') || 'fisica';
   const nombre = searchParams.get('nombre') || '';
   const esMoral = tipo === 'moral';
+  const formConfig = esMoral ? FORM_MORAL : FORM_FISICA;
+
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://link.msgsndr.com/js/form_embed.js';
+    script.async = true;
+    document.body.appendChild(script);
+    return () => { try { document.body.removeChild(script); } catch {} };
+  }, []);
 
   useEffect(() => {
     const script = document.createElement('script');
@@ -210,24 +223,42 @@ export const Aprobado: React.FC = () => {
           </p>
         </div>
 
-        {/* ── GHL Documentation Form CTA ──────────────── */}
-        <div className="bg-[#006d4e] rounded-2xl p-8 text-center text-white">
-          <div className="w-14 h-14 bg-white/15 rounded-full flex items-center justify-center mx-auto mb-5">
-            <FileText size={24} className="text-white" />
+        {/* ── GHL Documentation Upload Form ───────────── */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="bg-gradient-to-br from-[#006d4e] to-emerald-600 px-6 py-6 text-white">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-white/15 rounded-xl flex items-center justify-center flex-shrink-0">
+                <FileText size={22} className="text-white" />
+              </div>
+              <div>
+                <h2 className="font-serif text-xl md:text-2xl">Sube tu documentación</h2>
+                <p className="text-[#b8ddd3] text-xs md:text-sm mt-0.5">
+                  Formulario seguro · {esMoral ? 'Persona Moral' : 'Persona Física con Actividad Empresarial'}
+                </p>
+              </div>
+            </div>
           </div>
-          <h2 className="font-serif text-2xl mb-2">Listo para enviar tu documentación</h2>
-          <p className="text-[#b8ddd3] text-sm mb-6 max-w-sm mx-auto leading-relaxed">
-            Reúne los documentos de la lista anterior y haz clic en el botón para abrir el formulario seguro de carga.
-          </p>
-          <a
-            href="https://api.leadconnectorhq.com/widget/form/DxB8rjFqcSbClXQ5WCkI"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-8 py-3.5 bg-white text-[#006d4e] font-bold rounded-full hover:bg-gray-50 transition-colors no-underline text-sm"
-          >
-            <FileText size={16} />
-            Abrir formulario de documentación
-          </a>
+          <div className="p-2 sm:p-3 bg-gray-50">
+            <iframe
+              key={formConfig.id}
+              src={`https://api.leadconnectorhq.com/widget/form/${formConfig.id}`}
+              style={{ width: '100%', height: formConfig.height, border: 'none', borderRadius: '12px', display: 'block' }}
+              id={`inline-${formConfig.id}`}
+              data-layout="{'id':'INLINE'}"
+              data-trigger-type="alwaysShow"
+              data-trigger-value=""
+              data-activation-type="alwaysActivated"
+              data-activation-value=""
+              data-deactivation-type="neverDeactivate"
+              data-deactivation-value=""
+              data-form-name={formConfig.name}
+              data-height={formConfig.height}
+              data-layout-iframe-id={`inline-${formConfig.id}`}
+              data-form-id={formConfig.id}
+              title={formConfig.name}
+              className="bg-white"
+            />
+          </div>
         </div>
 
         {/* ── Support CTA ─────────────────────────────── */}
