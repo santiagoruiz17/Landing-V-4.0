@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, ArrowRight } from 'lucide-react';
+import { Menu, X, ArrowRight, Handshake } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export const Navbar: React.FC = () => {
@@ -69,15 +69,13 @@ export const Navbar: React.FC = () => {
             >
               Alianzas
             </a>
-            <a
-              href="/alianzas/portal/"
-              className="text-sm font-medium text-gray-600 hover:text-[#006d4e] transition-colors cursor-pointer flex items-center gap-1.5"
+            <button
+              onClick={() => navigate('/quiero-ser-aliado')}
+              className="border border-firma-green text-firma-green px-5 py-2.5 rounded-none text-sm font-semibold hover:bg-firma-green hover:text-white transition-colors duration-300 flex items-center gap-2 cursor-pointer"
+              style={{ cursor: 'pointer' }}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
-              </svg>
-              Portal CRM
-            </a>
+              <Handshake size={16} /> Quiero Aliarme
+            </button>
             <button
               onClick={() => navigate('/calculadora')}
               className="text-sm font-medium text-gray-600 hover:text-[#006d4e] transition-colors cursor-pointer flex items-center gap-1.5"
@@ -128,15 +126,13 @@ export const Navbar: React.FC = () => {
             >
               Alianzas
             </a>
-            <a
-              href="/alianzas/portal/"
-              className="flex items-center gap-2 w-full px-3 py-4 text-base font-medium text-gray-600 hover:text-[#006d4e] hover:bg-gray-50 transition-colors"
+            <button
+              onClick={() => { setIsMobileMenuOpen(false); navigate('/quiero-ser-aliado'); }}
+              className="flex items-center gap-2 w-full px-3 py-4 text-base font-semibold text-firma-green bg-firma-green/5 hover:bg-firma-green/10 transition-colors"
+              style={{ background: 'rgba(0,109,78,0.05)', border: 'none', cursor: 'pointer' }}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
-              </svg>
-              Portal CRM
-            </a>
+              <Handshake size={18} /> Quiero Aliarme
+            </button>
             <button
               onClick={() => { setIsMobileMenuOpen(false); navigate('/calculadora'); }}
               className="flex items-center gap-2 w-full px-3 py-4 text-base font-medium text-gray-600 hover:text-[#006d4e] hover:bg-gray-50 transition-colors"

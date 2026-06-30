@@ -1,11 +1,35 @@
 import React from 'react';
-import { Facebook, Instagram } from 'lucide-react';
+import { Facebook, Instagram, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
+const ALIANZAS = [
+  { name: 'Konfío', slug: 'konfio' },
+  { name: 'PDN', slug: 'pdn' },
+  { name: 'UNIFIN', slug: 'unifin' },
+  { name: 'FinBe ABC', slug: 'finbe-abc' },
+  { name: 'Xepelin', slug: 'xepelin' },
+  { name: 'Finkargo', slug: 'finkargo' },
+  { name: 'imagina LEASING', slug: 'imagina-leasing' },
+  { name: 'Covalto', slug: 'covalto' },
+  { name: 'engen CAPITAL', slug: 'engen-capital' },
+  { name: 'Hey Banco', slug: 'hey-banco' },
+  { name: 'Anticipa', slug: 'anticipa' },
+  { name: 'Axionex Financiera', slug: 'axionex-financiera' },
+  { name: 'Bx+', slug: 'bx-plus' },
+  { name: 'Finsus', slug: 'finsus' },
+  { name: 'Hay Cash', slug: 'hay-cash' },
+  { name: 'Banorte', slug: 'banorte' },
+  { name: 'Afirme', slug: 'afirme' },
+  { name: 'Creze', slug: 'creze' },
+];
 
 export const Footer: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
     <footer className="bg-[#052b22] text-white py-12 border-t border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-8">
+        <div className="flex flex-col md:flex-row justify-between items-start gap-10 pb-10 border-b border-white/10">
           <div className="text-center md:text-left">
             {/* Logo Footer - White Version */}
             <div className="flex items-center gap-3 justify-center md:justify-start mb-2">
@@ -31,27 +55,56 @@ export const Footer: React.FC = () => {
                 </span>
               </div>
             </div>
-            <p className="text-gray-400 text-sm mt-2 ml-1">Consultoría Financiera Premium.</p>
+            <p className="text-gray-400 text-sm mt-2 ml-1 mb-5">Consultoría Financiera Premium.</p>
+
+            <button
+              onClick={() => navigate('/perfil')}
+              className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-firma-green text-white rounded-full text-xs font-bold tracking-wide hover:bg-emerald-600 transition-colors"
+            >
+              Solicitar Crédito <ArrowRight size={14} />
+            </button>
+
+            <div className="flex items-center justify-center md:justify-start gap-4 mt-6">
+              <a
+                href="https://www.facebook.com/Firma7.Soc/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-full"
+                aria-label="Facebook"
+              >
+                <Facebook size={20} />
+              </a>
+              <a
+                href="https://www.instagram.com/soc_firma_7/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-full"
+                aria-label="Instagram"
+              >
+                <Instagram size={20} />
+              </a>
+            </div>
           </div>
 
-          <div className="flex items-center gap-6">
-            <a 
-              href="https://www.facebook.com/Firma7.Soc/" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-full"
-              aria-label="Facebook"
+          {/* Alianzas */}
+          <div className="text-center md:text-left">
+            <h3 className="text-xs font-bold tracking-[0.15em] text-gray-400 uppercase mb-4">Alianzas</h3>
+            <div className="grid grid-cols-2 gap-x-8 gap-y-2">
+              {ALIANZAS.map(a => (
+                <a
+                  key={a.slug}
+                  href={`/alianzas/${a.slug}/`}
+                  className="text-sm text-gray-400 hover:text-white transition-colors no-underline"
+                >
+                  {a.name}
+                </a>
+              ))}
+            </div>
+            <a
+              href="/alianzas/"
+              className="inline-block mt-4 text-xs font-semibold text-firma-green hover:text-emerald-400 transition-colors no-underline"
             >
-              <Facebook size={20} />
-            </a>
-            <a 
-              href="https://www.instagram.com/soc_firma_7/" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-full"
-              aria-label="Instagram"
-            >
-              <Instagram size={20} />
+              Ver todas las alianzas →
             </a>
           </div>
 

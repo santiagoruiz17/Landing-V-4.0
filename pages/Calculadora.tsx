@@ -37,7 +37,6 @@ export const Calculadora: React.FC = () => {
 
   const navigate = useNavigate();
   const [type, setType] = useState<'empresarial' | 'automotriz'>('empresarial');
-  const [modalOpen, setModalOpen] = useState(false);
 
   // Empresarial state
   const [empAmount, setEmpAmount] = useState(1500000);
@@ -150,10 +149,10 @@ export const Calculadora: React.FC = () => {
           <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
             <a href="/#methodology" style={{ fontSize: '0.875rem', fontWeight: 500, color: '#4b5563', textDecoration: 'none' }}>Metodología</a>
             <a href="/alianzas/" style={{ fontSize: '0.875rem', fontWeight: 500, color: '#4b5563', textDecoration: 'none' }}>Alianzas</a>
-            <button onClick={() => navigate('/#profiling')} style={{ background: CHARCOAL, color: 'white', padding: '0.625rem 1.5rem', fontSize: '0.875rem', fontWeight: 500, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', transition: 'background 0.3s' }}
+            <button onClick={() => navigate('/perfil')} style={{ background: CHARCOAL, color: 'white', padding: '0.625rem 1.5rem', fontSize: '0.875rem', fontWeight: 500, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', transition: 'background 0.3s' }}
               onMouseOver={e => (e.currentTarget.style.background = GREEN)}
               onMouseOut={e => (e.currentTarget.style.background = CHARCOAL)}>
-              Diagnóstico Rápido →
+              Solicitar Crédito →
             </button>
           </div>
         </div>
@@ -351,32 +350,69 @@ export const Calculadora: React.FC = () => {
           <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '0.95rem', marginBottom: '2rem', fontWeight: 300, position: 'relative', zIndex: 1 }}>
             Nuestros socios directores analizarán tu perfil y te presentarán las mejores opciones de financiamiento disponibles para ti.
           </p>
-          <button onClick={() => setModalOpen(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem', padding: '1rem 2rem', background: GREEN, color: 'white', border: 'none', borderRadius: '0.75rem', fontSize: '1rem', fontWeight: 600, cursor: 'pointer', transition: 'all 0.3s', position: 'relative', zIndex: 1, boxShadow: '0 8px 24px rgba(0,109,78,0.4)' }}>
+          <button onClick={() => navigate('/perfil')} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem', padding: '1rem 2rem', background: GREEN, color: 'white', border: 'none', borderRadius: '0.75rem', fontSize: '1rem', fontWeight: 600, cursor: 'pointer', transition: 'all 0.3s', position: 'relative', zIndex: 1, boxShadow: '0 8px 24px rgba(0,109,78,0.4)' }}>
             ✅ Iniciar Diagnóstico Gratuito
           </button>
         </div>
       </main>
 
       {/* Footer */}
-      <footer style={{ background: '#052b22', color: 'white', padding: '2.5rem 1.5rem', borderTop: '1px solid rgba(255,255,255,0.06)', marginTop: 'auto' }}>
-        <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', textAlign: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-            <svg viewBox="0 0 100 100" fill="white" width="28" height="28">
-              <circle cx="50" cy="50" r="12"/><circle cx="50" cy="20" r="12"/><circle cx="50" cy="80" r="12"/>
-              <circle cx="24" cy="35" r="12"/><circle cx="24" cy="65" r="12"/><circle cx="76" cy="35" r="12"/><circle cx="76" cy="65" r="12"/>
-            </svg>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ fontSize: '1.2rem', fontWeight: 700 }}>SOC</span>
-                <div style={{ width: '2px', height: '18px', background: 'rgba(255,255,255,0.35)' }} />
-                <span style={{ fontSize: '1.2rem', fontWeight: 700 }}>FIRMA 7</span>
+      <footer style={{ background: '#052b22', color: 'white', padding: '3rem 1.5rem 2rem', borderTop: '1px solid rgba(255,255,255,0.06)', marginTop: 'auto' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: '2.5rem', paddingBottom: '2rem', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+            <div style={{ textAlign: 'left' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.75rem' }}>
+                <svg viewBox="0 0 100 100" fill="white" width="28" height="28">
+                  <circle cx="50" cy="50" r="12"/><circle cx="50" cy="20" r="12"/><circle cx="50" cy="80" r="12"/>
+                  <circle cx="24" cy="35" r="12"/><circle cx="24" cy="65" r="12"/><circle cx="76" cy="35" r="12"/><circle cx="76" cy="65" r="12"/>
+                </svg>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ fontSize: '1.2rem', fontWeight: 700 }}>SOC</span>
+                    <div style={{ width: '2px', height: '18px', background: 'rgba(255,255,255,0.35)' }} />
+                    <span style={{ fontSize: '1.2rem', fontWeight: 700 }}>FIRMA 7</span>
+                  </div>
+                  <div style={{ fontSize: '0.5rem', fontWeight: 700, letterSpacing: '0.18em', color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase' as const, marginTop: '2px' }}>
+                    Líderes en Asesoría Financiera
+                  </div>
+                </div>
               </div>
-              <div style={{ fontSize: '0.5rem', fontWeight: 700, letterSpacing: '0.18em', color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase' as const, marginTop: '2px' }}>
-                Líderes en Asesoría Financiera
+              <button
+                onClick={() => navigate('/perfil')}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.6rem 1.25rem', background: GREEN, color: 'white', border: 'none', borderRadius: '999px', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}
+              >
+                Solicitar Crédito →
+              </button>
+            </div>
+
+            <div style={{ textAlign: 'left' }}>
+              <div style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase' as const, marginBottom: '0.85rem' }}>
+                Alianzas
               </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '2rem', rowGap: '0.4rem' }}>
+                {[
+                  { name: 'Konfío', slug: 'konfio' }, { name: 'PDN', slug: 'pdn' },
+                  { name: 'UNIFIN', slug: 'unifin' }, { name: 'FinBe ABC', slug: 'finbe-abc' },
+                  { name: 'Xepelin', slug: 'xepelin' }, { name: 'Finkargo', slug: 'finkargo' },
+                  { name: 'imagina LEASING', slug: 'imagina-leasing' }, { name: 'Covalto', slug: 'covalto' },
+                  { name: 'engen CAPITAL', slug: 'engen-capital' }, { name: 'Hey Banco', slug: 'hey-banco' },
+                  { name: 'Anticipa', slug: 'anticipa' }, { name: 'Axionex Financiera', slug: 'axionex-financiera' },
+                  { name: 'Bx+', slug: 'bx-plus' }, { name: 'Finsus', slug: 'finsus' },
+                  { name: 'Hay Cash', slug: 'hay-cash' }, { name: 'Banorte', slug: 'banorte' },
+                  { name: 'Afirme', slug: 'afirme' }, { name: 'Creze', slug: 'creze' },
+                ].map(a => (
+                  <a key={a.slug} href={`/alianzas/${a.slug}/`} style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.55)', textDecoration: 'none' }}>
+                    {a.name}
+                  </a>
+                ))}
+              </div>
+              <a href="/alianzas/" style={{ display: 'inline-block', marginTop: '0.85rem', fontSize: '0.72rem', fontWeight: 700, color: GREEN, textDecoration: 'none' }}>
+                Ver todas las alianzas →
+              </a>
             </div>
           </div>
-          <div style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.4)' }}>
+
+          <div style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.4)', textAlign: 'center', marginTop: '2rem' }}>
             © {new Date().getFullYear()} Firma 7. Todos los derechos reservados. · Av Patria 2085 Piso 1, Puerta de Hierro, Zapopan, Jalisco.
             {' · '}
             <a href="/aviso-de-privacidad" style={{ color: 'rgba(255,255,255,0.4)', textDecoration: 'underline' }}>
@@ -389,32 +425,6 @@ export const Calculadora: React.FC = () => {
           </div>
         </div>
       </footer>
-
-      {/* Modal Diagnóstico */}
-      {modalOpen && (
-        <div
-          onClick={e => { if (e.target === e.currentTarget) setModalOpen(false); }}
-          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', zIndex: 1000, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', overflowY: 'auto', padding: '3rem 1rem' }}
-        >
-          <div style={{ background: 'white', borderRadius: '1.5rem', maxWidth: '700px', width: '100%', margin: 'auto', overflow: 'hidden', boxShadow: '0 40px 100px rgba(0,0,0,0.25)' }}>
-            <div style={{ height: '4px', background: `linear-gradient(90deg, rgba(0,109,78,0.2), ${GREEN}, rgba(0,109,78,0.2))` }} />
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.5rem 2rem 1rem', borderBottom: '1px solid #e5e7eb' }}>
-              <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: '1.4rem', fontWeight: 600, color: CHARCOAL }}>
-                <em style={{ fontStyle: 'italic', color: GREEN }}>Pre-califícate</em> hoy mismo
-              </h3>
-              <button onClick={() => setModalOpen(false)} style={{ width: '36px', height: '36px', border: 'none', background: '#f3f4f6', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4b5563', fontSize: '16px' }}>✕</button>
-            </div>
-            <iframe
-              src="https://api.leadconnectorhq.com/widget/form/ytF9MgH3xDmSVPGeKAyS"
-              style={{ width: '100%', border: 'none', minHeight: '85vh', display: 'block', paddingTop: '1.5rem' }}
-              title="Formulario de Diagnóstico Firma 7"
-            />
-            <div style={{ padding: '0.75rem 2rem', borderTop: '1px solid #e5e7eb', textAlign: 'center', fontSize: '0.72rem', color: '#9ca3af', fontStyle: 'italic' }}>
-              🔒 Tu información está protegida por nuestros protocolos de seguridad bancaria y confidencialidad.
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
