@@ -113,6 +113,10 @@ export const Footer: React.FC = () => {
             <p className="mt-2">Av Patria 2085 Piso 1, Puerta de Hierro</p>
             <p>45116 Zapopan, Jalisco</p>
             <p className="mt-2">
+              <a href="/blog" className="text-gray-400 hover:text-white underline transition-colors">
+                Blog
+              </a>
+              {' · '}
               <a href="/aviso-de-privacidad" className="text-gray-400 hover:text-white underline transition-colors">
                 Aviso de Privacidad
               </a>

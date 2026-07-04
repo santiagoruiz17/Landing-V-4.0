@@ -38,6 +38,27 @@ const INITIAL: FormData = {
   giro: '', monto: '', destino: '', garantia: '',
 };
 
+// ─── Progreso guardado ─────────────────────────────────────────────────────────
+const PROGRESS_STORAGE_KEY = 'firma7_profiling_progress';
+const PROGRESS_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 días
+
+function loadSavedProgress(): { data: FormData; step: number } | null {
+  try {
+    const raw = localStorage.getItem(PROGRESS_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed?.savedAt || Date.now() - parsed.savedAt > PROGRESS_MAX_AGE_MS) return null;
+    if (!parsed.data) return null;
+    return { data: { ...INITIAL, ...parsed.data }, step: parsed.step ?? 0 };
+  } catch {
+    return null;
+  }
+}
+
+function clearSavedProgress(): void {
+  try { localStorage.removeItem(PROGRESS_STORAGE_KEY); } catch { /* noop */ }
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function isDescarte(data: FormData): boolean {
   if (data.ingresos === 'Menor a 150 mil pesos') return true;
@@ -278,9 +299,27 @@ const FOLLOWUP_DELAY_MS = 10 * 60 * 1000;
 // ─── Main Component ───────────────────────────────────────────────────────────
 export const ProfilingForm: React.FC = () => {
   const navigate = useNavigate();
-  const [data, setData] = useState<FormData>(INITIAL);
-  const [step, setStep] = useState(0);
+  const [savedProgress] = useState(() => loadSavedProgress());
+  const [data, setData] = useState<FormData>(() => savedProgress?.data ?? INITIAL);
+  const [step, setStep] = useState(() => savedProgress?.step ?? 0);
+  const [showRestoredBanner, setShowRestoredBanner] = useState(() => savedProgress !== null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Guarda el progreso en cada cambio, para poder retomarlo si el lead cierra
+  // o recarga la página antes de terminar.
+  useEffect(() => {
+    try {
+      localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify({ data, step, savedAt: Date.now() }));
+    } catch { /* noop */ }
+  }, [data, step]);
+
+  const startOver = () => {
+    clearSavedProgress();
+    setData(INITIAL);
+    setStep(0);
+    setErrors({});
+    setShowRestoredBanner(false);
+  };
 
   const dataRef = useRef(data);
   useEffect(() => { dataRef.current = data; }, [data]);
@@ -363,6 +402,7 @@ export const ProfilingForm: React.FC = () => {
     if (isDescarte({ ...data })) {
       resolvedRef.current = true;
       clearFollowupTimer();
+      clearSavedProgress();
       sendToAll(data, false, 'lead_descartado');
       navigate('/espera');
       return;
@@ -377,6 +417,7 @@ export const ProfilingForm: React.FC = () => {
     if (!validate()) return;
     resolvedRef.current = true;
     clearFollowupTimer();
+    clearSavedProgress();
     sendToN8N(data, true);
     const leadId = await sendToSupabase(data, true);
     const tipo = data.constitucion === 'Persona Moral' ? 'moral' : 'fisica';
@@ -699,6 +740,31 @@ export const ProfilingForm: React.FC = () => {
               />
             </div>
           </div>
+
+          {/* Aviso de progreso restaurado */}
+          {showRestoredBanner && (
+            <div className="mx-8 mt-1 mb-2 flex flex-wrap items-center justify-between gap-2 bg-firma-green/5 border border-firma-green/20 rounded-xl px-4 py-2.5">
+              <span className="text-xs text-firma-green font-medium">
+                Retomamos tu progreso anterior.
+              </span>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowRestoredBanner(false)}
+                  className="text-xs font-semibold text-firma-green hover:underline"
+                >
+                  Continuar
+                </button>
+                <button
+                  type="button"
+                  onClick={startOver}
+                  className="text-xs font-semibold text-gray-400 hover:text-gray-600 hover:underline"
+                >
+                  Empezar de nuevo
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Step dots */}
           <div className="flex items-start justify-between px-8 py-3">

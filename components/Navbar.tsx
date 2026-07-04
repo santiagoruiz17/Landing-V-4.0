@@ -70,6 +70,13 @@ export const Navbar: React.FC = () => {
               Alianzas
             </a>
             <button
+              onClick={() => navigate('/blog')}
+              className="text-sm font-medium text-gray-600 hover:text-[#006d4e] transition-colors cursor-pointer"
+              style={{ background: 'none', border: 'none' }}
+            >
+              Blog
+            </button>
+            <button
               onClick={() => navigate('/quiero-ser-aliado')}
               className="border border-firma-green text-firma-green px-5 py-2.5 rounded-none text-sm font-semibold hover:bg-firma-green hover:text-white transition-colors duration-300 flex items-center gap-2 cursor-pointer"
               style={{ cursor: 'pointer' }}
@@ -126,6 +133,13 @@ export const Navbar: React.FC = () => {
             >
               Alianzas
             </a>
+            <button
+              onClick={() => { setIsMobileMenuOpen(false); navigate('/blog'); }}
+              className="block w-full text-left px-3 py-4 text-base font-medium text-gray-600 hover:text-[#006d4e] hover:bg-gray-50 transition-colors"
+              style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+            >
+              Blog
+            </button>
             <button
               onClick={() => { setIsMobileMenuOpen(false); navigate('/quiero-ser-aliado'); }}
               className="flex items-center gap-2 w-full px-3 py-4 text-base font-semibold text-firma-green bg-firma-green/5 hover:bg-firma-green/10 transition-colors"

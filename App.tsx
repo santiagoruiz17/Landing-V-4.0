@@ -9,6 +9,7 @@ import { useSEO } from './hooks/useSEO';
 const Partners    = React.lazy(() => import('./components/Partners').then(m => ({ default: m.Partners })));
 const Methodology = React.lazy(() => import('./components/Methodology').then(m => ({ default: m.Methodology })));
 const Stats       = React.lazy(() => import('./components/Stats').then(m => ({ default: m.Stats })));
+const CaseStudies = React.lazy(() => import('./components/CaseStudies').then(m => ({ default: m.CaseStudies })));
 const FAQ         = React.lazy(() => import('./components/FAQ').then(m => ({ default: m.FAQ })));
 const Footer      = React.lazy(() => import('./components/Footer').then(m => ({ default: m.Footer })));
 
@@ -21,6 +22,8 @@ const DocumentosRecibidos = React.lazy(() => import('./pages/DocumentosRecibidos
 const NotFound            = React.lazy(() => import('./pages/NotFound').then(m => ({ default: m.NotFound })));
 const TerminosCondiciones = React.lazy(() => import('./pages/TerminosCondiciones').then(m => ({ default: m.TerminosCondiciones })));
 const QuieroSerAliado     = React.lazy(() => import('./pages/QuieroSerAliado').then(m => ({ default: m.QuieroSerAliado })));
+const Blog                = React.lazy(() => import('./pages/Blog').then(m => ({ default: m.Blog })));
+const BlogPost            = React.lazy(() => import('./pages/BlogPost').then(m => ({ default: m.BlogPost })));
 
 const SectionFallback = () => <div className="py-24 bg-white" />;
 
@@ -100,6 +103,7 @@ function LandingPage() {
         <Suspense fallback={<SectionFallback />}><Partners /></Suspense>
         <Suspense fallback={<SectionFallback />}><Methodology /></Suspense>
         <Suspense fallback={<SectionFallback />}><Stats /></Suspense>
+        <Suspense fallback={<SectionFallback />}><CaseStudies /></Suspense>
         <PerfilCTA />
         <Suspense fallback={<SectionFallback />}><FAQ /></Suspense>
       </main>
@@ -122,6 +126,8 @@ function App() {
           <Route path="/documentos-recibidos" element={<DocumentosRecibidos />} />
           <Route path="/terminos-y-condiciones" element={<TerminosCondiciones />} />
           <Route path="/quiero-ser-aliado" element={<QuieroSerAliado />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
