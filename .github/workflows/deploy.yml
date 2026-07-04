@@ -39,7 +39,28 @@ jobs:
           set net:timeout 30;
           set net:max-retries 3;
           open -u '${{ secrets.FTP_USERNAME }}','${{ secrets.FTP_PASSWORD }}' ftp://${{ secrets.FTP_SERVER }};
-          put -O /public_html/ ./dist/index.html;
           mirror --reverse --verbose ./dist/ /public_html/;
+          cd /public_html;
+          rm -f index.html;
+          put ./dist/index.html;
+          cd alianzas;
+          rm -f index.html;
+          put ./dist/alianzas/index.html;
           bye
         "
+
+    - name: 🔎 Verify deployed bundle matches build
+      run: |
+        EXPECTED=$(grep -oE '/assets/main-[A-Za-z0-9_-]+\.js' dist/index.html | head -1)
+        echo "Expected bundle reference: $EXPECTED"
+        for i in 1 2 3 4 5; do
+          sleep 3
+          LIVE=$(curl -s "https://firma7.com/?bust=$(date +%s%N)" | grep -oE '/assets/main-[A-Za-z0-9_-]+\.js' | head -1)
+          echo "Attempt $i — live bundle reference: $LIVE"
+          if [ "$LIVE" = "$EXPECTED" ]; then
+            echo "✅ Live site is serving the freshly built bundle."
+            exit 0
+          fi
+        done
+        echo "❌ Live site is still serving a stale bundle after 5 attempts. index.html did not update on the server."
+        exit 1
