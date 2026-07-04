@@ -110,32 +110,17 @@ function sendToN8N(data: FormData, calificado: boolean, evento?: string): void {
   }).catch(() => {});
 }
 
+// Se usa un RPC (security definer) en vez de insert().select().single() directo:
+// PostgREST necesita permiso de SELECT en RLS para devolver la fila insertada, y
+// leads no lo tiene (exponer SELECT dejaría leer todos los leads desde el navegador).
 async function sendToSupabase(data: FormData, calificado: boolean, evento?: string): Promise<string | null> {
   const eventoFinal = evento ?? (calificado ? 'lead_calificado' : 'lead_descartado');
   try {
-    const { data: row } = await supabase.from('leads').insert({
-      nombre_completo: data.nombreCompleto,
-      numero: data.numero,
-      correo: data.correo,
-      rfc: data.rfc,
-      cargo: data.cargo,
-      ingresos: data.ingresos,
-      antiguedad: data.antiguedad,
-      constitucion: data.constitucion,
-      buro_pf: data.buroPF,
-      buro_pf_detalle: data.buroPFDetalle,
-      buro_pm_empresa: data.buroPMEmpresa,
-      buro_pm_empresa_detalle: data.buroPMEmpresaDetalle,
-      buro_pm_accionista: data.buroPMAccionista,
-      buro_pm_accionista_detalle: data.buroPMAccionistaDetalle,
-      giro: data.giro,
-      monto: data.monto,
-      destino: data.destino,
-      garantia: data.garantia,
-      calificado,
-      evento: eventoFinal,
-    }).select('id').single();
-    return row?.id ?? null;
+    const { data: id, error } = await supabase.rpc('submit_lead', {
+      p: { ...data, calificado, evento: eventoFinal },
+    });
+    if (error) return null;
+    return (id as string) ?? null;
   } catch {
     return null;
   }
