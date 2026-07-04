@@ -7,9 +7,6 @@ const N8N_WEBHOOK_URL_PROD = 'https://n8n1.apexdigital.com.mx/webhook/firma7-lea
 const N8N_WEBHOOK_URL_TEST = 'https://santiagor17.app.n8n.cloud/webhook-test/956ed48a-8870-4b82-b74b-579b22e8c073';
 const N8N_WEBHOOK_URL = N8N_WEBHOOK_URL_PROD || N8N_WEBHOOK_URL_TEST;
 
-// ─── GHL Webhook ─────────────────────────────────────────────────────────────
-const GHL_WEBHOOK_URL = import.meta.env.VITE_GHL_WEBHOOK_URL as string | undefined;
-
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface FormData {
   nombreCompleto: string;
@@ -113,51 +110,42 @@ function sendToN8N(data: FormData, calificado: boolean, evento?: string): void {
   }).catch(() => {});
 }
 
-function sendToSupabase(data: FormData, calificado: boolean, evento?: string): void {
+async function sendToSupabase(data: FormData, calificado: boolean, evento?: string): Promise<string | null> {
   const eventoFinal = evento ?? (calificado ? 'lead_calificado' : 'lead_descartado');
-  supabase.from('leads').insert({
-    nombre_completo: data.nombreCompleto,
-    numero: data.numero,
-    correo: data.correo,
-    rfc: data.rfc,
-    cargo: data.cargo,
-    ingresos: data.ingresos,
-    antiguedad: data.antiguedad,
-    constitucion: data.constitucion,
-    buro_pf: data.buroPF,
-    buro_pf_detalle: data.buroPFDetalle,
-    buro_pm_empresa: data.buroPMEmpresa,
-    buro_pm_empresa_detalle: data.buroPMEmpresaDetalle,
-    buro_pm_accionista: data.buroPMAccionista,
-    buro_pm_accionista_detalle: data.buroPMAccionistaDetalle,
-    giro: data.giro,
-    monto: data.monto,
-    destino: data.destino,
-    garantia: data.garantia,
-    calificado,
-    evento: eventoFinal,
-  }).then(() => {});
+  try {
+    const { data: row } = await supabase.from('leads').insert({
+      nombre_completo: data.nombreCompleto,
+      numero: data.numero,
+      correo: data.correo,
+      rfc: data.rfc,
+      cargo: data.cargo,
+      ingresos: data.ingresos,
+      antiguedad: data.antiguedad,
+      constitucion: data.constitucion,
+      buro_pf: data.buroPF,
+      buro_pf_detalle: data.buroPFDetalle,
+      buro_pm_empresa: data.buroPMEmpresa,
+      buro_pm_empresa_detalle: data.buroPMEmpresaDetalle,
+      buro_pm_accionista: data.buroPMAccionista,
+      buro_pm_accionista_detalle: data.buroPMAccionistaDetalle,
+      giro: data.giro,
+      monto: data.monto,
+      destino: data.destino,
+      garantia: data.garantia,
+      calificado,
+      evento: eventoFinal,
+    }).select('id').single();
+    return row?.id ?? null;
+  } catch {
+    return null;
+  }
 }
 
-function sendToGHL(data: FormData, calificado: boolean, evento?: string): void {
-  if (!GHL_WEBHOOK_URL) return;
-  const payload = {
-    ...data,
-    calificado,
-    evento: evento ?? (calificado ? 'lead_calificado' : 'lead_descartado'),
-    timestamp: new Date().toISOString(),
-  };
-  fetch(GHL_WEBHOOK_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  }).catch(() => {});
-}
-
+// La sincronización a GHL ocurre en Supabase (trigger sync_lead_to_ghl sobre
+// la tabla leads), no aquí — así se evita exponer credenciales en el navegador.
 function sendToAll(data: FormData, calificado: boolean, evento?: string): void {
   sendToN8N(data, calificado, evento);
   sendToSupabase(data, calificado, evento);
-  sendToGHL(data, calificado, evento);
 }
 
 // ─── Confetti ─────────────────────────────────────────────────────────────────
@@ -400,13 +388,16 @@ export const ProfilingForm: React.FC = () => {
   const prev = () => { setErrors({}); setStep(s => Math.max(0, s - 1)); };
 
   // ─── Submit ────────────────────────────────────────────────────────────────
-  const submit = () => {
+  const submit = async () => {
     if (!validate()) return;
     resolvedRef.current = true;
     clearFollowupTimer();
-    sendToAll(data, true);
+    sendToN8N(data, true);
+    const leadId = await sendToSupabase(data, true);
     const tipo = data.constitucion === 'Persona Moral' ? 'moral' : 'fisica';
-    navigate(`/aprobado?tipo=${tipo}&nombre=${encodeURIComponent(data.nombreCompleto.split(' ')[0])}`);
+    const params = new URLSearchParams({ tipo, nombre: data.nombreCompleto.split(' ')[0] });
+    if (leadId) params.set('leadId', leadId);
+    navigate(`/aprobado?${params.toString()}`);
   };
 
   const inputClass = (field: string) =>

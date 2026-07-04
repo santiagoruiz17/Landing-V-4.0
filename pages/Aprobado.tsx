@@ -2,10 +2,7 @@ import React, { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Shield, FileText } from 'lucide-react';
 import { useSEO } from '../hooks/useSEO';
-
-// ─── GHL document upload forms ─────────────────────────────────────────────────
-const FORM_FISICA = { id: '09uTR2kfDvaEd9HIGT9o', name: 'FORMULARIO DOCUMENTOS PFAE', height: 1900 };
-const FORM_MORAL  = { id: '1Y9mjxUgKcICNapChZuj', name: 'FORMULARIO DOCUMENTOS PM', height: 2461 };
+import { DocumentUpload } from '../components/DocumentUpload';
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export const Aprobado: React.FC = () => {
@@ -20,33 +17,8 @@ export const Aprobado: React.FC = () => {
   const [searchParams] = useSearchParams();
   const tipo = searchParams.get('tipo') || 'fisica';
   const nombre = searchParams.get('nombre') || '';
+  const leadId = searchParams.get('leadId') || '';
   const esMoral = tipo === 'moral';
-  const formConfig = esMoral ? FORM_MORAL : FORM_FISICA;
-
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://link.msgsndr.com/js/form_embed.js';
-    script.async = true;
-    document.body.appendChild(script);
-    return () => { try { document.body.removeChild(script); } catch {} };
-  }, []);
-
-  // Detecta el envío del formulario GHL (postMessage del iframe) y redirige
-  // al inicio mostrando una pantalla de confirmación, en vez de dejar que el
-  // iframe muestre su propio "siguiente paso" (otro formulario).
-  useEffect(() => {
-    const allowedOrigins = ['https://api.leadconnectorhq.com', 'https://link.msgsndr.com', 'https://widgets.leadconnectorhq.com'];
-    const handleMessage = (event: MessageEvent) => {
-      if (!allowedOrigins.includes(event.origin)) return;
-      const raw = event.data;
-      const text = typeof raw === 'string' ? raw : JSON.stringify(raw ?? {});
-      if (/submit/i.test(text)) {
-        navigate('/documentos-recibidos');
-      }
-    };
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
-  }, [navigate]);
 
   useEffect(() => {
     const script = document.createElement('script');
@@ -141,43 +113,28 @@ export const Aprobado: React.FC = () => {
           </p>
         </div>
 
-        {/* ── GHL Documentation Upload Form ───────────── */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="bg-gradient-to-br from-[#006d4e] to-emerald-600 px-6 py-6 text-white">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-white/15 rounded-xl flex items-center justify-center flex-shrink-0">
-                <FileText size={22} className="text-white" />
-              </div>
-              <div>
-                <h2 className="font-serif text-xl md:text-2xl">Sube tu documentación</h2>
-                <p className="text-[#b8ddd3] text-xs md:text-sm mt-0.5">
-                  Formulario seguro · {esMoral ? 'Persona Moral' : 'Persona Física con Actividad Empresarial'}
-                </p>
-              </div>
+        {/* ── Documentation Upload Form ───────────── */}
+        {leadId ? (
+          <DocumentUpload leadId={leadId} tipo={esMoral ? 'moral' : 'fisica'} />
+        ) : (
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
+            <div className="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center mx-auto mb-4">
+              <FileText size={20} className="text-amber-500" />
             </div>
+            <h3 className="font-serif text-xl text-charcoal font-bold mb-2">No pudimos identificar tu solicitud</h3>
+            <p className="text-gray-500 text-sm max-w-md mx-auto mb-5">
+              Parece que llegaste a esta página directamente. Contáctanos por WhatsApp y con gusto te ayudamos a continuar tu trámite.
+            </p>
+            <a
+              href="https://wa.me/525525069817?text=Hola%2C%20fui%20pre-aprobado%20pero%20no%20puedo%20subir%20mi%20documentaci%C3%B3n%20desde%20la%20p%C3%A1gina."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#25D366] text-white font-semibold rounded-full hover:bg-[#1ebe5c] transition-colors no-underline text-sm"
+            >
+              Hablar con un asesor
+            </a>
           </div>
-          <div className="p-2 sm:p-3 bg-gray-50">
-            <iframe
-              key={formConfig.id}
-              src={`https://api.leadconnectorhq.com/widget/form/${formConfig.id}`}
-              style={{ width: '100%', height: formConfig.height, border: 'none', borderRadius: '12px', display: 'block' }}
-              id={`inline-${formConfig.id}`}
-              data-layout="{'id':'INLINE'}"
-              data-trigger-type="alwaysShow"
-              data-trigger-value=""
-              data-activation-type="alwaysActivated"
-              data-activation-value=""
-              data-deactivation-type="neverDeactivate"
-              data-deactivation-value=""
-              data-form-name={formConfig.name}
-              data-height={formConfig.height}
-              data-layout-iframe-id={`inline-${formConfig.id}`}
-              data-form-id={formConfig.id}
-              title={formConfig.name}
-              className="bg-white"
-            />
-          </div>
-        </div>
+        )}
 
         {/* ── Support CTA ─────────────────────────────── */}
         <div className="bg-charcoal rounded-2xl p-8 text-center text-white">
