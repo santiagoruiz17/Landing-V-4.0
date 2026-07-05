@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Clock, TrendingUp, Bookmark } from 'lucide-react';
 import { useSEO } from '../hooks/useSEO';
+import { GuiaDescargable } from '../components/GuiaDescargable';
 
 export const Espera: React.FC = () => {
   useSEO({
@@ -76,6 +77,9 @@ export const Espera: React.FC = () => {
             </p>
           </div>
         </div>
+
+        {/* ── Guía descargable ───────────────────────────── */}
+        <GuiaDescargable />
 
         {/* ── Next steps ─────────────────────────────────── */}
         <div className="space-y-3">

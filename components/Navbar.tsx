@@ -77,13 +77,6 @@ export const Navbar: React.FC = () => {
               Blog
             </button>
             <button
-              onClick={() => navigate('/quiero-ser-aliado')}
-              className="border border-firma-green text-firma-green px-5 py-2.5 rounded-none text-sm font-semibold hover:bg-firma-green hover:text-white transition-colors duration-300 flex items-center gap-2 cursor-pointer"
-              style={{ cursor: 'pointer' }}
-            >
-              <Handshake size={16} /> Quiero Aliarme
-            </button>
-            <button
               onClick={() => navigate('/calculadora')}
               className="text-sm font-medium text-gray-600 hover:text-[#006d4e] transition-colors cursor-pointer flex items-center gap-1.5"
               style={{ background: 'none', border: 'none' }}
@@ -93,6 +86,13 @@ export const Navbar: React.FC = () => {
                 <line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/>
               </svg>
               Calculadora
+            </button>
+            <button
+              onClick={() => navigate('/quiero-ser-aliado')}
+              className="border border-firma-green text-firma-green px-5 py-2.5 rounded-none text-sm font-semibold hover:bg-firma-green hover:text-white transition-colors duration-300 flex items-center gap-2 cursor-pointer"
+              style={{ cursor: 'pointer' }}
+            >
+              <Handshake size={16} /> Quiero Aliarme
             </button>
             <button
               onClick={() => navigate('/perfil')}
@@ -141,13 +141,6 @@ export const Navbar: React.FC = () => {
               Blog
             </button>
             <button
-              onClick={() => { setIsMobileMenuOpen(false); navigate('/quiero-ser-aliado'); }}
-              className="flex items-center gap-2 w-full px-3 py-4 text-base font-semibold text-firma-green bg-firma-green/5 hover:bg-firma-green/10 transition-colors"
-              style={{ background: 'rgba(0,109,78,0.05)', border: 'none', cursor: 'pointer' }}
-            >
-              <Handshake size={18} /> Quiero Aliarme
-            </button>
-            <button
               onClick={() => { setIsMobileMenuOpen(false); navigate('/calculadora'); }}
               className="flex items-center gap-2 w-full px-3 py-4 text-base font-medium text-gray-600 hover:text-[#006d4e] hover:bg-gray-50 transition-colors"
               style={{ background: 'none', border: 'none', cursor: 'pointer' }}
@@ -157,6 +150,13 @@ export const Navbar: React.FC = () => {
                 <line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/>
               </svg>
               Calculadora de Crédito
+            </button>
+            <button
+              onClick={() => { setIsMobileMenuOpen(false); navigate('/quiero-ser-aliado'); }}
+              className="flex items-center gap-2 w-full px-3 py-4 text-base font-semibold text-firma-green bg-firma-green/5 hover:bg-firma-green/10 transition-colors"
+              style={{ background: 'rgba(0,109,78,0.05)', border: 'none', cursor: 'pointer' }}
+            >
+              <Handshake size={18} /> Quiero Aliarme
             </button>
             <button
               onClick={() => { setIsMobileMenuOpen(false); navigate('/perfil'); }}

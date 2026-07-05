@@ -3,6 +3,7 @@ import { FileText, Send, CheckCircle2, Loader2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { DocumentSlot, DocumentoTipo } from './DocumentSlot';
 import { CiecInput } from './CiecInput';
+import { EstadosCuentaSlot } from './EstadosCuentaSlot';
 
 const FOLLOWUP_DELAY_MS = 30 * 60 * 1000; // 30 minutos
 
@@ -21,23 +22,27 @@ const ESTADOS_CUENTA: ItemDescriptor[] = Array.from({ length: 6 }, (_, i) => ({
   label: `Estado de cuenta — Mes ${i + 1}`,
 }));
 
-const ITEMS_PFAE: ItemDescriptor[] = [
+const ITEMS_PFAE_ANTES: ItemDescriptor[] = [
   { key: 'constancia_situacion_fiscal', tipoDocumento: 'constancia_situacion_fiscal', label: 'Constancia de situación fiscal' },
   { key: 'ine', tipoDocumento: 'ine', label: 'INE' },
   { key: 'declaracion_anual', tipoDocumento: 'declaracion_anual', label: 'Declaración anual 2025 con acuse electrónico' },
-  ...ESTADOS_CUENTA,
+];
+const ITEMS_PFAE_DESPUES: ItemDescriptor[] = [
   { key: 'comprobante_domicilio_fiscal', tipoDocumento: 'comprobante_domicilio_fiscal', label: 'Comprobante de domicilio fiscal' },
   { key: 'comprobante_domicilio_particular', tipoDocumento: 'comprobante_domicilio_particular', label: 'Comprobante de domicilio particular' },
 ];
+const ITEMS_PFAE: ItemDescriptor[] = [...ITEMS_PFAE_ANTES, ...ESTADOS_CUENTA, ...ITEMS_PFAE_DESPUES];
 
-const ITEMS_PM_EMPRESA: ItemDescriptor[] = [
+const ITEMS_PM_EMPRESA_ANTES: ItemDescriptor[] = [
   { key: 'acta_constitutiva', tipoDocumento: 'acta_constitutiva', label: 'Acta constitutiva con sello de registro público' },
   { key: 'escrituras_modificaciones', tipoDocumento: 'escrituras_modificaciones', label: 'Escrituras con modificaciones (si aplica)', optional: true },
   { key: 'constancia_situacion_fiscal', tipoDocumento: 'constancia_situacion_fiscal', label: 'Constancia de situación fiscal' },
   { key: 'declaracion_anual', tipoDocumento: 'declaracion_anual', label: 'Declaración anual 2025 con acuse electrónico' },
-  ...ESTADOS_CUENTA,
+];
+const ITEMS_PM_EMPRESA_DESPUES: ItemDescriptor[] = [
   { key: 'comprobante_domicilio_fiscal', tipoDocumento: 'comprobante_domicilio_fiscal', label: 'Comprobante de domicilio fiscal' },
 ];
+const ITEMS_PM_EMPRESA: ItemDescriptor[] = [...ITEMS_PM_EMPRESA_ANTES, ...ESTADOS_CUENTA, ...ITEMS_PM_EMPRESA_DESPUES];
 
 const ITEMS_PM_ACCIONISTA: ItemDescriptor[] = [
   { key: 'ine_accionista', tipoDocumento: 'ine_accionista', label: 'INE del principal accionista' },
@@ -141,7 +146,19 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({ leadId, tipo }) 
           <>
             <div className="space-y-5">
               <h3 className="text-sm font-bold text-charcoal uppercase tracking-wider">Documentación de la empresa</h3>
-              {ITEMS_PM_EMPRESA.map(item => (
+              {ITEMS_PM_EMPRESA_ANTES.map(item => (
+                <DocumentSlot
+                  key={item.key}
+                  leadId={leadId}
+                  tipoDocumento={item.tipoDocumento}
+                  slotIndex={item.slotIndex}
+                  label={item.label}
+                  optional={item.optional}
+                  onUploaded={markCompleted}
+                />
+              ))}
+              <EstadosCuentaSlot leadId={leadId} meses={ESTADOS_CUENTA.length} onUploaded={markCompleted} />
+              {ITEMS_PM_EMPRESA_DESPUES.map(item => (
                 <DocumentSlot
                   key={item.key}
                   leadId={leadId}
@@ -171,7 +188,19 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({ leadId, tipo }) 
           </>
         ) : (
           <div className="space-y-5">
-            {ITEMS_PFAE.map(item => (
+            {ITEMS_PFAE_ANTES.map(item => (
+              <DocumentSlot
+                key={item.key}
+                leadId={leadId}
+                tipoDocumento={item.tipoDocumento}
+                slotIndex={item.slotIndex}
+                label={item.label}
+                optional={item.optional}
+                onUploaded={markCompleted}
+              />
+            ))}
+            <EstadosCuentaSlot leadId={leadId} meses={ESTADOS_CUENTA.length} onUploaded={markCompleted} />
+            {ITEMS_PFAE_DESPUES.map(item => (
               <DocumentSlot
                 key={item.key}
                 leadId={leadId}
