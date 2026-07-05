@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { trackLead } from '../lib/metaPixel';
 
 // ─── N8N Webhook ──────────────────────────────────────────────────────────────
 const N8N_WEBHOOK_URL_PROD = 'https://n8n1.apexdigital.com.mx/webhook/firma7-leads';
@@ -420,6 +421,7 @@ export const ProfilingForm: React.FC = () => {
     clearFollowupTimer();
     clearSavedProgress();
     sendToN8N(data, true);
+    trackLead();
     const leadId = await sendToSupabase(data, true);
     const tipo = data.constitucion === 'Persona Moral' ? 'moral' : 'fisica';
     const params = new URLSearchParams({ tipo, nombre: data.nombreCompleto.split(' ')[0] });

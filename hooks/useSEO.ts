@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { trackPageView } from '../lib/metaPixel';
 
 interface SEOOptions {
   title: string;
@@ -41,5 +42,6 @@ export function useSEO({ title, description, canonical, noindex = false }: SEOOp
       document.head.appendChild(canonicalEl);
     }
     canonicalEl.href = canonical;
+    trackPageView();
   }, [title, description, canonical, noindex]);
 }

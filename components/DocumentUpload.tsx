@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import { DocumentSlot, DocumentoTipo } from './DocumentSlot';
 import { CiecInput } from './CiecInput';
 import { EstadosCuentaSlot } from './EstadosCuentaSlot';
+import { trackCompleteRegistration } from '../lib/metaPixel';
 
 const FOLLOWUP_DELAY_MS = 30 * 60 * 1000; // 30 minutos
 
@@ -90,6 +91,7 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({ leadId, tipo }) 
     resolvedRef.current = true;
     if (followupTimeoutRef.current) clearTimeout(followupTimeoutRef.current);
     await supabase.rpc('send_lead_documentos_email', { p_lead_id: leadId, p_kind: 'completo' });
+    trackCompleteRegistration();
     setSending(false);
     setSent(true);
   };
