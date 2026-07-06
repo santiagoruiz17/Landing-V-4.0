@@ -26,3 +26,11 @@ h5,
 h6 {
   font-family: var(--font-serif);
 }
+
+button:not(:disabled),
+a,
+[role="button"],
+input[type="submit"]:not(:disabled),
+input[type="button"]:not(:disabled) {
+  cursor: pointer;
+}

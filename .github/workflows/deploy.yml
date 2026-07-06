@@ -32,35 +32,81 @@ jobs:
     - name: 📂 Install lftp
       run: sudo apt-get install -y lftp
 
-    - name: 📂 Deploy to Hostinger via FTP
+    - name: 📂 Deploy to Hostinger via FTP (with verify + auto-retry)
       run: |
-        lftp -c "
-          set ftp:ssl-allow no;
-          set net:timeout 30;
-          set net:max-retries 3;
-          open -u '${{ secrets.FTP_USERNAME }}','${{ secrets.FTP_PASSWORD }}' ftp://${{ secrets.FTP_SERVER }};
-          mirror --reverse --verbose ./dist/ /public_html/;
-          cd /public_html;
-          rm -f index.html;
-          put ./dist/index.html;
-          cd alianzas;
-          rm -f index.html;
-          put ./dist/alianzas/index.html;
-          bye
-        "
+        deploy() {
+          lftp -c "
+            set ftp:ssl-allow no;
+            set net:timeout 30;
+            set net:max-retries 3;
+            open -u '${{ secrets.FTP_USERNAME }}','${{ secrets.FTP_PASSWORD }}' ftp://${{ secrets.FTP_SERVER }};
+            mirror --reverse --verbose ./dist/ /public_html/;
+            cd /public_html;
+            rm -f index.html;
+            put ./dist/index.html;
+            cd alianzas;
+            rm -f index.html;
+            put ./dist/alianzas/index.html;
+            bye
+          "
+        }
 
-    - name: 🔎 Verify deployed bundle matches build
-      run: |
-        EXPECTED=$(grep -oE '/assets/main-[A-Za-z0-9_-]+\.js' dist/index.html | head -1)
-        echo "Expected bundle reference: $EXPECTED"
-        for i in 1 2 3 4 5; do
-          sleep 3
-          LIVE=$(curl -s "https://firma7.com/?bust=$(date +%s%N)" | grep -oE '/assets/main-[A-Za-z0-9_-]+\.js' | head -1)
-          echo "Attempt $i — live bundle reference: $LIVE"
-          if [ "$LIVE" = "$EXPECTED" ]; then
-            echo "✅ Live site is serving the freshly built bundle."
+        # Revisa TODOS los .js/.css que Vite realmente generó en dist/assets —
+        # no solo los que aparecen como <script>/<link> en index.html. Los
+        # chunks de rutas con lazy-loading (Perfil, Espera, Aprobado, Blog...)
+        # solo se referencian dentro del bundle vía import() dinámico, nunca
+        # como tag HTML, así que si solo revisáramos index.html se nos
+        # escaparían justo los archivos que fallaron hoy.
+        #
+        # Cualquiera de estos puede quedar a medio subir por una falla
+        # intermitente de FTP: el archivo "existe" según el log de lftp, pero
+        # el servidor nunca lo escribió. El .htaccess entonces responde con el
+        # fallback de index.html (200, pero Content-Type text/html) en vez de
+        # servir el JS/CSS real — la app nunca monta y la página queda en
+        # blanco sin que el deploy se marque como fallido.
+        verify_assets() {
+          local ok=1
+          local file path content_type
+          for file in dist/assets/*.js dist/assets/*.css; do
+            [ -e "$file" ] || continue
+            path="/assets/$(basename "$file")"
+            content_type=$(curl -s -o /dev/null -w "%{content_type}" "https://firma7.com${path}?bust=$(date +%s%N)")
+            if [[ "$content_type" == text/html* ]]; then
+              echo "❌ ${path} -> Content-Type: ${content_type} (el .htaccess está sirviendo el fallback de index.html — el archivo no llegó al servidor)"
+              ok=0
+            else
+              echo "✅ ${path} -> Content-Type: ${content_type}"
+            fi
+          done
+          [ "$ok" -eq 1 ]
+        }
+
+        for attempt in 1 2 3; do
+          echo "── Intento de deploy $attempt/3 ──"
+          deploy
+          echo "── Verificando que index.html apunte al bundle nuevo ──"
+          EXPECTED=$(grep -oE '/assets/main-[A-Za-z0-9_-]+\.js' dist/index.html | head -1)
+          html_ok=0
+          for i in 1 2 3 4 5; do
+            sleep 3
+            LIVE=$(curl -s "https://firma7.com/?bust=$(date +%s%N)" | grep -oE '/assets/main-[A-Za-z0-9_-]+\.js' | head -1)
+            if [ "$LIVE" = "$EXPECTED" ]; then
+              html_ok=1
+              break
+            fi
+          done
+          if [ "$html_ok" -ne 1 ]; then
+            echo "❌ index.html sigue sirviendo un bundle viejo tras el intento $attempt."
+            continue
+          fi
+
+          echo "── Verificando que cada asset referenciado cargue como JS/CSS real ──"
+          if verify_assets; then
+            echo "✅ Deploy verificado: index.html y todos los assets cargan correctamente."
             exit 0
           fi
+          echo "⚠️ Algunos assets no cargaron correctamente tras el intento $attempt — reintentando deploy."
         done
-        echo "❌ Live site is still serving a stale bundle after 5 attempts. index.html did not update on the server."
+
+        echo "❌ El sitio sigue sirviendo archivos rotos/incompletos después de 3 intentos de deploy."
         exit 1

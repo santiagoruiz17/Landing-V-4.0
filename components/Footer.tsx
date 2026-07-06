@@ -87,9 +87,9 @@ export const Footer: React.FC = () => {
           </div>
 
           {/* Alianzas */}
-          <div className="text-center md:text-left">
+          <div className="text-center md:text-left md:flex-[1.4]">
             <h3 className="text-xs font-bold tracking-[0.15em] text-gray-400 uppercase mb-4">Alianzas</h3>
-            <div className="grid grid-cols-2 gap-x-8 gap-y-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-2">
               {ALIANZAS.map(a => (
                 <a
                   key={a.slug}
@@ -109,8 +109,7 @@ export const Footer: React.FC = () => {
           </div>
 
           <div className="text-sm text-gray-400 text-center md:text-right">
-            <p>&copy; {new Date().getFullYear()} Firma 7. Todos los derechos reservados.</p>
-            <p className="mt-2">Av Patria 2085 Piso 1, Puerta de Hierro</p>
+            <p>Av Patria 2085 Piso 1, Puerta de Hierro</p>
             <p>45116 Zapopan, Jalisco</p>
             <p className="mt-2">
               <a href="/blog" className="text-gray-400 hover:text-white underline transition-colors">
@@ -120,13 +119,19 @@ export const Footer: React.FC = () => {
               <a href="/aviso-de-privacidad" className="text-gray-400 hover:text-white underline transition-colors">
                 Aviso de Privacidad
               </a>
+              {/* Términos y Condiciones: aún no tenemos el texto legal definitivo — oculto para no mostrar una página vacía.
               {' · '}
               <a href="/terminos-y-condiciones" className="text-gray-400 hover:text-white underline transition-colors">
                 Términos y Condiciones
               </a>
+              */}
             </p>
           </div>
         </div>
+
+        <p className="text-center text-xs text-gray-500 pt-6">
+          &copy; {new Date().getFullYear()} Firma 7. Todos los derechos reservados.
+        </p>
       </div>
     </footer>
   );

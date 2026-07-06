@@ -20,7 +20,9 @@ const Espera              = React.lazy(() => import('./pages/Espera').then(m => 
 const AvisoPrivacidad     = React.lazy(() => import('./pages/AvisoPrivacidad').then(m => ({ default: m.AvisoPrivacidad })));
 const DocumentosRecibidos = React.lazy(() => import('./pages/DocumentosRecibidos').then(m => ({ default: m.DocumentosRecibidos })));
 const NotFound            = React.lazy(() => import('./pages/NotFound').then(m => ({ default: m.NotFound })));
-const TerminosCondiciones = React.lazy(() => import('./pages/TerminosCondiciones').then(m => ({ default: m.TerminosCondiciones })));
+// Términos y Condiciones: aún no tenemos el texto legal definitivo — ruta y enlaces
+// deshabilitados para no mostrar una página vacía. Reactivar cuando esté el texto.
+// const TerminosCondiciones = React.lazy(() => import('./pages/TerminosCondiciones').then(m => ({ default: m.TerminosCondiciones })));
 const QuieroSerAliado     = React.lazy(() => import('./pages/QuieroSerAliado').then(m => ({ default: m.QuieroSerAliado })));
 const Blog                = React.lazy(() => import('./pages/Blog').then(m => ({ default: m.Blog })));
 const BlogPost            = React.lazy(() => import('./pages/BlogPost').then(m => ({ default: m.BlogPost })));
@@ -124,7 +126,7 @@ function App() {
           <Route path="/espera" element={<Espera />} />
           <Route path="/aviso-de-privacidad" element={<AvisoPrivacidad />} />
           <Route path="/documentos-recibidos" element={<DocumentosRecibidos />} />
-          <Route path="/terminos-y-condiciones" element={<TerminosCondiciones />} />
+          {/* <Route path="/terminos-y-condiciones" element={<TerminosCondiciones />} /> */}
           <Route path="/quiero-ser-aliado" element={<QuieroSerAliado />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogPost />} />

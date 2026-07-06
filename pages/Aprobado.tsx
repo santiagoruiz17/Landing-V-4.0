@@ -160,8 +160,10 @@ export const Aprobado: React.FC = () => {
           © {new Date().getFullYear()} Firma 7 · SOC Asesores · Toda tu información está protegida
           {' · '}
           <a href="/aviso-de-privacidad" className="text-gray-400 hover:text-[#006d4e] underline">Aviso de Privacidad</a>
+          {/* Términos y Condiciones: aún no tenemos el texto legal definitivo — oculto para no mostrar una página vacía.
           {' · '}
           <a href="/terminos-y-condiciones" className="text-gray-400 hover:text-[#006d4e] underline">Términos y Condiciones</a>
+          */}
         </p>
       </main>
     </div>
