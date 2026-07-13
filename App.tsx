@@ -1,10 +1,11 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { SocialProofToast } from './components/SocialProofToast';
 import { ExitIntentPopup } from './components/ExitIntentPopup';
 import { useSEO } from './hooks/useSEO';
+import { captureUtmParams } from './lib/utmTracking';
 
 const Partners    = React.lazy(() => import('./components/Partners').then(m => ({ default: m.Partners })));
 const Methodology = React.lazy(() => import('./components/Methodology').then(m => ({ default: m.Methodology })));
@@ -115,6 +116,8 @@ function LandingPage() {
 }
 
 function App() {
+  useEffect(() => { captureUtmParams(); }, []);
+
   return (
     <BrowserRouter>
       <Suspense fallback={<div className="min-h-screen bg-gray-50" />}>

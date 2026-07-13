@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Eye } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { trackLead } from '../lib/metaPixel';
+import { getStoredUtmParams } from '../lib/utmTracking';
 
 // ─── N8N Webhook ──────────────────────────────────────────────────────────────
 const N8N_WEBHOOK_URL_PROD = 'https://n8n1.apexdigital.com.mx/webhook/firma7-leads';
@@ -29,6 +30,10 @@ interface FormData {
   monto: string;
   destino: string;
   garantia: string;
+  utmSource: string;
+  utmMedium: string;
+  utmCampaign: string;
+  utmContent: string;
 }
 
 const INITIAL: FormData = {
@@ -38,7 +43,14 @@ const INITIAL: FormData = {
   buroPMEmpresa: '', buroPMEmpresaDetalle: '',
   buroPMAccionista: '', buroPMAccionistaDetalle: '',
   giro: '', monto: '', destino: '', garantia: '',
+  utmSource: '', utmMedium: '', utmCampaign: '', utmContent: '',
 };
+
+// Datos frescos para una sesión nueva: arranca de INITIAL pero con la
+// atribución de campaña capturada por captureUtmParams() en App.tsx.
+function getInitialFormData(): FormData {
+  return { ...INITIAL, ...getStoredUtmParams() };
+}
 
 // ─── Progreso guardado ─────────────────────────────────────────────────────────
 const PROGRESS_STORAGE_KEY = 'firma7_profiling_progress';
@@ -302,7 +314,7 @@ const FOLLOWUP_DELAY_MS = 10 * 60 * 1000;
 export const ProfilingForm: React.FC = () => {
   const navigate = useNavigate();
   const [savedProgress] = useState(() => loadSavedProgress());
-  const [data, setData] = useState<FormData>(() => savedProgress?.data ?? INITIAL);
+  const [data, setData] = useState<FormData>(() => savedProgress?.data ?? getInitialFormData());
   const [step, setStep] = useState(() => savedProgress?.step ?? 0);
   const [showRestoredBanner, setShowRestoredBanner] = useState(() => savedProgress !== null);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -317,7 +329,7 @@ export const ProfilingForm: React.FC = () => {
 
   const startOver = () => {
     clearSavedProgress();
-    setData(INITIAL);
+    setData(getInitialFormData());
     setStep(0);
     setErrors({});
     setShowRestoredBanner(false);
