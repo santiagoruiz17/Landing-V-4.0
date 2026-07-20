@@ -20,6 +20,7 @@ const Aprobado            = React.lazy(() => import('./pages/Aprobado').then(m =
 const Espera              = React.lazy(() => import('./pages/Espera').then(m => ({ default: m.Espera })));
 const AvisoPrivacidad     = React.lazy(() => import('./pages/AvisoPrivacidad').then(m => ({ default: m.AvisoPrivacidad })));
 const DocumentosRecibidos = React.lazy(() => import('./pages/DocumentosRecibidos').then(m => ({ default: m.DocumentosRecibidos })));
+const Gracias             = React.lazy(() => import('./pages/Gracias').then(m => ({ default: m.Gracias })));
 const NotFound            = React.lazy(() => import('./pages/NotFound').then(m => ({ default: m.NotFound })));
 // Términos y Condiciones: aún no tenemos el texto legal definitivo — ruta y enlaces
 // deshabilitados para no mostrar una página vacía. Reactivar cuando esté el texto.
@@ -129,6 +130,7 @@ function App() {
           <Route path="/espera" element={<Espera />} />
           <Route path="/aviso-de-privacidad" element={<AvisoPrivacidad />} />
           <Route path="/documentos-recibidos" element={<DocumentosRecibidos />} />
+          <Route path="/gracias" element={<Gracias />} />
           {/* <Route path="/terminos-y-condiciones" element={<TerminosCondiciones />} /> */}
           <Route path="/quiero-ser-aliado" element={<QuieroSerAliado />} />
           <Route path="/blog" element={<Blog />} />
