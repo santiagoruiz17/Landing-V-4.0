@@ -35,7 +35,13 @@
   Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
 
   # Content Security Policy
-  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://*.supabase.co https://www.google-analytics.com https://analytics.google.com https://api.leadconnectorhq.com https://n8n1.apexdigital.com.mx; frame-src https://api.leadconnectorhq.com https://link.msgsndr.com; object-src 'none'; base-uri 'self';"
+  # script-src ya no incluye 'unsafe-inline' ni 'unsafe-eval' — los 3 scripts
+  # que antes iban inline (GA4, Meta Pixel, directorio de alianzas) ahora son
+  # archivos externos propios (/analytics-init.js, /meta-pixel-init.js,
+  # /alianzas-partners.js), cubiertos por 'self'. Si en el futuro se necesita
+  # agregar OTRO script inline, no reintroducir 'unsafe-inline': o se mueve a
+  # un archivo externo (preferido) o se agrega su hash sha256 específico.
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://*.supabase.co https://www.google-analytics.com https://analytics.google.com https://api.leadconnectorhq.com https://n8n1.apexdigital.com.mx; frame-src https://api.leadconnectorhq.com https://link.msgsndr.com; object-src 'none'; base-uri 'self';"
 
   # Remove server signature
   Header always unset X-Powered-By
@@ -61,6 +67,15 @@
   # HTML — never cache (ensures React Router updates reach users)
   <FilesMatch "\.html$">
     ExpiresDefault "access plus 0 seconds"
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+  </FilesMatch>
+
+  # Scripts que antes eran inline (GA4/Meta Pixel/alianzas) — a diferencia de
+  # los chunks de Vite, su nombre de archivo NO cambia cuando se edita el
+  # contenido, así que no pueden entrar en el cacheo agresivo de arriba (se
+  # quedarían "pegados" en el navegador de los visitantes hasta por 1 año).
+  <FilesMatch "^(analytics-init|meta-pixel-init|alianzas-partners)\.js$">
     Header set Cache-Control "no-cache, no-store, must-revalidate"
     Header set Pragma "no-cache"
   </FilesMatch>
