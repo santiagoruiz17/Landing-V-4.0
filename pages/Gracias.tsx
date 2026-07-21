@@ -15,6 +15,15 @@ interface ReferidoData {
 
 const REFERIDO_VACIO: ReferidoData = { empresa: '', contacto: '', correo: '', telefono: '' };
 
+// Validación de correo más estricta que un simple "algo@algo.algo" — exige un dominio con al menos un punto real.
+const EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+
+// Los teléfonos mexicanos que maneja el CRM son a 10 dígitos — se filtra mientras escriben
+// (no solo se valida al final) para que no puedan meter letras, espacios ni de más.
+function soloDigitos10(value: string): string {
+  return value.replace(/\D/g, '').slice(0, 10);
+}
+
 function fireConfetti() {
   const defaults = { startVelocity: 28, spread: 360, ticks: 55, zIndex: 0, colors: ['#006d4e', '#00a86b', '#ffd700'] };
   confetti({ ...defaults, particleCount: 60, origin: { x: 0.2, y: 0.4 } });
@@ -68,9 +77,11 @@ const ReferidoFields: React.FC<{
         <div>
           <input
             type="tel"
-            placeholder="Teléfono"
+            inputMode="numeric"
+            maxLength={10}
+            placeholder="Teléfono (10 dígitos)"
             value={value.telefono}
-            onChange={e => set('telefono', e.target.value)}
+            onChange={e => set('telefono', soloDigitos10(e.target.value))}
             className={`w-full rounded-xl border px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-firma-green/30 ${errors[`r${n}Telefono`] ? 'border-red-300' : 'border-gray-200'}`}
           />
           {errors[`r${n}Telefono`] && <p className="text-xs text-red-500 mt-1">{errors[`r${n}Telefono`]}</p>}
@@ -102,22 +113,22 @@ export const Gracias: React.FC = () => {
   const validate = (): boolean => {
     const e: Record<string, string> = {};
     if (!nombre.trim()) e.nombre = 'Requerido';
-    if (!correo.trim() || !/\S+@\S+\.\S+/.test(correo)) e.correo = 'Correo inválido';
+    if (!correo.trim() || !EMAIL_REGEX.test(correo.trim())) e.correo = 'Correo inválido';
     if (!r1.empresa.trim()) e.r1Empresa = 'Requerido';
     if (!r1.contacto.trim()) e.r1Contacto = 'Requerido';
-    if (!r1.correo.trim() || !/\S+@\S+\.\S+/.test(r1.correo)) e.r1Correo = 'Correo inválido';
-    if (!r1.telefono.trim()) e.r1Telefono = 'Requerido';
+    if (!r1.correo.trim() || !EMAIL_REGEX.test(r1.correo.trim())) e.r1Correo = 'Correo inválido';
+    if (r1.telefono.length !== 10) e.r1Telefono = 'Debe tener 10 dígitos';
     if (!r2.empresa.trim()) e.r2Empresa = 'Requerido';
     if (!r2.contacto.trim()) e.r2Contacto = 'Requerido';
-    if (!r2.correo.trim() || !/\S+@\S+\.\S+/.test(r2.correo)) e.r2Correo = 'Correo inválido';
-    if (!r2.telefono.trim()) e.r2Telefono = 'Requerido';
+    if (!r2.correo.trim() || !EMAIL_REGEX.test(r2.correo.trim())) e.r2Correo = 'Correo inválido';
+    if (r2.telefono.length !== 10) e.r2Telefono = 'Debe tener 10 dígitos';
     // Referido 3 es opcional, pero si empiezan a llenarlo, validamos que quede completo.
     const r3Empezado = r3.empresa || r3.contacto || r3.correo || r3.telefono;
     if (r3Empezado) {
       if (!r3.empresa.trim()) e.r3Empresa = 'Requerido';
       if (!r3.contacto.trim()) e.r3Contacto = 'Requerido';
-      if (!r3.correo.trim() || !/\S+@\S+\.\S+/.test(r3.correo)) e.r3Correo = 'Correo inválido';
-      if (!r3.telefono.trim()) e.r3Telefono = 'Requerido';
+      if (!r3.correo.trim() || !EMAIL_REGEX.test(r3.correo.trim())) e.r3Correo = 'Correo inválido';
+      if (r3.telefono.length !== 10) e.r3Telefono = 'Debe tener 10 dígitos';
     }
     setErrors(e);
     return Object.keys(e).length === 0;
