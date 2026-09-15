@@ -20,7 +20,7 @@ const ALIANZAS = [
   { name: 'Hay Cash', slug: 'hay-cash' },
   { name: 'Banorte', slug: 'banorte' },
   { name: 'Afirme', slug: 'afirme' },
-  { name: 'Creze', slug: 'creze' },
+  { name: 'Fondeadora', slug: 'creze' },
 ];
 
 export const Footer: React.FC = () => {

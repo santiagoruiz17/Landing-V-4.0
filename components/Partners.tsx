@@ -88,7 +88,7 @@ const partners = [
     sizeClass: 'scale-90'
   },
   { 
-    name: 'Creze', 
+    name: 'Fondeadora',
     url: 'https://fincor.com.mx/wp-content/uploads/2019/08/creze222.png',
     sizeClass: 'scale-125'
   },

@@ -4,13 +4,14 @@ import { supabase } from '../lib/supabase';
 
 interface CiecInputProps {
   leadId: string;
+  initialSaved?: boolean;
   onSaved?: () => void;
 }
 
-export const CiecInput: React.FC<CiecInputProps> = ({ leadId, onSaved }) => {
+export const CiecInput: React.FC<CiecInputProps> = ({ leadId, initialSaved, onSaved }) => {
   const [value, setValue] = useState('');
   const [visible, setVisible] = useState(false);
-  const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>(initialSaved ? 'saved' : 'idle');
 
   const save = async () => {
     if (!value.trim()) return;

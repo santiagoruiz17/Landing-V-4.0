@@ -1,16 +1,37 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye } from 'lucide-react';
+import { Eye, UserPlus, X, PlusCircle, ShieldCheck } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { trackLead } from '../lib/metaPixel';
+import { trackEvent } from '../lib/analytics';
 import { getStoredUtmParams } from '../lib/utmTracking';
+import { EMAIL_REGEX, soloDigitos10 } from '../lib/validation';
 
 // ─── N8N Webhook ──────────────────────────────────────────────────────────────
 const N8N_WEBHOOK_URL_PROD = 'https://n8n1.apexdigital.com.mx/webhook/firma7-leads';
 const N8N_WEBHOOK_URL_TEST = 'https://santiagor17.app.n8n.cloud/webhook-test/956ed48a-8870-4b82-b74b-579b22e8c073';
 const N8N_WEBHOOK_URL = N8N_WEBHOOK_URL_PROD || N8N_WEBHOOK_URL_TEST;
 
+const PORCENTAJE_MINIMO_ACCIONISTAS = 75;
+
 // ─── Types ────────────────────────────────────────────────────────────────────
+interface Accionista {
+  nombre: string;
+  porcentaje: string;
+  // Solo el representante legal necesita documentación en el siguiente paso —
+  // el resto de accionistas solo aporta datos de contacto.
+  esRepresentanteLegal: boolean;
+  correo: string;
+  telefono: string;
+}
+
+interface EquipoGarantia {
+  marca: string;
+  modelo: string;
+  anio: string;
+  valor: string;
+}
+
 interface FormData {
   nombreCompleto: string;
   numero: string;
@@ -20,6 +41,7 @@ interface FormData {
   ingresos: string;
   antiguedad: string;
   constitucion: string;
+  accionistas: Accionista[];
   buroPF: string;
   buroPFDetalle: string;
   buroPMEmpresa: string;
@@ -30,19 +52,33 @@ interface FormData {
   monto: string;
   destino: string;
   garantia: string;
+  garantiaTipo: string;
+  garantiaHipotecariaMonto: string;
+  garantiaHipotecariaParentesco: string;
+  garantiaHipotecariaUrl: string;
+  garantiaMaquinaria: EquipoGarantia[];
+  garantiaTransporte: EquipoGarantia;
   utmSource: string;
   utmMedium: string;
   utmCampaign: string;
   utmContent: string;
 }
 
+const ACCIONISTA_VACIO: Accionista = { nombre: '', porcentaje: '', esRepresentanteLegal: false, correo: '', telefono: '' };
+const EQUIPO_VACIO: EquipoGarantia = { marca: '', modelo: '', anio: '', valor: '' };
+
 const INITIAL: FormData = {
   nombreCompleto: '', numero: '', correo: '', rfc: '', cargo: '',
   ingresos: '', antiguedad: '', constitucion: '',
+  accionistas: [{ ...ACCIONISTA_VACIO }],
   buroPF: '', buroPFDetalle: '',
   buroPMEmpresa: '', buroPMEmpresaDetalle: '',
   buroPMAccionista: '', buroPMAccionistaDetalle: '',
   giro: '', monto: '', destino: '', garantia: '',
+  garantiaTipo: '',
+  garantiaHipotecariaMonto: '', garantiaHipotecariaParentesco: '', garantiaHipotecariaUrl: '',
+  garantiaMaquinaria: [{ ...EQUIPO_VACIO }],
+  garantiaTransporte: { ...EQUIPO_VACIO },
   utmSource: '', utmMedium: '', utmCampaign: '', utmContent: '',
 };
 
@@ -88,6 +124,8 @@ function isDescarte(data: FormData): boolean {
 function buildWhatsAppMessage(data: FormData): string {
   const lines: string[] = [
     '📋 *NUEVA SOLICITUD DE CRÉDITO – FIRMA 7*', '',
+    '🏢 *CONSTITUCIÓN*',
+    `• ${data.constitucion}`, '',
     '👤 *DATOS DEL SOLICITANTE*',
     `• Nombre: ${data.nombreCompleto}`,
     `• Número: ${data.numero}`,
@@ -100,9 +138,19 @@ function buildWhatsAppMessage(data: FormData): string {
     `• ${data.ingresos}`, '',
     '📅 *ANTIGÜEDAD DE LA EMPRESA*',
     `• ${data.antiguedad}`, '',
-    '🏢 *CONSTITUCIÓN*',
-    `• ${data.constitucion}`, '',
   ];
+  if (data.constitucion === 'Persona Moral') {
+    lines.push('🧾 *CUADRO ACCIONARIO*');
+    const unico = data.accionistas.length === 1;
+    data.accionistas.forEach(a => {
+      if (!a.nombre.trim()) return;
+      const esRepLegal = unico || a.esRepresentanteLegal;
+      const rol = esRepLegal ? ' (Representante legal)' : '';
+      const contacto = !esRepLegal && (a.correo || a.telefono) ? ` — ${[a.correo, a.telefono].filter(Boolean).join(' / ')}` : '';
+      lines.push(`• ${a.nombre} — ${a.porcentaje || '0'}%${rol}${contacto}`);
+    });
+    lines.push('');
+  }
   if (data.constitucion === 'Persona Física con Actividad Empresarial') {
     lines.push('📊 *BURÓ DE CRÉDITO (Persona Física)*');
     lines.push(`• ${data.buroPF}`);
@@ -127,6 +175,22 @@ function buildWhatsAppMessage(data: FormData): string {
   lines.push('');
   lines.push('🏠 *GARANTÍA*');
   lines.push(`• ${data.garantia}`);
+  if (data.garantia === 'Sí' && data.garantiaTipo) {
+    lines.push(`  Tipo: ${data.garantiaTipo}`);
+    if (data.garantiaTipo === 'Hipotecaria') {
+      lines.push(`  Monto aproximado: ${data.garantiaHipotecariaMonto}`);
+      lines.push(`  Propietario: ${data.garantiaHipotecariaParentesco}`);
+      lines.push(`  Ubicación: ${data.garantiaHipotecariaUrl}`);
+    }
+    if (data.garantiaTipo === 'Maquinaria') {
+      data.garantiaMaquinaria.forEach((eq, i) => {
+        if (eq.marca.trim()) lines.push(`  Equipo ${i + 1}: ${eq.marca} ${eq.modelo} (${eq.anio}) — $${eq.valor}`);
+      });
+    }
+    if (data.garantiaTipo === 'Equipo de transporte') {
+      lines.push(`  Equipo: ${data.garantiaTransporte.marca} ${data.garantiaTransporte.modelo} (${data.garantiaTransporte.anio}) — $${data.garantiaTransporte.valor}`);
+    }
+  }
   return lines.join('\n');
 }
 
@@ -305,6 +369,49 @@ const BuroSection: React.FC<{
   );
 };
 
+// ─── Campos de un equipo (maquinaria / transporte) ─────────────────────────────
+const EquipoFields: React.FC<{
+  equipo: EquipoGarantia;
+  onChange: (field: keyof EquipoGarantia, v: string) => void;
+  errors: Record<string, string>;
+  errorPrefix: string;
+}> = ({ equipo, onChange, errors, errorPrefix }) => {
+  const cls = (field: string) =>
+    `w-full border ${errors[`${errorPrefix}_${field}`] ? 'border-red-400 ring-1 ring-red-300' : 'border-gray-300'} rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-firma-green/40 focus:border-firma-green transition`;
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div>
+        <input placeholder="Marca" value={equipo.marca} onChange={e => onChange('marca', e.target.value)} className={cls('marca')} />
+        {errors[`${errorPrefix}_marca`] && <p className="field-error">{errors[`${errorPrefix}_marca`]}</p>}
+      </div>
+      <div>
+        <input placeholder="Modelo" value={equipo.modelo} onChange={e => onChange('modelo', e.target.value)} className={cls('modelo')} />
+        {errors[`${errorPrefix}_modelo`] && <p className="field-error">{errors[`${errorPrefix}_modelo`]}</p>}
+      </div>
+      <div>
+        <input placeholder="Año" inputMode="numeric" value={equipo.anio} onChange={e => onChange('anio', e.target.value.replace(/\D/g, '').slice(0, 4))} className={cls('anio')} />
+        {errors[`${errorPrefix}_anio`] && <p className="field-error">{errors[`${errorPrefix}_anio`]}</p>}
+      </div>
+      <div>
+        <div className="relative">
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-semibold text-sm">$</span>
+          <input
+            placeholder="Valor aproximado"
+            inputMode="numeric"
+            value={equipo.valor}
+            onChange={e => {
+              const raw = e.target.value.replace(/[^\d]/g, '');
+              onChange('valor', raw ? Number(raw).toLocaleString('es-MX') : '');
+            }}
+            className={`${cls('valor')} pl-8`}
+          />
+        </div>
+        {errors[`${errorPrefix}_valor`] && <p className="field-error">{errors[`${errorPrefix}_valor`]}</p>}
+      </div>
+    </div>
+  );
+};
+
 // ─── Seguimiento de leads incompletos ──────────────────────────────────────────
 // Si el lead llena sus datos de contacto pero no termina el formulario en este
 // tiempo, se notifica como "no completó" (no como descarte) con lo que haya capturado.
@@ -318,6 +425,13 @@ export const ProfilingForm: React.FC = () => {
   const [step, setStep] = useState(() => savedProgress?.step ?? 0);
   const [showRestoredBanner, setShowRestoredBanner] = useState(() => savedProgress !== null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Un solo evento por montaje del formulario — el denominador del embudo de
+  // abandono en GA4 (cuántos abren el perfilador vs. cuántos completan cada paso).
+  useEffect(() => {
+    trackEvent('profiling_started', { resumed: savedProgress !== null });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Guarda el progreso en cada cambio, para poder retomarlo si el lead cierra
   // o recarga la página antes de terminar.
@@ -359,24 +473,78 @@ export const ProfilingForm: React.FC = () => {
 
   useEffect(() => () => clearFollowupTimer(), []);
 
-  const set = (field: keyof FormData, value: string) =>
+  const set = (field: keyof FormData, value: any) =>
     setData(prev => ({ ...prev, [field]: value }));
 
-  // Paso 0–5 igual que antes; paso 6 = Giro; 7 = Monto; 8 = Destino; 9 = Garantía
-  const STEPS = ['Contacto', 'Ingresos', 'Antigüedad', 'Constitución', 'Buró', 'Empresa', 'Giro', 'Monto', 'Destino', 'Garantía'];
+  // ─── Pasos dinámicos ───────────────────────────────────────────────────────
+  // La constitución se elige primero porque decide qué pasos aplican después
+  // (el de "Accionistas" solo existe para Persona Moral).
+  const esMoral = data.constitucion === 'Persona Moral';
+  const STEP_KEYS = useMemo(() => [
+    'constitucion', 'contacto', 'ingresos', 'antiguedad',
+    ...(esMoral ? ['accionistas'] : []),
+    'buro', 'empresa', 'giro', 'monto', 'destino', 'garantia',
+  ], [esMoral]);
+  const STEP_LABELS: Record<string, string> = {
+    constitucion: 'Constitución', contacto: 'Contacto', ingresos: 'Ingresos', antiguedad: 'Antigüedad',
+    accionistas: 'Accionistas', buro: 'Buró', empresa: 'Empresa', giro: 'Giro', monto: 'Monto',
+    destino: 'Destino', garantia: 'Garantía',
+  };
+  const STEP_TITLES: Record<string, string> = {
+    constitucion: 'Constitución', contacto: 'Datos de Contacto', ingresos: 'Ingresos Mensuales',
+    antiguedad: 'Antigüedad de la Empresa', accionistas: 'Cuadro Accionario',
+    buro: esMoral ? 'Buró de Crédito (Empresa y Accionista)' : 'Buró de Crédito',
+    empresa: 'Datos de la Empresa', giro: 'Giro del Negocio', monto: 'Monto de Crédito',
+    destino: 'Destino del Crédito', garantia: 'Garantía',
+  };
+  const currentKey = STEP_KEYS[step];
+
+  // ─── Accionistas ───────────────────────────────────────────────────────────
+  const setAccionista = (i: number, field: keyof Accionista, value: string) =>
+    setData(prev => ({ ...prev, accionistas: prev.accionistas.map((a, idx) => idx === i ? { ...a, [field]: value } : a) }));
+  const agregarAccionista = () => setData(prev => ({ ...prev, accionistas: [...prev.accionistas, { ...ACCIONISTA_VACIO }] }));
+  const quitarAccionista = (i: number) => setData(prev => ({ ...prev, accionistas: prev.accionistas.filter((_, idx) => idx !== i) }));
+  const marcarRepresentanteLegal = (i: number) =>
+    setData(prev => ({ ...prev, accionistas: prev.accionistas.map((a, idx) => ({ ...a, esRepresentanteLegal: idx === i })) }));
+  const totalPorcentajeAccionistas = data.accionistas.reduce((sum, a) => sum + (parseFloat(a.porcentaje) || 0), 0);
+  const porcentajeCumplido = totalPorcentajeAccionistas >= PORCENTAJE_MINIMO_ACCIONISTAS;
+
+  // ─── Garantía: maquinaria (varios equipos) ─────────────────────────────────
+  const setMaquinaria = (i: number, field: keyof EquipoGarantia, value: string) =>
+    setData(prev => ({ ...prev, garantiaMaquinaria: prev.garantiaMaquinaria.map((eq, idx) => idx === i ? { ...eq, [field]: value } : eq) }));
+  const agregarMaquinaria = () => setData(prev => ({ ...prev, garantiaMaquinaria: [...prev.garantiaMaquinaria, { ...EQUIPO_VACIO }] }));
+  const quitarMaquinaria = (i: number) => setData(prev => ({ ...prev, garantiaMaquinaria: prev.garantiaMaquinaria.filter((_, idx) => idx !== i) }));
+  const setTransporte = (field: keyof EquipoGarantia, value: string) =>
+    setData(prev => ({ ...prev, garantiaTransporte: { ...prev.garantiaTransporte, [field]: value } }));
 
   // ─── Validate ──────────────────────────────────────────────────────────────
   const validate = (): boolean => {
     const e: Record<string, string> = {};
-    if (step === 0) {
+    if (currentKey === 'constitucion' && !data.constitucion) e.constitucion = 'Selecciona una opción';
+    if (currentKey === 'contacto') {
       if (!data.nombreCompleto.trim()) e.nombreCompleto = 'Requerido';
       if (!data.numero.trim()) e.numero = 'Requerido';
       if (!data.correo.trim() || !/\S+@\S+\.\S+/.test(data.correo)) e.correo = 'Correo inválido';
     }
-    if (step === 1 && !data.ingresos) e.ingresos = 'Selecciona una opción';
-    if (step === 2 && !data.antiguedad) e.antiguedad = 'Selecciona una opción';
-    if (step === 3 && !data.constitucion) e.constitucion = 'Selecciona una opción';
-    if (step === 4) {
+    if (currentKey === 'ingresos' && !data.ingresos) e.ingresos = 'Selecciona una opción';
+    if (currentKey === 'antiguedad' && !data.antiguedad) e.antiguedad = 'Selecciona una opción';
+    if (currentKey === 'accionistas') {
+      const unico = data.accionistas.length === 1;
+      data.accionistas.forEach((a, i) => {
+        if (!a.nombre.trim()) e[`accionista_nombre_${i}`] = 'Requerido';
+        if (!a.porcentaje || parseFloat(a.porcentaje) <= 0) e[`accionista_porcentaje_${i}`] = 'Requerido';
+        // El representante legal sube su documentación en el siguiente paso; los
+        // demás accionistas solo necesitan datos de contacto aquí.
+        if (!unico && !a.esRepresentanteLegal) {
+          if (!a.correo.trim() || !EMAIL_REGEX.test(a.correo.trim())) e[`accionista_correo_${i}`] = 'Correo inválido';
+          if (a.telefono.length !== 10) e[`accionista_telefono_${i}`] = 'Debe tener 10 dígitos';
+        }
+      });
+      if (!unico && !data.accionistas.some(a => a.esRepresentanteLegal)) {
+        e.accionistas_representante = 'Marca quién es el representante legal';
+      }
+    }
+    if (currentKey === 'buro') {
       if (data.constitucion === 'Persona Física con Actividad Empresarial') {
         if (!data.buroPF) e.buroPF = 'Selecciona una opción';
         if (data.buroPF === 'Regular' && !data.buroPFDetalle.trim()) e.buroPFDetalle = 'Por favor detalla el monto y acreedor';
@@ -388,17 +556,39 @@ export const ProfilingForm: React.FC = () => {
         if (data.buroPMAccionista === 'Regular' && !data.buroPMAccionistaDetalle.trim()) e.buroPMAccionistaDetalle = 'Por favor detalla el monto y acreedor';
       }
     }
-    if (step === 5) {
+    if (currentKey === 'empresa') {
       if (!data.rfc.trim()) e.rfc = 'Requerido';
       if (!data.cargo.trim()) e.cargo = 'Requerido';
     }
-    if (step === 6 && !data.giro.trim()) e.giro = 'Por favor describe a qué se dedica tu empresa';
-    if (step === 7) {
+    if (currentKey === 'giro' && !data.giro.trim()) e.giro = 'Por favor describe a qué se dedica tu empresa';
+    if (currentKey === 'monto') {
       if (!data.monto.trim()) e.monto = 'Requerido';
       else if (!/^\d[\d,]*$/.test(data.monto.replace(/\s/g, ''))) e.monto = 'Solo números';
     }
-    if (step === 8 && !data.destino.trim()) e.destino = 'Por favor describe el destino del crédito';
-    if (step === 9 && !data.garantia) e.garantia = 'Selecciona una opción';
+    if (currentKey === 'destino' && !data.destino.trim()) e.destino = 'Por favor describe el destino del crédito';
+    if (currentKey === 'garantia') {
+      if (!data.garantia) e.garantia = 'Selecciona una opción';
+      if (data.garantia === 'Sí') {
+        if (!data.garantiaTipo) e.garantiaTipo = 'Selecciona el tipo de garantía';
+        else if (data.garantiaTipo === 'Hipotecaria') {
+          if (!data.garantiaHipotecariaMonto.trim()) e.garantiaHipotecariaMonto = 'Requerido';
+          if (!data.garantiaHipotecariaParentesco.trim()) e.garantiaHipotecariaParentesco = 'Requerido';
+          if (!data.garantiaHipotecariaUrl.trim()) e.garantiaHipotecariaUrl = 'Requerido';
+        } else if (data.garantiaTipo === 'Maquinaria') {
+          data.garantiaMaquinaria.forEach((eq, i) => {
+            if (!eq.marca.trim()) e[`maquinaria_${i}_marca`] = 'Requerido';
+            if (!eq.modelo.trim()) e[`maquinaria_${i}_modelo`] = 'Requerido';
+            if (!eq.anio.trim()) e[`maquinaria_${i}_anio`] = 'Requerido';
+            if (!eq.valor.trim()) e[`maquinaria_${i}_valor`] = 'Requerido';
+          });
+        } else if (data.garantiaTipo === 'Equipo de transporte') {
+          if (!data.garantiaTransporte.marca.trim()) e.transporte_marca = 'Requerido';
+          if (!data.garantiaTransporte.modelo.trim()) e.transporte_modelo = 'Requerido';
+          if (!data.garantiaTransporte.anio.trim()) e.transporte_anio = 'Requerido';
+          if (!data.garantiaTransporte.valor.trim()) e.transporte_valor = 'Requerido';
+        }
+      }
+    }
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -406,7 +596,8 @@ export const ProfilingForm: React.FC = () => {
   // ─── Navigation ────────────────────────────────────────────────────────────
   const next = () => {
     if (!validate()) return;
-    if (step === 0 && !timerStartedRef.current) {
+    trackEvent('profiling_step_completed', { step_key: currentKey, step_number: step + 1, step_total: STEP_KEYS.length });
+    if (currentKey === 'contacto' && !timerStartedRef.current) {
       // Ya tenemos datos de contacto: arrancamos la cuenta regresiva de 10 min.
       // Si el lead no termina el formulario en ese lapso, se notifica como
       // "no completó" — no se envía ningún correo todavía.
@@ -418,6 +609,7 @@ export const ProfilingForm: React.FC = () => {
       clearFollowupTimer();
       clearSavedProgress();
       sendToAll(data, false, 'lead_descartado');
+      trackEvent('profiling_descarte', { step_key: currentKey });
       navigate('/espera');
       return;
     }
@@ -434,6 +626,7 @@ export const ProfilingForm: React.FC = () => {
     clearSavedProgress();
     sendToN8N(data, true);
     trackLead();
+    trackEvent('profiling_completed');
     const leadId = await sendToSupabase(data, true);
     const tipo = data.constitucion === 'Persona Moral' ? 'moral' : 'fisica';
     const params = new URLSearchParams({ tipo, nombre: data.nombreCompleto.split(' ')[0] });
@@ -486,8 +679,28 @@ export const ProfilingForm: React.FC = () => {
 
   // ─── Step content ──────────────────────────────────────────────────────────
   const renderStep = () => {
-    switch (step) {
-      case 0:
+    switch (currentKey) {
+      case 'constitucion':
+        return (
+          <div className="space-y-3">
+            <p className="text-sm text-gray-500 mb-4">¿Cómo está constituida tu empresa?</p>
+            {['Persona Física con Actividad Empresarial', 'Persona Moral'].map(op => (
+              <RadioOption key={op} value={op} selected={data.constitucion === op}
+                onChange={v => {
+                  set('constitucion', v);
+                  set('buroPF', ''); set('buroPFDetalle', '');
+                  set('buroPMEmpresa', ''); set('buroPMEmpresaDetalle', '');
+                  set('buroPMAccionista', ''); set('buroPMAccionistaDetalle', '');
+                  setErrors({});
+                }}>
+                {op}
+              </RadioOption>
+            ))}
+            {errors.constitucion && <p className="field-error">{errors.constitucion}</p>}
+          </div>
+        );
+
+      case 'contacto':
         return (
           <div className="space-y-4">
             <p className="text-sm text-gray-500 mb-2">Solo toma 2 minutos. Empieza con tus datos de contacto.</p>
@@ -511,7 +724,7 @@ export const ProfilingForm: React.FC = () => {
           </div>
         );
 
-      case 1:
+      case 'ingresos':
         return (
           <div className="space-y-3">
             <p className="text-sm text-gray-500 mb-4">Selecciona el rango de ingresos mensuales de tu empresa.</p>
@@ -530,7 +743,7 @@ export const ProfilingForm: React.FC = () => {
           </div>
         );
 
-      case 2:
+      case 'antiguedad':
         return (
           <div className="space-y-3">
             <p className="text-sm text-gray-500 mb-4">¿Cuánto tiempo lleva operando tu empresa?</p>
@@ -549,30 +762,122 @@ export const ProfilingForm: React.FC = () => {
           </div>
         );
 
-      case 3:
+      case 'accionistas':
         return (
-          <div className="space-y-3">
-            <p className="text-sm text-gray-500 mb-4">¿Cómo está constituida tu empresa?</p>
-            {['Persona Física con Actividad Empresarial', 'Persona Moral'].map(op => (
-              <RadioOption key={op} value={op} selected={data.constitucion === op}
-                onChange={v => {
-                  set('constitucion', v);
-                  set('buroPF', ''); set('buroPFDetalle', '');
-                  set('buroPMEmpresa', ''); set('buroPMEmpresaDetalle', '');
-                  set('buroPMAccionista', ''); set('buroPMAccionistaDetalle', '');
-                  setErrors({});
-                }}>
-                {op}
-              </RadioOption>
-            ))}
-            {errors.constitucion && <p className="field-error">{errors.constitucion}</p>}
+          <div className="space-y-4">
+            <p className="text-sm text-gray-500">
+              Indica a los accionistas de la empresa y qué porcentaje de acciones tiene cada uno.
+            </p>
+            <div className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium ${
+              porcentajeCumplido ? 'bg-firma-green/5 text-firma-green' : 'bg-amber-50 text-amber-700'
+            }`}>
+              <span>
+                Cuadro accionario capturado: <strong>{totalPorcentajeAccionistas}%</strong>
+                {!porcentajeCumplido && ` — necesitas al menos ${PORCENTAJE_MINIMO_ACCIONISTAS}%`}
+              </span>
+            </div>
+            {errors.accionistas_representante && <p className="field-error">{errors.accionistas_representante}</p>}
+            <div className="space-y-3">
+              {data.accionistas.map((a, i) => {
+                const unico = data.accionistas.length === 1;
+                const esRepLegalEfectivo = unico || a.esRepresentanteLegal;
+                return (
+                  <div key={i} className="border-2 border-gray-100 rounded-xl p-4 space-y-3 bg-gray-50/50">
+                    <div className="flex items-start gap-2">
+                      <div className="flex-1 grid grid-cols-1 sm:grid-cols-[1fr_140px] gap-2">
+                        <div>
+                          <input
+                            placeholder="Nombre del accionista"
+                            value={a.nombre}
+                            onChange={e => setAccionista(i, 'nombre', e.target.value)}
+                            className={inputClass(`accionista_nombre_${i}`)}
+                          />
+                          {errors[`accionista_nombre_${i}`] && <p className="field-error">{errors[`accionista_nombre_${i}`]}</p>}
+                        </div>
+                        <div className="relative">
+                          <input
+                            placeholder="Porcentaje"
+                            inputMode="decimal"
+                            value={a.porcentaje}
+                            onChange={e => {
+                              const limpio = e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
+                              const num = parseFloat(limpio);
+                              setAccionista(i, 'porcentaje', !isNaN(num) && num > 100 ? '100' : limpio);
+                            }}
+                            className={`${inputClass(`accionista_porcentaje_${i}`)} pr-7`}
+                          />
+                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">%</span>
+                          {errors[`accionista_porcentaje_${i}`] && <p className="field-error">{errors[`accionista_porcentaje_${i}`]}</p>}
+                        </div>
+                      </div>
+                      {!unico && (
+                        <button type="button" onClick={() => quitarAccionista(i)} className="w-11 h-11 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl flex-shrink-0" aria-label="Quitar accionista">
+                          <X size={16} />
+                        </button>
+                      )}
+                    </div>
+
+                    {unico ? (
+                      <p className="text-xs text-gray-400">Se toma como representante legal — subirá su documentación más adelante.</p>
+                    ) : a.esRepresentanteLegal ? (
+                      <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-firma-green bg-firma-green/10 rounded-full px-3 py-1">
+                        <ShieldCheck size={13} /> Representante legal
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => marcarRepresentanteLegal(i)}
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-400 hover:text-firma-green transition-colors"
+                      >
+                        <ShieldCheck size={13} /> Marcar como representante legal
+                      </button>
+                    )}
+
+                    {!esRepLegalEfectivo && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div>
+                          <input
+                            type="email"
+                            placeholder="Correo"
+                            value={a.correo}
+                            onChange={e => setAccionista(i, 'correo', e.target.value)}
+                            className={inputClass(`accionista_correo_${i}`)}
+                          />
+                          {errors[`accionista_correo_${i}`] && <p className="field-error">{errors[`accionista_correo_${i}`]}</p>}
+                        </div>
+                        <div>
+                          <input
+                            type="tel"
+                            inputMode="numeric"
+                            maxLength={10}
+                            placeholder="Teléfono (10 dígitos)"
+                            value={a.telefono}
+                            onChange={e => setAccionista(i, 'telefono', soloDigitos10(e.target.value))}
+                            className={inputClass(`accionista_telefono_${i}`)}
+                          />
+                          {errors[`accionista_telefono_${i}`] && <p className="field-error">{errors[`accionista_telefono_${i}`]}</p>}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+            <button
+              type="button"
+              onClick={agregarAccionista}
+              className="w-full flex items-center justify-center gap-2 border-2 border-dashed border-gray-300 rounded-xl px-4 py-3 text-sm font-semibold text-gray-500 hover:border-firma-green/50 hover:text-firma-green hover:bg-firma-green/5 transition-colors"
+            >
+              <UserPlus size={16} />
+              Agregar accionista
+            </button>
           </div>
         );
 
-      case 4:
+      case 'buro':
         return renderBuroStep();
 
-      case 5:
+      case 'empresa':
         return (
           <div className="space-y-4">
             <p className="text-sm text-gray-500 mb-2">¡Vas muy bien! Necesitamos los datos formales de tu empresa.</p>
@@ -591,8 +896,7 @@ export const ProfilingForm: React.FC = () => {
           </div>
         );
 
-      // Paso 6 — Giro del negocio (nuevo)
-      case 6:
+      case 'giro':
         return (
           <div className="space-y-4">
             <p className="text-sm text-gray-500">
@@ -616,7 +920,7 @@ export const ProfilingForm: React.FC = () => {
           </div>
         );
 
-      case 7:
+      case 'monto':
         return (
           <div className="space-y-4">
             <p className="text-sm text-gray-500">Ingresa el monto de crédito que deseas solicitar (solo números).</p>
@@ -640,7 +944,7 @@ export const ProfilingForm: React.FC = () => {
           </div>
         );
 
-      case 8:
+      case 'destino':
         return (
           <div className="space-y-4">
             <p className="text-sm text-gray-500">¿Para qué se va a utilizar el crédito? Brinda una breve explicación.</p>
@@ -657,22 +961,121 @@ export const ProfilingForm: React.FC = () => {
           </div>
         );
 
-      case 9:
+      case 'garantia':
         return (
           <div className="space-y-4">
             <p className="text-sm text-gray-500">En caso de requerirse, ¿cuenta con garantía?</p>
             <div className="space-y-3">
               <RadioOption value="Sí" selected={data.garantia === 'Sí'} onChange={v => { set('garantia', v); setErrors({}); }}>
-                <span>
-                  <span className="font-semibold">Sí</span>
-                  <span className="block text-xs text-gray-500 mt-1">⚠️ Solo se aceptan terrenos y propiedades libres de gravamen como garantía.</span>
-                </span>
+                Sí
               </RadioOption>
-              <RadioOption value="No" selected={data.garantia === 'No'} onChange={v => { set('garantia', v); setErrors({}); }}>
+              <RadioOption value="No" selected={data.garantia === 'No'} onChange={v => {
+                set('garantia', v); set('garantiaTipo', ''); setErrors({});
+              }}>
                 No
               </RadioOption>
             </div>
             {errors.garantia && <p className="field-error">{errors.garantia}</p>}
+
+            {data.garantia === 'Sí' && (
+              <div className="mt-4 pt-5 border-t border-gray-100 space-y-4 animate-fadeIn">
+                <div>
+                  <label className="field-label">Tipo de garantía</label>
+                  <select
+                    value={data.garantiaTipo}
+                    onChange={e => { set('garantiaTipo', e.target.value); setErrors({}); }}
+                    className={inputClass('garantiaTipo')}
+                  >
+                    <option value="">Selecciona…</option>
+                    <option value="Hipotecaria">Hipotecaria</option>
+                    <option value="Maquinaria">Maquinaria</option>
+                    <option value="Equipo de transporte">Equipo de transporte</option>
+                  </select>
+                  {errors.garantiaTipo && <p className="field-error">{errors.garantiaTipo}</p>}
+                </div>
+
+                {data.garantiaTipo === 'Hipotecaria' && (
+                  <div className="space-y-3">
+                    <div>
+                      <label className="field-label">Monto aproximado de la propiedad (MXN)</label>
+                      <div className="relative">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-semibold text-sm">$</span>
+                        <input
+                          inputMode="numeric"
+                          value={data.garantiaHipotecariaMonto}
+                          onChange={e => {
+                            const raw = e.target.value.replace(/[^\d]/g, '');
+                            set('garantiaHipotecariaMonto', raw ? Number(raw).toLocaleString('es-MX') : '');
+                          }}
+                          className={`${inputClass('garantiaHipotecariaMonto')} pl-8`}
+                        />
+                      </div>
+                      {errors.garantiaHipotecariaMonto && <p className="field-error">{errors.garantiaHipotecariaMonto}</p>}
+                    </div>
+                    <div>
+                      <label className="field-label">¿Es tuya la propiedad? Si no, ¿qué parentesco tienes con el dueño?</label>
+                      <input
+                        placeholder="Ej: Es mía / Es de mi padre / Es de mi esposa…"
+                        value={data.garantiaHipotecariaParentesco}
+                        onChange={e => set('garantiaHipotecariaParentesco', e.target.value)}
+                        className={inputClass('garantiaHipotecariaParentesco')}
+                      />
+                      {errors.garantiaHipotecariaParentesco && <p className="field-error">{errors.garantiaHipotecariaParentesco}</p>}
+                    </div>
+                    <div>
+                      <label className="field-label">URL de la ubicación de la propiedad (Google Maps)</label>
+                      <input
+                        placeholder="https://maps.google.com/…"
+                        value={data.garantiaHipotecariaUrl}
+                        onChange={e => set('garantiaHipotecariaUrl', e.target.value)}
+                        className={inputClass('garantiaHipotecariaUrl')}
+                      />
+                      {errors.garantiaHipotecariaUrl && <p className="field-error">{errors.garantiaHipotecariaUrl}</p>}
+                    </div>
+                  </div>
+                )}
+
+                {data.garantiaTipo === 'Maquinaria' && (
+                  <div className="space-y-4">
+                    {data.garantiaMaquinaria.map((eq, i) => (
+                      <div key={i} className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <label className="field-label !mb-0">Equipo {i + 1}</label>
+                          {data.garantiaMaquinaria.length > 1 && (
+                            <button type="button" onClick={() => quitarMaquinaria(i)} className="text-gray-400 hover:text-red-500 text-xs font-semibold flex items-center gap-1">
+                              <X size={13} /> Quitar
+                            </button>
+                          )}
+                        </div>
+                        <EquipoFields
+                          equipo={eq}
+                          onChange={(field, v) => setMaquinaria(i, field, v)}
+                          errors={errors}
+                          errorPrefix={`maquinaria_${i}`}
+                        />
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={agregarMaquinaria}
+                      className="w-full flex items-center justify-center gap-2 border-2 border-dashed border-gray-300 rounded-xl px-4 py-3 text-sm font-semibold text-gray-500 hover:border-firma-green/50 hover:text-firma-green hover:bg-firma-green/5 transition-colors"
+                    >
+                      <PlusCircle size={16} />
+                      Agregar otro equipo
+                    </button>
+                  </div>
+                )}
+
+                {data.garantiaTipo === 'Equipo de transporte' && (
+                  <EquipoFields
+                    equipo={data.garantiaTransporte}
+                    onChange={(field, v) => setTransporte(field, v)}
+                    errors={errors}
+                    errorPrefix="transporte"
+                  />
+                )}
+              </div>
+            )}
           </div>
         );
 
@@ -680,22 +1083,9 @@ export const ProfilingForm: React.FC = () => {
     }
   };
 
-  const stepTitles = [
-    'Datos de Contacto',
-    'Ingresos Mensuales',
-    'Antigüedad de la Empresa',
-    'Constitución',
-    data.constitucion === 'Persona Moral' ? 'Buró de Crédito (Empresa y Accionista)' : 'Buró de Crédito',
-    'Datos de la Empresa',
-    'Giro del Negocio',
-    'Monto de Crédito',
-    'Destino del Crédito',
-    'Garantía',
-  ];
-
   // ─── Main form ─────────────────────────────────────────────────────────────
-  const isLastStep = step === STEPS.length - 1;
-  const progress = (step / (STEPS.length - 1)) * 100;
+  const isLastStep = step === STEP_KEYS.length - 1;
+  const progress = (step / (STEP_KEYS.length - 1)) * 100;
 
   return (
     <section id="profiling" className="py-24 bg-concrete relative overflow-hidden">
@@ -721,7 +1111,7 @@ export const ProfilingForm: React.FC = () => {
               Acceso a más de 20 instituciones financieras
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
-              {['Axionex', 'Xepelin', 'Konfío', 'Creze', 'Hey Banco', 'Covalto', 'Finsus', 'Finkargo'].map(name => (
+              {['Axionex', 'Xepelin', 'Konfío', 'Fondeadora', 'Hey Banco', 'Covalto', 'Finsus', 'Finkargo'].map(name => (
                 <span
                   key={name}
                   className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-semibold text-gray-500 shadow-sm"
@@ -744,7 +1134,7 @@ export const ProfilingForm: React.FC = () => {
           <div className="px-8 pt-6 pb-2">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-semibold text-firma-green uppercase tracking-widest">
-                Paso {step + 1} de {STEPS.length}
+                Paso {step + 1} de {STEP_KEYS.length}
               </span>
               <span className="text-xs text-gray-400">{Math.round(progress)}% completado</span>
             </div>
@@ -783,8 +1173,8 @@ export const ProfilingForm: React.FC = () => {
 
           {/* Step dots */}
           <div className="flex items-start justify-between px-8 py-3">
-            {STEPS.map((label, i) => (
-              <StepDot key={i} label={label} active={i === step} completed={i < step} />
+            {STEP_KEYS.map((key, i) => (
+              <StepDot key={key} label={STEP_LABELS[key]} active={i === step} completed={i < step} />
             ))}
           </div>
 
@@ -794,7 +1184,7 @@ export const ProfilingForm: React.FC = () => {
               <span className="w-7 h-7 rounded-full bg-firma-green/10 flex items-center justify-center text-firma-green text-sm font-bold flex-shrink-0">
                 {step + 1}
               </span>
-              {stepTitles[step]}
+              {STEP_TITLES[currentKey]}
             </h3>
             {renderStep()}
           </div>

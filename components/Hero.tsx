@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { RatingBadge } from './RatingBadge';
 
 export const Hero: React.FC = () => {
   const navigate = useNavigate();
@@ -21,9 +22,10 @@ export const Hero: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <span className="inline-block py-1 px-3 border border-firma-green/20 rounded-full text-xs font-semibold tracking-wider text-firma-green uppercase mb-6 bg-firma-green/5">
+            <span className="inline-block py-1 px-3 border border-firma-green/20 rounded-full text-xs font-semibold tracking-wider text-firma-green uppercase mb-4 bg-firma-green/5">
               Consultoría Financiera Premium · +300 empresas impulsadas
             </span>
+            <RatingBadge />
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-medium text-charcoal leading-tight mb-8">
               Crédito Empresarial y Financiamiento PyME en{' '}
               <span className="italic text-transparent bg-clip-text bg-gradient-to-r from-firma-green to-midnight">México</span>

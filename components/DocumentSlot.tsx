@@ -1,15 +1,13 @@
 import React, { useRef, useState } from 'react';
 import { Upload, CheckCircle2, Loader2, AlertCircle, RotateCcw } from 'lucide-react';
-import { supabase } from '../lib/supabase';
-
-const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
-const BUCKET = 'lead-documentos';
+import { uploadDocumento } from '../lib/uploadDocumento';
 
 export type DocumentoTipo =
   | 'constancia_situacion_fiscal' | 'ine' | 'declaracion_anual' | 'estado_cuenta'
-  | 'comprobante_domicilio_fiscal' | 'comprobante_domicilio_particular'
+  | 'comprobante_domicilio_fiscal' | 'comprobante_domicilio_particular' | 'comprobante_domicilio_operativo'
   | 'acta_constitutiva' | 'escrituras_modificaciones'
-  | 'ine_accionista' | 'comprobante_domicilio_accionista' | 'constancia_situacion_fiscal_accionista';
+  | 'ine_accionista' | 'comprobante_domicilio_accionista' | 'constancia_situacion_fiscal_accionista'
+  | 'acta_matrimonio_accionista';
 
 type Status = 'idle' | 'uploading' | 'success' | 'error';
 
@@ -19,62 +17,34 @@ interface DocumentSlotProps {
   slotIndex?: number;
   label: string;
   optional?: boolean;
+  numero?: number;
+  initialFileName?: string;
   onUploaded?: (tipoDocumento: DocumentoTipo, slotIndex: number) => void;
 }
 
 export const DocumentSlot: React.FC<DocumentSlotProps> = ({
-  leadId, tipoDocumento, slotIndex = 1, label, optional, onUploaded,
+  leadId, tipoDocumento, slotIndex = 1, label, optional, numero, initialFileName, onUploaded,
 }) => {
-  const [status, setStatus] = useState<Status>('idle');
-  const [fileName, setFileName] = useState('');
+  const [status, setStatus] = useState<Status>(initialFileName ? 'success' : 'idle');
+  const [fileName, setFileName] = useState(initialFileName ?? '');
   const [error, setError] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = async (file: File | undefined) => {
     if (!file) return;
     setError('');
-
-    if (file.size > MAX_FILE_SIZE_BYTES) {
-      setStatus('error');
-      setError('El archivo pesa más de 10MB. Intenta subir el PDF directo del banco/portal en vez de una foto o escaneo.');
-      return;
-    }
-
     setStatus('uploading');
     setFileName(file.name);
 
-    const ext = file.name.includes('.') ? file.name.split('.').pop() : 'pdf';
-    const path = `${leadId}/${tipoDocumento}/${slotIndex}-${Date.now()}.${ext}`;
+    const result = await uploadDocumento({ leadId, tipoDocumento, slotIndex, file });
 
-    const { error: uploadError } = await supabase.storage.from(BUCKET).upload(path, file, {
-      contentType: file.type || 'application/octet-stream',
-    });
-
-    if (uploadError) {
+    if (!result.ok) {
       setStatus('error');
-      setError('No se pudo subir el archivo. Intenta de nuevo.');
+      setError(result.error ?? 'No se pudo subir el archivo. Intenta de nuevo.');
       return;
     }
 
-    // La metadata se registra vía RPC (security definer): un upsert directo del
-    // navegador requeriría un policy de SELECT en la tabla para que Postgres pueda
-    // localizar la fila en conflicto, y eso expondría metadata de otros leads.
-    const { error: rpcError } = await supabase.rpc('record_document_upload', {
-      p_lead_id: leadId,
-      p_tipo_documento: tipoDocumento,
-      p_slot_index: slotIndex,
-      p_storage_path: path,
-      p_file_name: file.name,
-      p_file_size_bytes: file.size,
-      p_mime_type: file.type || null,
-    });
-
-    if (rpcError) {
-      setStatus('error');
-      setError('El archivo se subió pero no se pudo registrar. Intenta de nuevo.');
-      return;
-    }
-
+    setFileName(result.fileName ?? file.name);
     setStatus('success');
     onUploaded?.(tipoDocumento, slotIndex);
   };
@@ -84,6 +54,15 @@ export const DocumentSlot: React.FC<DocumentSlotProps> = ({
   return (
     <div className="space-y-1.5">
       <div className="flex items-center gap-2">
+        {numero != null && (
+          <span
+            className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 ${
+              status === 'success' ? 'bg-firma-green text-white' : 'bg-gray-100 text-gray-400'
+            }`}
+          >
+            {numero}
+          </span>
+        )}
         <span className="field-label !mb-0">{label}</span>
         {optional && (
           <span className="text-[9px] font-semibold text-gray-400 uppercase tracking-wider bg-gray-100 rounded-full px-2 py-0.5">
@@ -96,6 +75,7 @@ export const DocumentSlot: React.FC<DocumentSlotProps> = ({
         ref={inputRef}
         type="file"
         accept="application/pdf,image/*"
+        capture="environment"
         className="hidden"
         onChange={e => handleFile(e.target.files?.[0])}
       />

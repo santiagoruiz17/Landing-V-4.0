@@ -11,6 +11,7 @@ const Partners    = React.lazy(() => import('./components/Partners').then(m => (
 const Methodology = React.lazy(() => import('./components/Methodology').then(m => ({ default: m.Methodology })));
 const Stats       = React.lazy(() => import('./components/Stats').then(m => ({ default: m.Stats })));
 const CaseStudies = React.lazy(() => import('./components/CaseStudies').then(m => ({ default: m.CaseStudies })));
+const Testimonios = React.lazy(() => import('./components/Testimonios').then(m => ({ default: m.Testimonios })));
 const FAQ         = React.lazy(() => import('./components/FAQ').then(m => ({ default: m.FAQ })));
 const Footer      = React.lazy(() => import('./components/Footer').then(m => ({ default: m.Footer })));
 
@@ -21,6 +22,7 @@ const Espera              = React.lazy(() => import('./pages/Espera').then(m => 
 const AvisoPrivacidad     = React.lazy(() => import('./pages/AvisoPrivacidad').then(m => ({ default: m.AvisoPrivacidad })));
 const DocumentosRecibidos = React.lazy(() => import('./pages/DocumentosRecibidos').then(m => ({ default: m.DocumentosRecibidos })));
 const Gracias             = React.lazy(() => import('./pages/Gracias').then(m => ({ default: m.Gracias })));
+const DocumentacionDirecta = React.lazy(() => import('./pages/DocumentacionDirecta').then(m => ({ default: m.DocumentacionDirecta })));
 const NotFound            = React.lazy(() => import('./pages/NotFound').then(m => ({ default: m.NotFound })));
 // Términos y Condiciones: aún no tenemos el texto legal definitivo — ruta y enlaces
 // deshabilitados para no mostrar una página vacía. Reactivar cuando esté el texto.
@@ -28,6 +30,7 @@ const NotFound            = React.lazy(() => import('./pages/NotFound').then(m =
 const QuieroSerAliado     = React.lazy(() => import('./pages/QuieroSerAliado').then(m => ({ default: m.QuieroSerAliado })));
 const Blog                = React.lazy(() => import('./pages/Blog').then(m => ({ default: m.Blog })));
 const BlogPost            = React.lazy(() => import('./pages/BlogPost').then(m => ({ default: m.BlogPost })));
+const AdminPanel          = React.lazy(() => import('./pages/AdminPanel').then(m => ({ default: m.AdminPanel })));
 
 const SectionFallback = () => <div className="py-24 bg-white" />;
 
@@ -108,6 +111,7 @@ function LandingPage() {
         <Suspense fallback={<SectionFallback />}><Methodology /></Suspense>
         <Suspense fallback={<SectionFallback />}><Stats /></Suspense>
         <Suspense fallback={<SectionFallback />}><CaseStudies /></Suspense>
+        <Suspense fallback={<SectionFallback />}><Testimonios /></Suspense>
         <PerfilCTA />
         <Suspense fallback={<SectionFallback />}><FAQ /></Suspense>
       </main>
@@ -131,6 +135,8 @@ function App() {
           <Route path="/aviso-de-privacidad" element={<AvisoPrivacidad />} />
           <Route path="/documentos-recibidos" element={<DocumentosRecibidos />} />
           <Route path="/gracias" element={<Gracias />} />
+          <Route path="/documentacion" element={<DocumentacionDirecta />} />
+          <Route path="/admin" element={<AdminPanel />} />
           {/* <Route path="/terminos-y-condiciones" element={<TerminosCondiciones />} /> */}
           <Route path="/quiero-ser-aliado" element={<QuieroSerAliado />} />
           <Route path="/blog" element={<Blog />} />

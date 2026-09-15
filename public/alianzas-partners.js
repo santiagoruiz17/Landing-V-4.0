@@ -19,7 +19,7 @@ const partners = [
   { name: 'Hay Cash', slug: 'hay-cash', logo: 'https://socasesores.com/oficinas/img/bancos/empresarial/HEY-CASH-color.png' },
   { name: 'BANORTE', slug: 'banorte', logo: '../images/logo-banorte.png' },
   { name: 'AFIRME', slug: 'afirme', logo: '../images/logo-afirme.png' },
-  { name: 'Creze', slug: 'creze', logo: 'https://fincor.com.mx/wp-content/uploads/2019/08/creze222.png' },
+  { name: 'Fondeadora', slug: 'creze', logo: 'https://fincor.com.mx/wp-content/uploads/2019/08/creze222.png' },
 ];
 
 document.getElementById('partner-count').textContent = partners.length;

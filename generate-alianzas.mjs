@@ -371,7 +371,7 @@ const partners = [
     `
   },
   { name: 'AFIRME', slug: 'afirme', logo: '../../images/logo-afirme.png' },
-  { name: 'Creze', slug: 'creze', logo: 'https://fincor.com.mx/wp-content/uploads/2019/08/creze222.png' }
+  { name: 'Fondeadora', slug: 'creze', logo: 'https://fincor.com.mx/wp-content/uploads/2019/08/creze222.png' }
 ];
 
 const template = (partner) => `<!DOCTYPE html>

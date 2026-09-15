@@ -399,7 +399,7 @@ export const Calculadora: React.FC = () => {
                   { name: 'Anticipa', slug: 'anticipa' }, { name: 'Axionex Financiera', slug: 'axionex-financiera' },
                   { name: 'Bx+', slug: 'bx-plus' }, { name: 'Finsus', slug: 'finsus' },
                   { name: 'Hay Cash', slug: 'hay-cash' }, { name: 'Banorte', slug: 'banorte' },
-                  { name: 'Afirme', slug: 'afirme' }, { name: 'Creze', slug: 'creze' },
+                  { name: 'Afirme', slug: 'afirme' }, { name: 'Fondeadora', slug: 'creze' },
                 ].map(a => (
                   <a key={a.slug} href={`/alianzas/${a.slug}/`} style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.55)', textDecoration: 'none' }}>
                     {a.name}

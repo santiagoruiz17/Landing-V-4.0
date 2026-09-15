@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import confetti from 'canvas-confetti';
-import { Heart, Star, Users, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
+import { Heart, Users, User, MessageSquare, CheckCircle2, Loader2, AlertCircle, ArrowLeft, Facebook, Instagram } from 'lucide-react';
 import { useSEO } from '../hooks/useSEO';
 import { supabase } from '../lib/supabase';
+import { EMAIL_REGEX, soloDigitos10 } from '../lib/validation';
 
 const FACEBOOK_REVIEW_URL = 'https://www.facebook.com/106460525837472/reviews/';
+
+type Paso = 'datos' | 'comentario' | 'referidos';
+const PASOS: Paso[] = ['datos', 'comentario', 'referidos'];
 
 interface ReferidoData {
   empresa: string;
@@ -14,15 +18,6 @@ interface ReferidoData {
 }
 
 const REFERIDO_VACIO: ReferidoData = { empresa: '', contacto: '', correo: '', telefono: '' };
-
-// Validación de correo más estricta que un simple "algo@algo.algo" — exige un dominio con al menos un punto real.
-const EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
-
-// Los teléfonos mexicanos que maneja el CRM son a 10 dígitos — se filtra mientras escriben
-// (no solo se valida al final) para que no puedan meter letras, espacios ni de más.
-function soloDigitos10(value: string): string {
-  return value.replace(/\D/g, '').slice(0, 10);
-}
 
 function fireConfetti() {
   const defaults = { startVelocity: 28, spread: 360, ticks: 55, zIndex: 0, colors: ['#006d4e', '#00a86b', '#ffd700'] };
@@ -101,19 +96,34 @@ export const Gracias: React.FC = () => {
 
   useEffect(() => { fireConfetti(); }, []);
 
+  const [paso, setPaso] = useState<Paso>('datos');
   const [nombre, setNombre] = useState('');
   const [empresa, setEmpresa] = useState('');
   const [correo, setCorreo] = useState('');
+  const [comentario, setComentario] = useState('');
   const [r1, setR1] = useState<ReferidoData>(REFERIDO_VACIO);
   const [r2, setR2] = useState<ReferidoData>(REFERIDO_VACIO);
   const [r3, setR3] = useState<ReferidoData>(REFERIDO_VACIO);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
 
-  const validate = (): boolean => {
+  const continuarDatos = () => {
     const e: Record<string, string> = {};
     if (!nombre.trim()) e.nombre = 'Requerido';
     if (!correo.trim() || !EMAIL_REGEX.test(correo.trim())) e.correo = 'Correo inválido';
+    setErrors(e);
+    if (Object.keys(e).length === 0) setPaso('comentario');
+  };
+
+  const continuarComentario = () => {
+    const e: Record<string, string> = {};
+    if (!comentario.trim() || comentario.trim().length < 10) e.comentario = 'Cuéntanos un poco más (mínimo 10 caracteres)';
+    setErrors(e);
+    if (Object.keys(e).length === 0) setPaso('referidos');
+  };
+
+  const validateReferidos = (): boolean => {
+    const e: Record<string, string> = {};
     if (!r1.empresa.trim()) e.r1Empresa = 'Requerido';
     if (!r1.contacto.trim()) e.r1Contacto = 'Requerido';
     if (!r1.correo.trim() || !EMAIL_REGEX.test(r1.correo.trim())) e.r1Correo = 'Correo inválido';
@@ -135,13 +145,14 @@ export const Gracias: React.FC = () => {
   };
 
   const submit = async () => {
-    if (!validate()) return;
+    if (!validateReferidos()) return;
     setStatus('sending');
     const { error } = await supabase.rpc('submit_referido', {
       p: {
         referidoPorNombre: nombre,
         referidoPorEmpresa: empresa,
         referidoPorCorreo: correo,
+        comentario,
         referido1Empresa: r1.empresa,
         referido1Contacto: r1.contacto,
         referido1Correo: r1.correo,
@@ -158,6 +169,9 @@ export const Gracias: React.FC = () => {
     });
     setStatus(error ? 'error' : 'success');
   };
+
+  const pasoIndex = PASOS.indexOf(paso);
+  const progress = ((pasoIndex + 1) / PASOS.length) * 100;
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans text-charcoal">
@@ -204,34 +218,47 @@ export const Gracias: React.FC = () => {
           </p>
         </div>
 
-        {/* ── Referidos ───────────────────────────────── */}
+        {/* ── Datos, comentario y referidos (formulario de 3 pasos) ──── */}
         <div className="bg-white border border-gray-100 rounded-2xl p-8 md:p-10 mt-6 shadow-sm">
           {status === 'success' ? (
             <div className="text-center py-6">
               <div className="w-14 h-14 bg-firma-green/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <CheckCircle2 size={28} className="text-firma-green" />
               </div>
-              <h3 className="font-serif text-2xl text-charcoal mb-2">¡Gracias por tus referidos!</h3>
+              <h3 className="font-serif text-2xl text-charcoal mb-2">¡Gracias por tu opinión y tus referidos!</h3>
               <p className="text-gray-500 text-sm max-w-sm mx-auto">
-                Nos pondremos en contacto con ellos pronto. Apreciamos mucho que confíes en nosotros para recomendarnos.
+                Nos pondremos en contacto con tus referidos pronto. Revisaremos tu comentario y, con tu permiso,
+                podría aparecer como testimonio en nuestra página principal.
               </p>
             </div>
           ) : (
             <>
-              <div className="text-center mb-8">
-                <div className="w-12 h-12 bg-firma-green/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Users size={22} className="text-firma-green" />
+              {/* ── Progreso ───────────────────────────── */}
+              <div className="mb-7">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-semibold text-firma-green uppercase tracking-widest">
+                    Paso {pasoIndex + 1} de {PASOS.length}
+                  </span>
                 </div>
-                <h3 className="font-serif text-2xl text-charcoal mb-2">¿Conoces a alguien que también necesite financiamiento?</h3>
-                <p className="text-gray-500 text-sm max-w-md mx-auto leading-relaxed">
-                  Compártenos los datos de 2 empresas o personas que crean que podrían beneficiarse de un crédito
-                  empresarial — nosotros nos encargamos del resto. (Y si se te ocurre una tercera, mejor.)
-                </p>
+                <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-firma-green/70 to-firma-green rounded-full transition-all duration-500 ease-out"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
               </div>
 
-              <div className="space-y-6">
-                <div className="space-y-3">
-                  <p className="text-xs font-bold tracking-widest text-gray-400 uppercase">Tus datos</p>
+              {paso === 'datos' && (
+                <div className="space-y-6">
+                  <div className="text-center mb-2">
+                    <div className="w-12 h-12 bg-firma-green/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <User size={22} className="text-firma-green" />
+                    </div>
+                    <h3 className="font-serif text-2xl text-charcoal mb-2">Cuéntanos quién eres</h3>
+                    <p className="text-gray-500 text-sm max-w-md mx-auto leading-relaxed">
+                      Antes de continuar, confírmanos tus datos.
+                    </p>
+                  </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <input
@@ -261,40 +288,112 @@ export const Gracias: React.FC = () => {
                     />
                     {errors.correo && <p className="text-xs text-red-500 mt-1">{errors.correo}</p>}
                   </div>
+                  <button
+                    type="button"
+                    onClick={continuarDatos}
+                    className="w-full inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-firma-green text-white font-bold rounded-full hover:bg-emerald-600 transition-colors"
+                  >
+                    Continuar
+                  </button>
                 </div>
+              )}
 
-                <div className="border-t border-gray-100 pt-6">
-                  <ReferidoFields n={1} value={r1} onChange={setR1} errors={errors} />
-                </div>
-                <div className="border-t border-gray-100 pt-6">
-                  <ReferidoFields n={2} value={r2} onChange={setR2} errors={errors} />
-                </div>
-                <div className="border-t border-gray-100 pt-6">
-                  <ReferidoFields n={3} optional value={r3} onChange={setR3} errors={errors} />
-                </div>
-
-                {status === 'error' && (
-                  <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
-                    <AlertCircle size={16} className="flex-shrink-0" />
-                    No se pudo enviar. Por favor intenta de nuevo.
+              {paso === 'comentario' && (
+                <div className="space-y-6">
+                  <div className="text-center mb-2">
+                    <div className="w-12 h-12 bg-firma-green/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <MessageSquare size={22} className="text-firma-green" />
+                    </div>
+                    <h3 className="font-serif text-2xl text-charcoal mb-2">¿Cómo fue tu experiencia con nosotros?</h3>
+                    <p className="text-gray-500 text-sm max-w-md mx-auto leading-relaxed">
+                      Tu comentario nos ayuda a mejorar y, con tu permiso, podría aparecer como testimonio en nuestra página principal.
+                    </p>
                   </div>
-                )}
+                  <div>
+                    <textarea
+                      rows={4}
+                      maxLength={500}
+                      placeholder="Cuéntanos tu experiencia con Firma 7…"
+                      value={comentario}
+                      onChange={e => setComentario(e.target.value)}
+                      className={`w-full rounded-xl border px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-firma-green/30 resize-none ${errors.comentario ? 'border-red-300' : 'border-gray-200'}`}
+                    />
+                    {errors.comentario && <p className="text-xs text-red-500 mt-1">{errors.comentario}</p>}
+                  </div>
+                  <div className="flex gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setPaso('datos')}
+                      className="inline-flex items-center gap-1.5 px-5 py-3.5 text-sm font-semibold text-gray-400 hover:text-charcoal transition-colors"
+                    >
+                      <ArrowLeft size={15} /> Atrás
+                    </button>
+                    <button
+                      type="button"
+                      onClick={continuarComentario}
+                      className="flex-1 inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-firma-green text-white font-bold rounded-full hover:bg-emerald-600 transition-colors"
+                    >
+                      Continuar
+                    </button>
+                  </div>
+                </div>
+              )}
 
-                <button
-                  type="button"
-                  onClick={submit}
-                  disabled={status === 'sending'}
-                  className="w-full inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-firma-green text-white font-bold rounded-full hover:bg-emerald-600 disabled:opacity-60 transition-colors"
-                >
-                  {status === 'sending' ? (
-                    <>
-                      <Loader2 size={18} className="animate-spin" /> Enviando…
-                    </>
-                  ) : (
-                    'Enviar referidos'
-                  )}
-                </button>
-              </div>
+              {paso === 'referidos' && (
+                <>
+                  <div className="text-center mb-8">
+                    <div className="w-12 h-12 bg-firma-green/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Users size={22} className="text-firma-green" />
+                    </div>
+                    <h3 className="font-serif text-2xl text-charcoal mb-2">¿Conoces a alguien que también necesite financiamiento?</h3>
+                    <p className="text-gray-500 text-sm max-w-md mx-auto leading-relaxed">
+                      Compártenos los datos de 2 empresas o personas que crean que podrían beneficiarse de un crédito
+                      empresarial — nosotros nos encargamos del resto. (Y si se te ocurre una tercera, mejor.)
+                    </p>
+                  </div>
+
+                  <div className="space-y-6">
+                    <ReferidoFields n={1} value={r1} onChange={setR1} errors={errors} />
+                    <div className="border-t border-gray-100 pt-6">
+                      <ReferidoFields n={2} value={r2} onChange={setR2} errors={errors} />
+                    </div>
+                    <div className="border-t border-gray-100 pt-6">
+                      <ReferidoFields n={3} optional value={r3} onChange={setR3} errors={errors} />
+                    </div>
+
+                    {status === 'error' && (
+                      <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+                        <AlertCircle size={16} className="flex-shrink-0" />
+                        No se pudo enviar. Por favor intenta de nuevo.
+                      </div>
+                    )}
+
+                    <div className="flex gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setPaso('comentario')}
+                        className="inline-flex items-center gap-1.5 px-5 py-3.5 text-sm font-semibold text-gray-400 hover:text-charcoal transition-colors"
+                      >
+                        <ArrowLeft size={15} /> Atrás
+                      </button>
+                      <button
+                        type="button"
+                        onClick={submit}
+                        disabled={status === 'sending'}
+                        className="flex-1 inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-firma-green text-white font-bold rounded-full hover:bg-emerald-600 disabled:opacity-60 transition-colors"
+                      >
+                        {status === 'sending' ? (
+                          <>
+                            <Loader2 size={18} className="animate-spin" /> Enviando…
+                          </>
+                        ) : (
+                          'Enviar referidos'
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
             </>
           )}
         </div>
@@ -302,10 +401,10 @@ export const Gracias: React.FC = () => {
         {/* ── Reseña ──────────────────────────────────── */}
         {/* Siempre debajo del formulario, para que primero quede el espacio de compartir referidos. */}
         <div className="bg-charcoal rounded-2xl p-8 text-center text-white mt-6">
-          <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Star size={22} className="text-yellow-400" fill="currentColor" />
+          <div className="w-12 h-12 bg-[#1877F2]/15 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Facebook size={22} className="text-[#1877F2]" fill="currentColor" />
           </div>
-          <h3 className="font-serif text-2xl mb-2">¿Nos regalas una reseña?</h3>
+          <h3 className="font-serif text-2xl mb-2">¿Nos regalas una reseña en Facebook?</h3>
           <p className="text-gray-400 text-sm mb-6 max-w-sm mx-auto leading-relaxed">
             Tu experiencia ayuda a que más empresas como la tuya confíen en nosotros.
             Solo te tomará un minuto.
@@ -316,9 +415,19 @@ export const Gracias: React.FC = () => {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-8 py-3 bg-firma-green text-white font-bold rounded-full hover:bg-emerald-600 transition-colors no-underline"
           >
-            <Star size={18} fill="currentColor" />
-            Dejar una reseña
+            <Facebook size={18} fill="currentColor" />
+            Dejar una reseña en Facebook
           </a>
+          <p className="text-gray-500 text-xs mt-5">
+            También puedes seguirnos en{' '}
+            <a href="https://www.instagram.com/soc_firma_7/" target="_blank" rel="noopener noreferrer" className="text-white font-semibold no-underline hover:underline inline-flex items-center gap-1">
+              <Instagram size={13} /> Instagram
+            </a>
+            {' · '}
+            <a href="https://www.facebook.com/Firma7.Soc" target="_blank" rel="noopener noreferrer" className="text-white font-semibold no-underline hover:underline inline-flex items-center gap-1">
+              <Facebook size={13} /> Facebook
+            </a>
+          </p>
         </div>
 
         <p className="text-center text-gray-400 text-xs pt-8">
