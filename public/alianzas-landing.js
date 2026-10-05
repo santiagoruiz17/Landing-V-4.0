@@ -26,6 +26,14 @@
   var enviarBtn = document.getElementById('alianza-enviar');
   var ultimoFoco = null;
 
+  var modoPrueba = new URLSearchParams(window.location.search).get('prueba') === '1';
+  if (modoPrueba) {
+    var aviso = document.createElement('div');
+    aviso.textContent = 'MODO PRUEBA: no se guarda ningún dato ni se abre la plataforma de la alianza';
+    aviso.setAttribute('style', 'position:fixed;left:0;right:0;bottom:0;z-index:99999;background:#b45309;color:#fff;font:600 13px Inter,sans-serif;text-align:center;padding:8px 12px');
+    body.appendChild(aviso);
+  }
+
   function abrir() {
     ultimoFoco = document.activeElement;
     pasoForm.hidden = false;
@@ -76,6 +84,17 @@
     if (telefono.length !== 10) return mostrarError('Escribe tu teléfono a 10 dígitos.');
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(correo)) return mostrarError('Escribe un correo válido.');
     if (!autoriza) return mostrarError('Marca la casilla para que un asesor pueda contactarte.');
+
+    // Modo prueba (agrega ?prueba=1 a la dirección): valida el formulario y muestra el mensaje final,
+    // pero NO guarda nada, NO avisa al equipo, NO crea contacto en GHL y NO abre la plataforma de la alianza.
+    if (modoPrueba) {
+      document.getElementById('alianza-nombre-ok').textContent = nombre.split(' ')[0];
+      document.getElementById('alianza-abrio').hidden = false;
+      document.getElementById('alianza-continuar').hidden = true;
+      pasoForm.hidden = true;
+      pasoOk.hidden = false;
+      return;
+    }
 
     // Se abre una pestaña en blanco AHORA (con el clic del usuario) para que el navegador no la bloquee;
     // cuando llegue el enlace de la alianza, se redirige esa pestaña.
