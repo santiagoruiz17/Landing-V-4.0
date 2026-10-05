@@ -11,19 +11,33 @@ interface Testimonio {
   empresa: string | null;
   comentario: string;
   aprobado: boolean;
+  calificacion: number | null;
+  autoriza_publicar: boolean;
   created_at: string;
 }
+
+const Estrellas: React.FC<{ valor: number | null }> = ({ valor }) =>
+  valor ? (
+    <span className="inline-flex items-center gap-0.5 align-middle" aria-label={`${valor} de 5 estrellas`}>
+      {[1, 2, 3, 4, 5].map(n => (
+        <Star key={n} size={13} className={n <= valor ? 'text-amber-400' : 'text-gray-200'} fill="currentColor" />
+      ))}
+    </span>
+  ) : null;
 
 interface Referido {
   id: string;
   referido_por_nombre: string;
   referido_por_empresa: string | null;
   referido_por_correo: string | null;
+  referido_por_telefono: string | null;
   comentario: string | null;
-  referido_1_empresa: string;
-  referido_1_contacto: string;
-  referido_1_correo: string;
-  referido_1_telefono: string;
+  calificacion: number | null;
+  finalizado_at: string | null;
+  referido_1_empresa: string | null;
+  referido_1_contacto: string | null;
+  referido_1_correo: string | null;
+  referido_1_telefono: string | null;
   referido_2_empresa: string | null;
   referido_2_contacto: string | null;
   referido_2_correo: string | null;
@@ -34,6 +48,23 @@ interface Referido {
   referido_3_telefono: string | null;
   created_at: string;
 }
+
+interface ReferidoItem {
+  id: string;
+  envio_id: string;
+  orden: number;
+  nombre: string;
+  telefono: string;
+  correo: string | null;
+  empresa: string | null;
+  tipo_credito: 'automotriz' | 'hipotecario' | 'empresarial';
+}
+
+const ETIQUETA_TIPO_CREDITO: Record<ReferidoItem['tipo_credito'], string> = {
+  automotriz: 'Crédito automotriz',
+  hipotecario: 'Crédito hipotecario',
+  empresarial: 'Crédito empresarial',
+};
 
 type Tab = 'testimonios' | 'referidos' | 'rating';
 
@@ -53,6 +84,7 @@ export const AdminPanel: React.FC = () => {
   const [tab, setTab] = useState<Tab>('testimonios');
   const [testimonios, setTestimonios] = useState<Testimonio[]>([]);
   const [referidos, setReferidos] = useState<Referido[]>([]);
+  const [referidosItems, setReferidosItems] = useState<ReferidoItem[]>([]);
   const [ratingValue, setRatingValue] = useState('');
   const [reviewsValue, setReviewsValue] = useState('');
   const [ratingStatus, setRatingStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
@@ -78,6 +110,8 @@ export const AdminPanel: React.FC = () => {
   const cargarReferidos = async () => {
     const { data } = await supabase.rpc('admin_list_referidos', { p_passcode: passcode });
     setReferidos(data ?? []);
+    const { data: items } = await supabase.rpc('admin_list_referidos_gracias_items', { p_passcode: passcode });
+    setReferidosItems(items ?? []);
   };
 
   const cargarRating = async () => {
@@ -207,19 +241,25 @@ export const AdminPanel: React.FC = () => {
                     <p className="text-sm font-bold text-charcoal">
                       {t.nombre} {t.empresa && <span className="text-gray-400 font-normal">· {t.empresa}</span>}
                     </p>
-                    <p className="text-xs text-gray-400 mt-0.5">{new Date(t.created_at).toLocaleString('es-MX')}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      <Estrellas valor={t.calificacion} /> {t.calificacion ? '· ' : ''}{new Date(t.created_at).toLocaleString('es-MX')}
+                    </p>
                   </div>
                   <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full flex-shrink-0 ${t.aprobado ? 'bg-firma-green/10 text-firma-green' : 'bg-amber-50 text-amber-600'}`}>
                     {t.aprobado ? 'Publicado' : 'Pendiente'}
                   </span>
                 </div>
                 <p className="text-sm text-gray-600 mt-3 italic">"{t.comentario}"</p>
+                {!t.autoriza_publicar && (
+                  <p className="text-xs text-amber-600 mt-2">El cliente no autorizó publicar su comentario — úsalo solo como retroalimentación interna.</p>
+                )}
                 <div className="flex gap-2 mt-4">
                   {!t.aprobado ? (
                     <button
                       type="button"
                       onClick={() => aprobar(t.id, true)}
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-firma-green px-3 py-1.5 rounded-full hover:bg-emerald-600 transition-colors"
+                      disabled={!t.autoriza_publicar}
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-firma-green px-3 py-1.5 rounded-full hover:bg-emerald-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                     >
                       <CheckCircle2 size={13} /> Aprobar y publicar
                     </button>
@@ -250,11 +290,14 @@ export const AdminPanel: React.FC = () => {
             {referidos.length === 0 && <p className="text-sm text-gray-400">Sin referidos todavía.</p>}
             {referidos.map(r => (
               <div key={r.id} className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm text-sm">
-                <p className="text-xs text-gray-400 mb-2">{new Date(r.created_at).toLocaleString('es-MX')}</p>
+                <p className="text-xs text-gray-400 mb-2">
+                  <Estrellas valor={r.calificacion} /> {r.calificacion ? '· ' : ''}{new Date(r.created_at).toLocaleString('es-MX')}
+                  {!r.finalizado_at && r.referido_1_empresa == null && <span className="ml-2 text-amber-600">· no terminó el paso de referidos</span>}
+                </p>
                 <p className="font-bold text-charcoal">
                   {r.referido_por_nombre} {r.referido_por_empresa && <span className="text-gray-400 font-normal">· {r.referido_por_empresa}</span>}
                 </p>
-                <p className="text-gray-400 text-xs">{r.referido_por_correo}</p>
+                <p className="text-gray-400 text-xs">{[r.referido_por_correo, r.referido_por_telefono].filter(Boolean).join(' · ')}</p>
                 {r.comentario && <p className="text-gray-600 italic mt-2">"{r.comentario}"</p>}
                 <div className="grid sm:grid-cols-3 gap-3 mt-3">
                   {[
@@ -267,6 +310,15 @@ export const AdminPanel: React.FC = () => {
                       <p className="text-gray-500">{x.contacto}</p>
                       <p className="text-gray-400 text-xs">{x.correo}</p>
                       <p className="text-gray-400 text-xs">{x.telefono}</p>
+                    </div>
+                  ))}
+                  {referidosItems.filter(it => it.envio_id === r.id).sort((a, b) => a.orden - b.orden).map(it => (
+                    <div key={it.id} className="bg-gray-50 rounded-lg p-3">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-firma-green mb-1">{ETIQUETA_TIPO_CREDITO[it.tipo_credito]}</p>
+                      <p className="font-semibold text-charcoal">{it.nombre}</p>
+                      {it.empresa && <p className="text-gray-500">{it.empresa}</p>}
+                      <p className="text-gray-400 text-xs">{it.telefono}</p>
+                      {it.correo && <p className="text-gray-400 text-xs">{it.correo}</p>}
                     </div>
                   ))}
                 </div>

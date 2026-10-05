@@ -30,7 +30,10 @@ const NotFound            = React.lazy(() => import('./pages/NotFound').then(m =
 const QuieroSerAliado     = React.lazy(() => import('./pages/QuieroSerAliado').then(m => ({ default: m.QuieroSerAliado })));
 const Blog                = React.lazy(() => import('./pages/Blog').then(m => ({ default: m.Blog })));
 const BlogPost            = React.lazy(() => import('./pages/BlogPost').then(m => ({ default: m.BlogPost })));
+const AprobarTestimonio   = React.lazy(() => import('./pages/AprobarTestimonio').then(m => ({ default: m.AprobarTestimonio })));
 const AdminPanel          = React.lazy(() => import('./pages/AdminPanel').then(m => ({ default: m.AdminPanel })));
+// BORRADOR (portal de clientes): ruta /mi-cuenta desactivada hasta que esté listo el proceso de crear cuentas.
+// const MiCuenta            = React.lazy(() => import('./pages/MiCuenta').then(m => ({ default: m.MiCuenta })));
 
 const SectionFallback = () => <div className="py-24 bg-white" />;
 
@@ -136,7 +139,9 @@ function App() {
           <Route path="/documentos-recibidos" element={<DocumentosRecibidos />} />
           <Route path="/gracias" element={<Gracias />} />
           <Route path="/documentacion" element={<DocumentacionDirecta />} />
+          <Route path="/aprobar-testimonio" element={<AprobarTestimonio />} />
           <Route path="/admin" element={<AdminPanel />} />
+          {/* <Route path="/mi-cuenta" element={<MiCuenta />} /> */}
           {/* <Route path="/terminos-y-condiciones" element={<TerminosCondiciones />} /> */}
           <Route path="/quiero-ser-aliado" element={<QuieroSerAliado />} />
           <Route path="/blog" element={<Blog />} />
