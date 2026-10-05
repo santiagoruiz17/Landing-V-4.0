@@ -118,6 +118,5 @@ export const CONTENIDO = {
       'Accionista mayoritario de 30 a 70 años, sin morosidad en buró, que funge como aval',
       'Empresa con buen perfil crediticio y cuenta bancaria activa con ventas acordes a su facturación',
     ],
-    nota: 'Estos requisitos aplican al Crédito PyME Digital; para crédito simple y arrendamiento, tu asesor revisa tu caso.',
   },
 };
