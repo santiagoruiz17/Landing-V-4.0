@@ -1,4 +1,10 @@
 User-agent: *
 Allow: /
 
+# Áreas internas: no tienen nada que mostrar en buscadores
+Disallow: /admin
+Disallow: /aprobar-testimonio
+Disallow: /mi-cuenta
+Disallow: /alianzas/portal/
+
 Sitemap: https://firma7.com/sitemap.xml

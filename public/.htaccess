@@ -3,6 +3,11 @@
   RewriteEngine On
   RewriteBase /
 
+  # Una sola dirección para el sitio: www.firma7.com → firma7.com (evita contenido duplicado en Google).
+  # El paso http → https ya lo hace el servidor.
+  RewriteCond %{HTTP_HOST} ^www\.firma7\.com$ [NC]
+  RewriteRule ^ https://firma7.com%{REQUEST_URI} [L,R=301]
+
   # Serve existing files and directories directly
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d

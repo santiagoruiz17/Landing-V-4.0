@@ -98,8 +98,8 @@ function PerfilCTA() {
 
 function LandingPage() {
   useSEO({
-    title: 'Crédito Empresarial y Financiamiento para PyMEs en México | SOC · Firma 7',
-    description: 'Obtén crédito empresarial, inyección de capital y financiamiento para tu PyME en México. SOC · Firma 7 compara +20 instituciones financieras para conseguirte la mejor tasa. Respuesta en 24–72 horas, sin burocracia bancaria.',
+    title: 'Crédito Empresarial y Financiamiento PyME | SOC · Firma 7',
+    description: 'Consigue crédito empresarial para tu PyME en México. Comparamos +20 instituciones para darte la mejor tasa, sin burocracia. Respuesta en 24–72 horas.',
     canonical: 'https://firma7.com/',
   });
 
