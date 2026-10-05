@@ -5,7 +5,7 @@
 //   hechos:     tarjetas con lo más importante (monto, rapidez, ventaja…)
 //   requisitos: lo mínimo para aplicar (filtra a quien no califica antes de iniciar)
 //   nota:       línea opcional bajo los requisitos
-// FinBe no está aquí a propósito: su presentación trae aviso de confidencialidad; se queda con el texto anterior.
+// FinBe: la presentación trae aviso de confidencialidad; Santiago autorizó usar su información (2026-10-05).
 
 export const CONTENIDO = {
   konfio: {
@@ -103,5 +103,21 @@ export const CONTENIDO = {
       'Edad de 21 a 68 años',
       'Buen historial crediticio',
     ],
+  },
+  'finbe-abc': {
+    quienes: 'Alianza entre FinBe, ABC Leasing y Lendia, respaldada por Grupo Bepensa y enfocada en financiar a las PyMEs.',
+    hechos: [
+      { t: 'Crédito simple', x: 'Hasta $50 millones (hasta $10 millones sin garantía hipotecaria), plazo de 12 a 60 meses y sin penalización por pagos anticipados.' },
+      { t: 'Crédito PyME Digital', x: 'De $1 a $3 millones, plazo de 12 a 36 meses. Respuesta en 24 horas con tu clave CIEC y recursos en menos de 5 días.' },
+      { t: 'Arrendamiento puro', x: 'Plazo de 12 a 60 meses, renta mensual fija y anticipo desde 0%.' },
+      { t: 'Cuenta corriente', x: 'Línea revolvente: contrato de 12 meses, y hasta 36 meses con garantía hipotecaria.' },
+    ],
+    requisitos: [
+      'RFC y clave CIEC válidos, y firmantes con FIEL activa',
+      'Al menos 24 meses de operación en tu actividad principal',
+      'Accionista mayoritario de 30 a 70 años, sin morosidad en buró, que funge como aval',
+      'Empresa con buen perfil crediticio y cuenta bancaria activa con ventas acordes a su facturación',
+    ],
+    nota: 'Estos requisitos aplican al Crédito PyME Digital; para crédito simple y arrendamiento, tu asesor revisa tu caso.',
   },
 };

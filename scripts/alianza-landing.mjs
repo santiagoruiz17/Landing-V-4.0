@@ -34,7 +34,7 @@ export function landingTemplate(partner, cfg) {
   const faqs = [
     { q: `¿Qué empresas pueden solicitar financiamiento con ${nombre}?`, a: `${nombre} atiende tanto a Personas Morales como a Personas Físicas con Actividad Empresarial. Un asesor de Firma 7 te confirma si tu caso aplica y te acompaña durante la solicitud.` },
     { q: '¿Cuánto cuesta el servicio de Firma 7?', a: 'Firma 7 no te cobra comisión: nuestros honorarios son cubiertos por la institución financiera, así que la gestión no tiene costo para ti.' },
-    { q: '¿Qué documentos necesito?', a: 'Un asesor de Firma 7 se pone en contacto contigo y te indica exactamente qué necesitas. Normalmente se solicita constancia de situación fiscal, identificación oficial, comprobantes de domicilio y estados de cuenta bancarios.' },
+    { q: '¿Qué documentos necesito?', a: 'Un asesor de Firma 7 se pone en contacto contigo y te indica exactamente qué necesitas. Normalmente se solicita constancia de situación fiscal, identificación oficial, comprobantes de domicilio y estados de cuenta bancarios.', link: { href: '/documentacion', text: 'Subir mi documentación' } },
     { q: `¿Qué pasa si ${nombre} no aprueba mi solicitud?`, a: 'Firma 7 compara más de 20 instituciones financieras. Si esta opción no es la ideal o no se aprueba, tu asesor revisa contigo otras alternativas para tu empresa.' },
   ];
 
@@ -70,7 +70,7 @@ export function landingTemplate(partner, cfg) {
       },
       {
         '@type': 'FAQPage',
-        mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+        mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.link ? `${f.a} Puedes subir tu documentación en https://firma7.com${f.link.href}` : f.a } })),
       },
     ],
   };
@@ -222,6 +222,7 @@ export function landingTemplate(partner, cfg) {
     .ok-box p { color: #4b5563; margin-bottom: 1rem; }
     .ok-docs { margin: 1.25rem 0 .6rem; font-weight: 600; color: var(--charcoal); font-size: .93rem; }
     .btn-outline { background: #fff; color: var(--green); border: 2px solid var(--green); padding: .85rem 1.5rem; }
+    .faq-btn { padding: .7rem 1.3rem; font-size: .92rem; }
     .btn-outline:hover { background: var(--green-light); box-shadow: none; }
     .reqs { list-style: none; max-width: 640px; margin: 0 auto; display: grid; gap: .7rem; }
     .reqs li { display: flex; gap: .75rem; align-items: flex-start; background: var(--gray-subtle); border: 1px solid var(--gray-border); border-radius: 12px; padding: .8rem 1rem; font-size: .95rem; }
@@ -322,7 +323,7 @@ export function landingTemplate(partner, cfg) {
       <h2>Preguntas frecuentes</h2>
       <p class="sec-sub">Resolvemos lo que más nos preguntan sobre ${esc(nombre)}.</p>
       <div class="faq">
-        ${faqs.map((f) => `<details><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join('\n        ')}
+        ${faqs.map((f) => `<details><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p>${f.link ? `<p><a class="btn btn-outline faq-btn" href="${f.link.href}" target="_blank" rel="noopener">${esc(f.link.text)}</a></p>` : ''}</details>`).join('\n        ')}
       </div>
     </div>
   </section>
