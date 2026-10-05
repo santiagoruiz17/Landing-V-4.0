@@ -3,11 +3,15 @@ import { User2, X, ShieldCheck } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { DocumentSlot } from './DocumentSlot';
 
+// El reverso de la INE se guarda en el slot del accionista + 100 (ver DocumentUpload / _document_label).
+const SLOT_REVERSO_INE = 100;
+
 const DOCS_ACCIONISTA = [
-  { tipoDocumento: 'ine_accionista' as const, label: 'INE' },
-  { tipoDocumento: 'comprobante_domicilio_accionista' as const, label: 'Comprobante de domicilio (no mayor a 60 días)' },
-  { tipoDocumento: 'constancia_situacion_fiscal_accionista' as const, label: 'Constancia de situación fiscal actualizada' },
-  { tipoDocumento: 'acta_matrimonio_accionista' as const, label: 'Acta de matrimonio (en caso de aplicar)', optional: true },
+  { key: 'ine_accionista', tipoDocumento: 'ine_accionista' as const, label: 'INE — frente', hint: 'Usa su INE más vigente. Sube una foto del frente y otra del reverso, bien legibles y sin reflejos.', camara: true, slotOffset: 0 },
+  { key: 'ine_accionista_reverso', tipoDocumento: 'ine_accionista' as const, label: 'INE — reverso', camara: true, slotOffset: SLOT_REVERSO_INE },
+  { key: 'comprobante_domicilio_accionista', tipoDocumento: 'comprobante_domicilio_accionista' as const, label: 'Comprobante de domicilio (no mayor a 60 días)', hint: 'Recibo de luz, agua, teléfono o internet fijo.', slotOffset: 0 },
+  { key: 'constancia_situacion_fiscal_accionista', tipoDocumento: 'constancia_situacion_fiscal_accionista' as const, label: 'Constancia de situación fiscal actualizada', hint: 'Se descarga gratis en sat.gob.mx. Debe ser del mes en curso.', slotOffset: 0 },
+  { key: 'acta_matrimonio_accionista', tipoDocumento: 'acta_matrimonio_accionista' as const, label: 'Acta de matrimonio (en caso de aplicar)', optional: true, slotOffset: 0 },
 ];
 
 function soloPorcentaje(value: string): string {
@@ -30,6 +34,7 @@ interface AccionistaCardProps {
   esRepresentanteLegal: boolean;
   esUnicoAccionista: boolean;
   initialDocs?: Record<string, string>;
+  initialPurgados?: Record<string, boolean>;
   onChangeNombre: (v: string) => void;
   onChangePorcentaje: (v: string) => void;
   onChangeCorreo: (v: string) => void;
@@ -41,7 +46,7 @@ interface AccionistaCardProps {
 
 export const AccionistaCard: React.FC<AccionistaCardProps> = ({
   leadId, slotIndex, nombre, porcentaje, correo, telefono, esRepresentanteLegal, esUnicoAccionista,
-  initialDocs, onChangeNombre, onChangePorcentaje, onChangeCorreo, onChangeTelefono, onMarcarRepresentanteLegal, onRemove, onUploaded,
+  initialDocs, initialPurgados, onChangeNombre, onChangePorcentaje, onChangeCorreo, onChangeTelefono, onMarcarRepresentanteLegal, onRemove, onUploaded,
 }) => {
   const [removiendo, setRemoviendo] = useState(false);
   const esRepLegalEfectivo = esUnicoAccionista || esRepresentanteLegal;
@@ -131,14 +136,17 @@ export const AccionistaCard: React.FC<AccionistaCardProps> = ({
         <div className="space-y-3 pl-1">
           {DOCS_ACCIONISTA.map((doc, i) => (
             <DocumentSlot
-              key={doc.tipoDocumento}
+              key={doc.key}
               leadId={leadId}
               tipoDocumento={doc.tipoDocumento}
-              slotIndex={slotIndex}
+              slotIndex={slotIndex + doc.slotOffset}
               label={doc.label}
+              hint={doc.hint}
+              camara={doc.camara}
               optional={doc.optional}
               numero={i + 1}
-              initialFileName={initialDocs?.[doc.tipoDocumento]}
+              initialFileName={initialDocs?.[doc.key]}
+              initialPurgado={initialPurgados?.[doc.key]}
               onUploaded={onUploaded}
             />
           ))}

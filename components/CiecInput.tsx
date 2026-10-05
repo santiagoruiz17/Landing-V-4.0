@@ -30,7 +30,8 @@ export const CiecInput: React.FC<CiecInputProps> = ({ leadId, initialSaved, onSa
       <label className="field-label">Clave CIEC del SAT</label>
       <p className="text-xs text-gray-400 -mt-1 mb-1 leading-relaxed">
         Es la contraseña de acceso al portal del SAT. Se guarda cifrada y solo nuestro equipo autorizado
-        puede consultarla para gestionar tu trámite.
+        puede consultarla para gestionar tu trámite.{' '}
+        <strong className="text-gray-600">Sin ella tu trámite puede tardar más.</strong>
       </p>
       <div className="relative">
         <input

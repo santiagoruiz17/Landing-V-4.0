@@ -6,7 +6,7 @@ import { useSEO } from '../hooks/useSEO';
 export const DocumentosRecibidos: React.FC = () => {
   useSEO({
     title: 'Documentación Recibida | Firma 7',
-    description: 'Tu documentación fue recibida. Nuestro equipo te contactará en un lapso de 24 a 72 horas hábiles.',
+    description: 'Tu documentación fue recibida. Nuestro equipo te contactará en menos de 24 horas hábiles.',
     canonical: 'https://firma7.com/documentos-recibidos',
     noindex: true,
   });
@@ -56,7 +56,7 @@ export const DocumentosRecibidos: React.FC = () => {
           </h1>
           <p className="text-gray-500 text-base leading-relaxed max-w-lg mx-auto mb-6">
             Ya estamos trabajando en tu caso. Nuestro equipo revisará tu información y se pondrá en contacto contigo
-            en un lapso de <strong className="text-charcoal">24 a 72 horas hábiles</strong>.
+            en <strong className="text-charcoal">menos de 24 horas hábiles</strong>.
           </p>
           <div className="flex items-center justify-center gap-2 text-sm text-gray-400">
             <Clock size={16} className="text-firma-green" />

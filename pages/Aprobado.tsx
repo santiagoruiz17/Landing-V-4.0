@@ -3,6 +3,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Shield, FileText } from 'lucide-react';
 import { useSEO } from '../hooks/useSEO';
 import { DocumentUpload } from '../components/DocumentUpload';
+// BORRADOR (portal de clientes): imports de ClienteCrearCuentaCTA y CuentaExistenteBanner
+// desactivados junto con sus usos de abajo.
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export const Aprobado: React.FC = () => {
@@ -70,6 +72,10 @@ export const Aprobado: React.FC = () => {
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6">
 
+        {/* BORRADOR (portal de clientes): se reactiva junto con la creación de cuentas.
+        <CuentaExistenteBanner />
+        */}
+
         {/* ── Celebration banner ──────────────────────── */}
         <div className="bg-gradient-to-br from-[#f0fdf4] to-[#dcfce7] border-2 border-[#86efac] rounded-2xl p-8 text-center shadow-sm">
           <div className="w-16 h-16 bg-gradient-to-br from-[#006d4e] to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-[#006d4e]/30">
@@ -98,7 +104,7 @@ export const Aprobado: React.FC = () => {
               <h2 className="text-base font-semibold text-charcoal mb-1">Siguiente paso: reunir tu documentación</h2>
               <p className="text-gray-500 text-sm leading-relaxed">
                 Para avanzar con tu solicitud necesitamos verificar algunos documentos. Completa el formulario de abajo
-                con la información solicitada y adjunta tus archivos. Nuestro equipo los revisará y te contactará en 24–72 horas.
+                con la información solicitada y adjunta tus archivos. Nuestro equipo los revisará y te contactará en menos de 24 horas hábiles.
               </p>
             </div>
           </div>
@@ -115,7 +121,12 @@ export const Aprobado: React.FC = () => {
 
         {/* ── Documentation Upload Form ───────────── */}
         {leadId ? (
-          <DocumentUpload leadId={leadId} tipo={esMoral ? 'moral' : 'fisica'} />
+          <>
+            <DocumentUpload leadId={leadId} tipo={esMoral ? 'moral' : 'fisica'} />
+            {/* BORRADOR (portal de clientes): se reactiva cuando esté listo el proceso de crear cuentas.
+            <ClienteCrearCuentaCTA />
+            */}
+          </>
         ) : (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
             <div className="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center mx-auto mb-4">
