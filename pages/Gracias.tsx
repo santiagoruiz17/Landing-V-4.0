@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import confetti from 'canvas-confetti';
 import { Heart, Users, User, MessageSquare, CheckCircle2, Loader2, AlertCircle, ArrowLeft, Facebook, Instagram, Star, Car, Home, Building2, PlusCircle, X, Share2 } from 'lucide-react';
 import { useSEO } from '../hooks/useSEO';
@@ -35,20 +34,6 @@ const REFERIDO_VACIO: ReferidoData = { nombre: '', telefono: '', correo: '', emp
 
 const referidoVacio = (r: ReferidoData) =>
   !r.nombre.trim() && !r.telefono && !r.correo.trim() && !r.empresa.trim() && !r.tipoCredito;
-
-// Los datos pueden venir en el enlace (WhatsApp / GHL): /gracias?nombre=Ana&empresa=ACME&correo=ana@acme.com&telefono=5512345678
-function primerParam(params: URLSearchParams, ...claves: string[]): string {
-  for (const c of claves) {
-    const v = params.get(c);
-    if (v && v.trim()) return v.trim();
-  }
-  return '';
-}
-
-function telefono10(raw: string): string {
-  const d = raw.replace(/\D/g, '');
-  return d.length > 10 ? d.slice(-10) : d;
-}
 
 function fireConfetti() {
   const defaults = { startVelocity: 28, spread: 360, ticks: 55, zIndex: 0, colors: ['#006d4e', '#00a86b', '#ffd700'] };
@@ -140,16 +125,9 @@ export const Gracias: React.FC = () => {
 
   useEffect(() => { fireConfetti(); }, []);
 
-  const [searchParams] = useSearchParams();
-  const [nombre, setNombre] = useState(() => primerParam(searchParams, 'nombre', 'name'));
-  const [empresa, setEmpresa] = useState(() => primerParam(searchParams, 'empresa', 'company'));
-  const [correo, setCorreo] = useState(() => primerParam(searchParams, 'correo', 'email'));
-  const [telefono, setTelefono] = useState(() => telefono10(primerParam(searchParams, 'telefono', 'tel', 'celular', 'phone')));
-  // Si el enlace ya trae los datos obligatorios, se salta el primer paso.
-  const [saltoDatos, setSaltoDatos] = useState(
-    () => Boolean(nombre.trim() && EMAIL_REGEX.test(correo.trim()) && telefono.length === 10)
-  );
-  const [paso, setPaso] = useState<Paso>(saltoDatos ? 'comentario' : 'datos');
+  const [nombre, setNombre] = useState('');
+  const [empresa, setEmpresa] = useState('');
+  const [paso, setPaso] = useState<Paso>('datos');
   const [calificacion, setCalificacion] = useState(0);
   const [hoverEstrella, setHoverEstrella] = useState(0);
   const [comentario, setComentario] = useState('');
@@ -164,8 +142,6 @@ export const Gracias: React.FC = () => {
   const continuarDatos = () => {
     const e: Record<string, string> = {};
     if (!nombre.trim()) e.nombre = 'Requerido';
-    if (!correo.trim() || !EMAIL_REGEX.test(correo.trim())) e.correo = 'Correo inválido';
-    if (telefono.length !== 10) e.telefono = 'Debe tener 10 dígitos';
     setErrors(e);
     if (Object.keys(e).length === 0) setPaso('comentario');
   };
@@ -183,8 +159,6 @@ export const Gracias: React.FC = () => {
         id: opinionId,
         nombre,
         empresa,
-        correo,
-        telefono,
         calificacion,
         comentario,
         autoriza: autoriza && comentario.trim().length > 0,
@@ -244,9 +218,8 @@ export const Gracias: React.FC = () => {
     await enviarReferidos([]);
   };
 
-  const pasosVisibles = saltoDatos ? PASOS.filter(p => p !== 'datos') : PASOS;
-  const pasoIndex = pasosVisibles.indexOf(paso);
-  const progress = ((pasoIndex + 1) / pasosVisibles.length) * 100;
+  const pasoIndex = PASOS.indexOf(paso);
+  const progress = ((pasoIndex + 1) / PASOS.length) * 100;
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans text-charcoal">
@@ -319,7 +292,7 @@ export const Gracias: React.FC = () => {
               <div className="mb-7">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-semibold text-firma-green uppercase tracking-widest">
-                    Paso {pasoIndex + 1} de {pasosVisibles.length}
+                    Paso {pasoIndex + 1} de {PASOS.length}
                   </span>
                 </div>
                 <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
@@ -338,7 +311,7 @@ export const Gracias: React.FC = () => {
                     </div>
                     <h3 className="font-serif text-2xl text-charcoal mb-2">Cuéntanos quién eres</h3>
                     <p className="text-gray-500 text-sm max-w-md mx-auto leading-relaxed">
-                      Antes de continuar, confírmanos tus datos.
+                      Solo necesitamos tu nombre para continuar.
                     </p>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -360,28 +333,6 @@ export const Gracias: React.FC = () => {
                       className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-firma-green/30"
                     />
                   </div>
-                  <div>
-                    <input
-                      type="email"
-                      placeholder="Tu correo"
-                      value={correo}
-                      onChange={e => setCorreo(e.target.value)}
-                      className={`w-full rounded-xl border px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-firma-green/30 ${errors.correo ? 'border-red-300' : 'border-gray-200'}`}
-                    />
-                    {errors.correo && <p className="text-xs text-red-500 mt-1">{errors.correo}</p>}
-                  </div>
-                  <div>
-                    <input
-                      type="tel"
-                      inputMode="numeric"
-                      maxLength={10}
-                      placeholder="Tu teléfono (10 dígitos)"
-                      value={telefono}
-                      onChange={e => setTelefono(soloDigitos10(e.target.value))}
-                      className={`w-full rounded-xl border px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-firma-green/30 ${errors.telefono ? 'border-red-300' : 'border-gray-200'}`}
-                    />
-                    {errors.telefono && <p className="text-xs text-red-500 mt-1">{errors.telefono}</p>}
-                  </div>
                   <button
                     type="button"
                     onClick={continuarDatos}
@@ -398,14 +349,6 @@ export const Gracias: React.FC = () => {
                     <div className="w-12 h-12 bg-firma-green/10 rounded-full flex items-center justify-center mx-auto mb-4">
                       <MessageSquare size={22} className="text-firma-green" />
                     </div>
-                    {saltoDatos && (
-                      <p className="text-xs text-gray-400 mb-3">
-                        Hola, <strong className="text-gray-600">{nombre.split(' ')[0]}</strong> ·{' '}
-                        <button type="button" onClick={() => { setSaltoDatos(false); setPaso('datos'); }} className="underline hover:text-firma-green">
-                          ¿No eres tú? Cambiar mis datos
-                        </button>
-                      </p>
-                    )}
                     <h3 className="font-serif text-2xl text-charcoal mb-2">¿Cómo fue tu experiencia con nosotros?</h3>
                     <p className="text-gray-500 text-sm max-w-md mx-auto leading-relaxed">
                       Tu opinión nos ayuda a mejorar.
@@ -462,7 +405,7 @@ export const Gracias: React.FC = () => {
                   <div className="flex gap-3">
                     <button
                       type="button"
-                      onClick={() => { setSaltoDatos(false); setPaso('datos'); }}
+                      onClick={() => setPaso('datos')}
                       className="inline-flex items-center gap-1.5 px-5 py-3.5 text-sm font-semibold text-gray-400 hover:text-charcoal transition-colors"
                     >
                       <ArrowLeft size={15} /> Atrás

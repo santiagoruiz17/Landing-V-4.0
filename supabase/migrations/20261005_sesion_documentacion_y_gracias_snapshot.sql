@@ -990,19 +990,18 @@ declare
   v_autoriza boolean := coalesce((p->>'autoriza')::boolean, false);
 begin
   if v_nombre = '' then raise exception 'Falta el nombre'; end if;
-  if v_correo = '' then raise exception 'Falta el correo'; end if;
   if length(v_tel) > 10 then v_tel := right(v_tel, 10); end if;
-  if length(v_tel) <> 10 then raise exception 'Telefono invalido'; end if;
+  if v_tel <> '' and length(v_tel) <> 10 then raise exception 'Telefono invalido'; end if;
   if v_cal is null or v_cal not between 1 and 5 then raise exception 'Calificacion invalida'; end if;
 
   if v_id is not null and exists (select 1 from public.referidos_clientes where id = v_id and finalizado_at is null) then
     update public.referidos_clientes set
-      referido_por_nombre = v_nombre, referido_por_empresa = v_empresa, referido_por_correo = v_correo,
-      referido_por_telefono = v_tel, comentario = nullif(v_comentario, ''), calificacion = v_cal, autoriza_publicar = v_autoriza
+      referido_por_nombre = v_nombre, referido_por_empresa = v_empresa, referido_por_correo = nullif(v_correo, ''),
+      referido_por_telefono = nullif(v_tel, ''), comentario = nullif(v_comentario, ''), calificacion = v_cal, autoriza_publicar = v_autoriza
     where id = v_id;
   else
     insert into public.referidos_clientes (referido_por_nombre, referido_por_empresa, referido_por_correo, referido_por_telefono, comentario, calificacion, autoriza_publicar)
-    values (v_nombre, v_empresa, v_correo, v_tel, nullif(v_comentario, ''), v_cal, v_autoriza)
+    values (v_nombre, v_empresa, nullif(v_correo, ''), nullif(v_tel, ''), nullif(v_comentario, ''), v_cal, v_autoriza)
     returning id into v_id;
   end if;
 
