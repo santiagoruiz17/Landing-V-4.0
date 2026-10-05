@@ -1,24 +1,106 @@
-<!DOCTYPE html>
+// Plantilla de la landing de una alianza CON enlace de oficina (Konfío, Fondeadora, Hay Cash, Xepelin, Finsus, Covalto, FinBe).
+// La usa generate-alianzas.mjs. Es HTML estático (lo lee Google sin JavaScript); el formulario emergente lo maneja
+// /alianzas-landing.js (los scripts en línea están bloqueados por la política de seguridad del sitio).
+
+const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+// "<h3>Título</h3><p>Texto</p>" → [{ titulo, texto }]
+export function parseSecciones(html = '') {
+  return [...html.matchAll(/<h3>(.*?)<\/h3>\s*<p>([\s\S]*?)<\/p>/g)].map((m) => ({ titulo: m[1].trim(), texto: m[2].trim() }));
+}
+
+const buscar = (secciones, clave) => secciones.find((s) => s.titulo.toLowerCase().includes(clave))?.texto ?? null;
+
+export function landingTemplate(partner, cfg) {
+  const { supabaseUrl, supabaseKey } = cfg;
+  const nombre = partner.name;
+  const url = `https://firma7.com/alianzas/${partner.slug}/`;
+  const secciones = parseSecciones(partner.contentHtml);
+  const quienes = buscar(secciones, 'quiénes');
+  const como = buscar(secciones, 'cómo trabajan');
+  const tiempo = buscar(secciones, 'tiempo');
+  const ventaja = buscar(secciones, 'ventaja');
+  const monto = buscar(secciones, 'monto');
+
+  const title = `Financiamiento ${nombre} para tu empresa | SOC · Firma 7`;
+  const description = `Solicita financiamiento ${nombre} con asesoría de SOC · Firma 7: un asesor te acompaña en todo el proceso y compara +20 instituciones. Personas morales y físicas con actividad empresarial.`;
+
+  const faqs = [
+    { q: `¿Qué empresas pueden solicitar financiamiento con ${nombre}?`, a: `${nombre} atiende tanto a Personas Morales como a Personas Físicas con Actividad Empresarial. Un asesor de Firma 7 te confirma si tu caso aplica y te acompaña durante la solicitud.` },
+    { q: '¿Cuánto cuesta el servicio de Firma 7?', a: 'Nada: la consultoría de Firma 7 no tiene costo para ti, en ningún producto financiero.' },
+    { q: '¿Qué documentos necesito?', a: 'Un asesor de Firma 7 se pone en contacto contigo y te indica exactamente qué necesitas. Normalmente se solicita constancia de situación fiscal, identificación oficial, comprobantes de domicilio y estados de cuenta bancarios.' },
+    { q: `¿Qué pasa si ${nombre} no aprueba mi solicitud?`, a: 'Firma 7 compara más de 20 instituciones financieras. Si esta opción no es la ideal o no se aprueba, tu asesor revisa contigo otras alternativas para tu empresa.' },
+  ];
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': `${url}#webpage`,
+        url,
+        name: title,
+        description,
+        inLanguage: 'es-MX',
+        isPartOf: { '@id': 'https://firma7.com/#website' },
+        about: { '@id': 'https://firma7.com/#organization' },
+      },
+      {
+        '@type': 'Service',
+        name: `Gestión de financiamiento ${nombre} con Firma 7`,
+        serviceType: 'Asesoría y gestión de crédito empresarial',
+        provider: { '@id': 'https://firma7.com/#organization' },
+        areaServed: { '@type': 'Country', name: 'México' },
+        audience: { '@type': 'BusinessAudience', name: 'Personas morales y personas físicas con actividad empresarial' },
+        url,
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Inicio', item: 'https://firma7.com/' },
+          { '@type': 'ListItem', position: 2, name: 'Alianzas', item: 'https://firma7.com/alianzas/' },
+          { '@type': 'ListItem', position: 3, name: nombre, item: url },
+        ],
+      },
+      {
+        '@type': 'FAQPage',
+        mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+      },
+    ],
+  };
+
+  const hechos = [
+    monto && { t: 'Monto de financiamiento', x: monto },
+    tiempo && { t: 'Tiempo de respuesta', x: tiempo },
+    ventaja && { t: 'Ventaja principal', x: ventaja },
+  ].filter(Boolean);
+
+  const cta = (extra = '') => `<button type="button" class="btn ${extra}" data-alianza-cta>Iniciar con ${esc(nombre)}
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg></button>`;
+
+  const circulos = '<circle cx="50" cy="50" r="12"/><circle cx="50" cy="20" r="12"/><circle cx="50" cy="80" r="12"/><circle cx="24" cy="35" r="12"/><circle cx="24" cy="65" r="12"/><circle cx="76" cy="35" r="12"/><circle cx="76" cy="65" r="12"/>';
+
+  return `<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Financiamiento FinBe ABC para tu empresa | SOC · Firma 7</title>
-  <meta name="description" content="Solicita financiamiento FinBe ABC con asesoría de SOC · Firma 7: un asesor te acompaña en todo el proceso y compara +20 instituciones. Personas morales y físicas con actividad empresarial." />
+  <title>${esc(title)}</title>
+  <meta name="description" content="${esc(description)}" />
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
-  <link rel="canonical" href="https://firma7.com/alianzas/finbe-abc/" />
+  <link rel="canonical" href="${url}" />
   <meta name="theme-color" content="#006d4e" />
 
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="SOC · Firma 7" />
   <meta property="og:locale" content="es_MX" />
-  <meta property="og:title" content="Financiamiento FinBe ABC para tu empresa | SOC · Firma 7" />
-  <meta property="og:description" content="Solicita financiamiento FinBe ABC con asesoría de SOC · Firma 7: un asesor te acompaña en todo el proceso y compara +20 instituciones. Personas morales y físicas con actividad empresarial." />
-  <meta property="og:url" content="https://firma7.com/alianzas/finbe-abc/" />
+  <meta property="og:title" content="${esc(title)}" />
+  <meta property="og:description" content="${esc(description)}" />
+  <meta property="og:url" content="${url}" />
   <meta property="og:image" content="https://firma7.com/og-firma7.png?v=2" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Financiamiento FinBe ABC para tu empresa | SOC · Firma 7" />
-  <meta name="twitter:description" content="Solicita financiamiento FinBe ABC con asesoría de SOC · Firma 7: un asesor te acompaña en todo el proceso y compara +20 instituciones. Personas morales y físicas con actividad empresarial." />
+  <meta name="twitter:title" content="${esc(title)}" />
+  <meta name="twitter:description" content="${esc(description)}" />
   <meta name="twitter:image" content="https://firma7.com/og-firma7.png?v=2" />
 
   <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2" />
@@ -26,7 +108,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=2" />
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2" />
 
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"https://firma7.com/alianzas/finbe-abc/#webpage","url":"https://firma7.com/alianzas/finbe-abc/","name":"Financiamiento FinBe ABC para tu empresa | SOC · Firma 7","description":"Solicita financiamiento FinBe ABC con asesoría de SOC · Firma 7: un asesor te acompaña en todo el proceso y compara +20 instituciones. Personas morales y físicas con actividad empresarial.","inLanguage":"es-MX","isPartOf":{"@id":"https://firma7.com/#website"},"about":{"@id":"https://firma7.com/#organization"}},{"@type":"Service","name":"Gestión de financiamiento FinBe ABC con Firma 7","serviceType":"Asesoría y gestión de crédito empresarial","provider":{"@id":"https://firma7.com/#organization"},"areaServed":{"@type":"Country","name":"México"},"audience":{"@type":"BusinessAudience","name":"Personas morales y personas físicas con actividad empresarial"},"url":"https://firma7.com/alianzas/finbe-abc/"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Inicio","item":"https://firma7.com/"},{"@type":"ListItem","position":2,"name":"Alianzas","item":"https://firma7.com/alianzas/"},{"@type":"ListItem","position":3,"name":"FinBe ABC","item":"https://firma7.com/alianzas/finbe-abc/"}]},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"¿Qué empresas pueden solicitar financiamiento con FinBe ABC?","acceptedAnswer":{"@type":"Answer","text":"FinBe ABC atiende tanto a Personas Morales como a Personas Físicas con Actividad Empresarial. Un asesor de Firma 7 te confirma si tu caso aplica y te acompaña durante la solicitud."}},{"@type":"Question","name":"¿Cuánto cuesta el servicio de Firma 7?","acceptedAnswer":{"@type":"Answer","text":"Nada: la consultoría de Firma 7 no tiene costo para ti, en ningún producto financiero."}},{"@type":"Question","name":"¿Qué documentos necesito?","acceptedAnswer":{"@type":"Answer","text":"Un asesor de Firma 7 se pone en contacto contigo y te indica exactamente qué necesitas. Normalmente se solicita constancia de situación fiscal, identificación oficial, comprobantes de domicilio y estados de cuenta bancarios."}},{"@type":"Question","name":"¿Qué pasa si FinBe ABC no aprueba mi solicitud?","acceptedAnswer":{"@type":"Answer","text":"Firma 7 compara más de 20 instituciones financieras. Si esta opción no es la ideal o no se aprueba, tu asesor revisa contigo otras alternativas para tu empresa."}}]}]}</script>
+  <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -136,12 +218,12 @@
     .ok-box[hidden], #alianza-continuar[hidden] { display: none; }
   </style>
 </head>
-<body data-alianza="finbe-abc" data-alianza-nombre="FinBe ABC" data-sb-url="https://pkfnmpdlrbpnlerttoaz.supabase.co" data-sb-key="sb_publishable_q6OsQGRNhR0Jt9F0_xh4Eg_Abe0HQct">
+<body data-alianza="${esc(partner.slug)}" data-alianza-nombre="${esc(nombre)}" data-sb-url="${esc(supabaseUrl)}" data-sb-key="${esc(supabaseKey)}">
 
   <nav class="navbar">
     <div class="navbar-inner">
       <a href="/" class="logo-link" aria-label="Firma 7 — inicio">
-        <svg class="logo-icon" viewBox="0 0 100 100" fill="currentColor"><circle cx="50" cy="50" r="12"/><circle cx="50" cy="20" r="12"/><circle cx="50" cy="80" r="12"/><circle cx="24" cy="35" r="12"/><circle cx="24" cy="65" r="12"/><circle cx="76" cy="35" r="12"/><circle cx="76" cy="65" r="12"/></svg>
+        <svg class="logo-icon" viewBox="0 0 100 100" fill="currentColor">${circulos}</svg>
         <div><div class="logo-name"><span>SOC</span><span class="logo-divider"></span><span style="font-weight:400">FIRMA 7</span></div><span class="logo-sub">Líderes en asesoría financiera</span></div>
       </a>
       <div class="menu">
@@ -162,34 +244,31 @@
 
   <header class="hero">
     <div class="wrap">
-      <div class="partner-logo"><img src="../../images/logo-finbe-abc.png" alt="Logo de FinBe ABC" width="180" height="90" /></div>
+      <div class="partner-logo"><img src="${esc(partner.logo)}" alt="Logo de ${esc(nombre)}" width="180" height="90" /></div>
       <span class="kicker">Alianza con SOC · Firma 7</span>
-      <h1>Financiamiento <span>FinBe ABC</span> para tu empresa</h1>
+      <h1>Financiamiento <span>${esc(nombre)}</span> para tu empresa</h1>
       <p class="lead">Inicia tu solicitud en minutos. Un asesor de Firma 7 te acompaña en todo el proceso, sin costo para ti.</p>
-      <button type="button" class="btn " data-alianza-cta>Iniciar con FinBe ABC
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg></button>
+      ${cta()}
       <p class="hero-note">Para personas morales y personas físicas con actividad empresarial.</p>
     </div>
   </header>
 
-  <section>
+  ${hechos.length ? `<section>
     <div class="wrap">
-      <h2>FinBe ABC en pocas palabras</h2>
+      <h2>${esc(nombre)} en pocas palabras</h2>
       <p class="sec-sub">Lo esencial antes de iniciar tu solicitud.</p>
       <div class="grid g3">
-        <div class="card"><h3>Monto de financiamiento</h3><p>Generalmente hasta $5,000,000 de pesos para créditos ágiles (pudiendo estructurar montos mayores dependiendo del perfil, garantías o si se trata de arrendamiento de equipo mayor).</p></div>
-        <div class="card"><h3>Tiempo de respuesta</h3><p>Cuentan con procesos de evaluación estandarizados. Una vez integrado el expediente completo, el análisis y respuesta toman en promedio de 3 a 5 días hábiles.</p></div>
-        <div class="card"><h3>Ventaja principal</h3><p>El respaldo de un gran corporativo les permite combinar líneas de crédito con arrendamiento en un solo lugar.</p></div>
+        ${hechos.map((h) => `<div class="card"><h3>${esc(h.t)}</h3><p>${esc(h.x)}</p></div>`).join('\n        ')}
       </div>
     </div>
-  </section>
+  </section>` : ''}
 
-  <section style="padding-top:0">
+  ${quienes || como ? `<section style="padding-top:0">
     <div class="wrap about">
-      <h3>¿Quiénes son?</h3><p>Institución financiera respaldada por el sólido Grupo Bepensa, con fuerte presencia nacional y enfocada en PyMEs.</p>
-      <h3>¿Cómo trabajan?</h3><p>Ofrecen Crédito Simple, Crédito Revolvente y Arrendamiento Puro, adaptándose al ciclo de ingresos de tu empresa para que los pagos no ahoguen tu flujo de efectivo.</p>
+      ${quienes ? `<h3>¿Quiénes son?</h3><p>${esc(quienes)}</p>` : ''}
+      ${como ? `<h3>¿Cómo trabajan?</h3><p>${esc(como)}</p>` : ''}
     </div>
-  </section>
+  </section>` : ''}
 
   <section class="why">
     <div class="wrap">
@@ -197,7 +276,7 @@
       <p class="sec-sub">Tres pasos, sin papeleo al inicio.</p>
       <div class="grid g3 steps">
         <div class="step"><h3>Déjanos tus datos</h3><p>Nombre, teléfono y correo. Te toma menos de un minuto.</p></div>
-        <div class="step"><h3>Continúa en FinBe ABC</h3><p>Se abre su plataforma para que inicies tu evaluación.</p></div>
+        <div class="step"><h3>Continúa en ${esc(nombre)}</h3><p>Se abre su plataforma para que inicies tu evaluación.</p></div>
         <div class="step"><h3>Te acompañamos</h3><p>Un asesor de Firma 7 te contacta, te indica qué documentos reunir y da seguimiento.</p></div>
       </div>
     </div>
@@ -208,7 +287,7 @@
       <h2>¿Por qué hacerlo con Firma 7?</h2>
       <p class="sec-sub">Más que un enlace: una oficina que te acompaña.</p>
       <ul class="why" style="background:none">
-        <li>Comparamos más de 20 instituciones: si FinBe ABC no es la ideal, te proponemos otra.</li>
+        <li>Comparamos más de 20 instituciones: si ${esc(nombre)} no es la ideal, te proponemos otra.</li>
         <li>Un asesor revisa tu caso y te pide solo lo necesario, en el orden correcto.</li>
         <li>Sin costo de consultoría para ti, en todos los productos.</li>
       </ul>
@@ -218,26 +297,22 @@
   <section style="background:var(--gray-subtle)">
     <div class="wrap">
       <h2>Preguntas frecuentes</h2>
-      <p class="sec-sub">Resolvemos lo que más nos preguntan sobre FinBe ABC.</p>
+      <p class="sec-sub">Resolvemos lo que más nos preguntan sobre ${esc(nombre)}.</p>
       <div class="faq">
-        <details><summary>¿Qué empresas pueden solicitar financiamiento con FinBe ABC?</summary><p>FinBe ABC atiende tanto a Personas Morales como a Personas Físicas con Actividad Empresarial. Un asesor de Firma 7 te confirma si tu caso aplica y te acompaña durante la solicitud.</p></details>
-        <details><summary>¿Cuánto cuesta el servicio de Firma 7?</summary><p>Nada: la consultoría de Firma 7 no tiene costo para ti, en ningún producto financiero.</p></details>
-        <details><summary>¿Qué documentos necesito?</summary><p>Un asesor de Firma 7 se pone en contacto contigo y te indica exactamente qué necesitas. Normalmente se solicita constancia de situación fiscal, identificación oficial, comprobantes de domicilio y estados de cuenta bancarios.</p></details>
-        <details><summary>¿Qué pasa si FinBe ABC no aprueba mi solicitud?</summary><p>Firma 7 compara más de 20 instituciones financieras. Si esta opción no es la ideal o no se aprueba, tu asesor revisa contigo otras alternativas para tu empresa.</p></details>
+        ${faqs.map((f) => `<details><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join('\n        ')}
       </div>
     </div>
   </section>
 
   <section class="final">
     <div class="wrap">
-      <h2>¿Listo para iniciar con FinBe ABC?</h2>
+      <h2>¿Listo para iniciar con ${esc(nombre)}?</h2>
       <p>Déjanos tus datos y comienza tu evaluación hoy mismo. Un asesor de Firma 7 te acompaña.</p>
-      <button type="button" class="btn btn-light" data-alianza-cta>Iniciar con FinBe ABC
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg></button>
+      ${cta('btn-light')}
     </div>
   </section>
 
-  <p class="legal">Firma 7 es un asesor financiero independiente. FinBe ABC es marca de su respectivo titular y se muestra únicamente con fines informativos. La aprobación del financiamiento depende de la evaluación de la institución financiera.</p>
+  <p class="legal">Firma 7 es un asesor financiero independiente. ${esc(nombre)} es marca de su respectivo titular y se muestra únicamente con fines informativos. La aprobación del financiamiento depende de la evaluación de la institución financiera.</p>
 
   <footer>
     <p>&copy; <span id="anio">2026</span> SOC · Firma 7 — <a href="/aviso-de-privacidad">Aviso de Privacidad</a></p>
@@ -250,7 +325,7 @@
       <button class="modal-x" type="button" data-cerrar aria-label="Cerrar">&times;</button>
 
       <div id="alianza-paso-form">
-        <h2 id="modal-titulo">Inicia con FinBe ABC</h2>
+        <h2 id="modal-titulo">Inicia con ${esc(nombre)}</h2>
         <p class="modal-sub">Déjanos tus datos. Un asesor de Firma 7 te acompañará en tu solicitud.</p>
         <form id="alianza-form" novalidate>
           <label>Nombre completo<input type="text" name="nombre" autocomplete="name" required /></label>
@@ -259,7 +334,7 @@
           <div class="hp" aria-hidden="true"><label>Sitio web<input type="text" name="sitio_web" tabindex="-1" autocomplete="off" /></label></div>
           <label class="check"><input type="checkbox" name="autoriza" /><span>Autorizo que un asesor de Firma 7 se ponga en contacto conmigo para ayudarme con mi solicitud y pedirme mi documentación. <a href="/aviso-de-privacidad" target="_blank" rel="noopener">Aviso de Privacidad</a></span></label>
           <p class="error" id="alianza-error" role="alert" hidden></p>
-          <button type="submit" class="btn" id="alianza-enviar">Continuar con FinBe ABC</button>
+          <button type="submit" class="btn" id="alianza-enviar">Continuar con ${esc(nombre)}</button>
         </form>
       </div>
 
@@ -267,8 +342,8 @@
         <div class="ok-icon">✓</div>
         <h2 style="text-align:center">¡Listo, <span id="alianza-nombre-ok"></span>!</h2>
         <p>Un asesor de Firma 7 se pondrá en contacto contigo para acompañarte y pedirte tu documentación.</p>
-        <p id="alianza-abrio" hidden>Abrimos FinBe ABC en otra pestaña para que inicies tu evaluación.</p>
-        <a id="alianza-continuar" class="btn" href="#" target="_blank" rel="noopener" hidden>Continuar con FinBe ABC</a>
+        <p id="alianza-abrio" hidden>Abrimos ${esc(nombre)} en otra pestaña para que inicies tu evaluación.</p>
+        <a id="alianza-continuar" class="btn" href="#" target="_blank" rel="noopener" hidden>Continuar con ${esc(nombre)}</a>
         <a class="ok-link" href="/documentacion" target="_blank" rel="noopener">¿Quieres adelantar tu documentación? Súbela aquí (opcional)</a>
       </div>
     </div>
@@ -277,3 +352,5 @@
   <script src="/alianzas-landing.js"></script>
 </body>
 </html>
+`;
+}

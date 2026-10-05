@@ -80,7 +80,7 @@
   # los chunks de Vite, su nombre de archivo NO cambia cuando se edita el
   # contenido, así que no pueden entrar en el cacheo agresivo de arriba (se
   # quedarían "pegados" en el navegador de los visitantes hasta por 1 año).
-  <FilesMatch "^(analytics-init|meta-pixel-init|alianzas-partners)\.js$">
+  <FilesMatch "^(analytics-init|meta-pixel-init|alianzas-partners|alianzas-landing)\.js$">
     Header set Cache-Control "no-cache, no-store, must-revalidate"
     Header set Pragma "no-cache"
   </FilesMatch>

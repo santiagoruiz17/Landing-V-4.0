@@ -1,11 +1,12 @@
 import fs from 'fs';
 import path from 'path';
+import { landingTemplate } from './scripts/alianza-landing.mjs';
 
 const partners = [
   { 
     name: 'Konfío', 
     slug: 'konfio', 
-    logo: 'https://static.wixstatic.com/media/84b48d_c3d0407487a44c8bac8cd9dd0bed9444~mv2.png/v1/fill/w_1000,h_563,al_c,q_90,usm_0.66_1.00_0.01/84b48d_c3d0407487a44c8bac8cd9dd0bed9444~mv2.png',
+    logo: '../../images/logo-konfio.png',
     contentHtml: `
       <div class="partner-details">
         <h3>¿Quiénes son?</h3>
@@ -97,7 +98,7 @@ const partners = [
   { 
     name: 'Xepelin', 
     slug: 'xepelin', 
-    logo: 'https://almomento.mx/wp-content/uploads/2024/02/Logotipo-Xepelin-Press-Kit-1-scaled.jpg',
+    logo: '../../images/logo-xepelin.png',
     contentHtml: `
       <div class="partner-details">
         <h3>¿Quiénes son?</h3>
@@ -166,7 +167,7 @@ const partners = [
   { 
     name: 'Covalto', 
     slug: 'covalto', 
-    logo: 'https://media.cdn.teamtailor.com/images/s3/teamtailor-production/logotype-v3/image_uploads/15e2f7f9-b5a4-476a-852c-c435bc8cc489/original.png',
+    logo: '../../images/logo-covalto.png',
     contentHtml: `
       <div class="partner-details">
         <h3>¿Quiénes son?</h3>
@@ -327,7 +328,7 @@ const partners = [
   { 
     name: 'Hay Cash', 
     slug: 'hay-cash', 
-    logo: 'https://socasesores.com/oficinas/img/bancos/empresarial/HEY-CASH-color.png',
+    logo: '../../images/logo-hay-cash.png',
     contentHtml: `
       <div class="partner-details">
         <h3>¿Quiénes son?</h3>
@@ -371,7 +372,7 @@ const partners = [
     `
   },
   { name: 'AFIRME', slug: 'afirme', logo: '../../images/logo-afirme.png' },
-  { name: 'Fondeadora', slug: 'creze', logo: 'https://fincor.com.mx/wp-content/uploads/2019/08/creze222.png' }
+  { name: 'Fondeadora', slug: 'creze', logo: '../../images/logo-creze.png' }
 ];
 
 const template = (partner) => `<!DOCTYPE html>
@@ -545,12 +546,40 @@ const template = (partner) => `<!DOCTYPE html>
 </html>
 `;
 
+// Alianzas con enlace de oficina: tienen landing completa (formulario + redirección a la plataforma de la alianza).
+// El resto sigue con la página sencilla (el ingreso es manual).
+// Uso: node generate-alianzas.mjs            → regenera todas
+//      node generate-alianzas.mjs --enlazadas → solo las que tienen landing completa
+const ENLAZADAS = ['konfio', 'creze', 'hay-cash', 'xepelin', 'finsus', 'covalto', 'finbe-abc'];
+
+function leerEnv() {
+  const env = { ...process.env };
+  for (const f of ['.env.production.local', '.env.local', '.env.production', '.env']) {
+    const p = path.join(process.cwd(), f);
+    if (!fs.existsSync(p)) continue;
+    for (const linea of fs.readFileSync(p, 'utf8').split(/\r?\n/)) {
+      const m = linea.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/);
+      if (m && env[m[1]] === undefined) env[m[1]] = m[2].replace(/^["']|["']$/g, '');
+    }
+  }
+  return env;
+}
+
+const env = leerEnv();
+const cfg = { supabaseUrl: env.VITE_SUPABASE_URL, supabaseKey: env.VITE_SUPABASE_ANON_KEY };
+const soloEnlazadas = process.argv.includes('--enlazadas');
+
 partners.forEach(partner => {
+  const enlazada = ENLAZADAS.includes(partner.slug);
+  if (soloEnlazadas && !enlazada) return;
+  if (enlazada && (!cfg.supabaseUrl || !cfg.supabaseKey)) {
+    throw new Error('Faltan VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY (variables de entorno o .env) para generar las landings con formulario.');
+  }
   const dirPath = path.join(process.cwd(), 'alianzas', partner.slug);
   if (!fs.existsSync(dirPath)) {
     fs.mkdirSync(dirPath, { recursive: true });
   }
-  fs.writeFileSync(path.join(dirPath, 'index.html'), template(partner));
+  fs.writeFileSync(path.join(dirPath, 'index.html'), enlazada ? landingTemplate(partner, cfg) : template(partner));
 });
 
 console.log('Se generaron ' + partners.length + ' subdirectorios con éxito.');

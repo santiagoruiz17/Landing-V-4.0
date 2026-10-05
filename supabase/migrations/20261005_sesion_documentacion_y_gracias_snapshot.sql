@@ -82,6 +82,24 @@ create unique index if not exists testimonios_lead_id_key on public.testimonios 
 create unique index if not exists testimonios_referido_id_key on public.testimonios (referido_id) where referido_id is not null;
 create unique index if not exists testimonios_aprobar_token_key on public.testimonios (aprobar_token);
 
+-- Landings de alianzas (enlaces de oficina; las URLs son datos y no se guardan aquí)
+create table if not exists public.alianza_enlaces (
+  slug text primary key,
+  nombre text not null,
+  url_inicio text,
+  activo boolean not null default true,
+  orden int not null default 100,
+  created_at timestamptz not null default now()
+);
+alter table public.alianza_enlaces enable row level security;  -- sin políticas: solo vía RPC security definer
+insert into public.alianza_enlaces (slug, nombre, orden) values
+  ('konfio', 'Konfío', 1), ('creze', 'Fondeadora', 2), ('hay-cash', 'Hay Cash', 3), ('xepelin', 'Xepelin', 4),
+  ('finsus', 'Finsus', 5), ('covalto', 'Covalto', 6), ('finbe-abc', 'FinBe ABC', 7)
+on conflict (slug) do nothing;
+alter table public.leads add column if not exists alianza_origen text;
+alter table public.leads add column if not exists alianza_enlace_entregado_at timestamptz;
+alter table public.leads add column if not exists contacto_autorizado_at timestamptz;
+
 -- El trigger se crea DESPUÉS de las funciones (sección 2)
 
 
@@ -123,6 +141,43 @@ begin
   end if;
 exception when others then
   raise warning '_avisar_referidos_gracias: %', sqlerrm;
+end;
+$function$
+;
+
+CREATE OR REPLACE FUNCTION public._avisar_registro_alianza(p_lead uuid, p_alianza text, p_enlace boolean, p_existente boolean)
+ RETURNS void
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare
+  r record; v_content text; v_html text;
+begin
+  select * into r from public.leads where id = p_lead;
+  if not found then return; end if;
+
+  v_content := public._team_section('Datos del contacto',
+        public._team_row('Nombre', public._esc(r.nombre_completo))
+     || public._team_row('Teléfono', public._esc(r.numero))
+     || public._team_row('Correo', public._esc(r.correo)))
+   || public._team_section('Origen',
+        public._team_row('Alianza', public._esc(p_alianza))
+     || public._team_row('Lead', case when p_existente then 'Ya estaba registrado (se actualizó su origen)' else 'Nuevo' end)
+     || public._team_row('Plataforma de la alianza', case when p_enlace then 'Se le abrió su enlace para continuar ✅' else '<span style="color:#b45309">Aún no hay enlace configurado: no se le pudo abrir la plataforma</span>' end)
+     || public._team_row('Campaña', public._esc(coalesce(r.utm_campaign, r.utm_source))));
+
+  v_html := public._team_email_shell(
+    '#006d4e', 'Nuevo lead de alianza', public._esc(r.nombre_completo),
+    'Quiere iniciar su solicitud con ' || public._esc(p_alianza) || '.',
+    public._team_acciones(r.numero), v_content,
+    public._team_nota('#f0faf5', '#006d4e', '#14532d',
+      '<strong>Siguiente paso:</strong> contáctalo, confirma si es persona física o moral y pídele su documentación (el enlace para subirla es <strong>firma7.com/documentacion</strong>).'),
+    'ID ' || r.id || ' · ' || to_char(now() at time zone 'America/Mexico_City', 'DD/MM/YYYY HH24:MI'));
+
+  perform public._enviar_correo_equipo('🤝 Lead de alianza — ' || p_alianza || ' — ' || coalesce(r.nombre_completo, ''), v_html);
+exception when others then
+  raise warning '_avisar_registro_alianza: %', sqlerrm;
 end;
 $function$
 ;
@@ -1035,6 +1090,46 @@ end;
 $function$
 ;
 
+CREATE OR REPLACE FUNCTION public.notify_lead_inserted()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public', 'vault'
+AS $function$
+declare
+  v_secret text;
+begin
+  if new.evento = 'lead_calificado' then
+    return new;
+  end if;
+
+  -- Los leads de "documentación directa" (clientes de Facebook, ya en GHL y ya
+  -- contactados por el equipo) no deben generar el correo de aviso normal de
+  -- leads nuevos — ese correo está pensado para leads que vienen del
+  -- perfilamiento del sitio, no para estos.
+  if new.evento in ('documentacion_directa', 'alianza_directa') then
+    return new;
+  end if;
+
+  select decrypted_secret into v_secret from vault.decrypted_secrets where name = 'lead_notify_webhook_secret';
+  if v_secret is null then
+    raise warning 'notify_lead_inserted: lead_notify_webhook_secret no configurado en vault';
+    return new;
+  end if;
+
+  perform net.http_post(
+    url     := 'https://pkfnmpdlrbpnlerttoaz.supabase.co/functions/v1/notify-lead',
+    body    := jsonb_build_object('record', row_to_json(new)),
+    headers := jsonb_build_object(
+      'Content-Type',     'application/json',
+      'x-webhook-secret', v_secret
+    )
+  );
+  return new;
+end;
+$function$
+;
+
 CREATE OR REPLACE FUNCTION public.notify_referido_inserted()
  RETURNS trigger
  LANGUAGE plpgsql
@@ -1138,6 +1233,64 @@ begin
     mime_type = excluded.mime_type,
     purgado_at = null,
     created_at = now();
+end;
+$function$
+;
+
+CREATE OR REPLACE FUNCTION public.registrar_lead_alianza(p jsonb)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+declare
+  v_slug text := lower(trim(coalesce(p->>'alianza', '')));
+  v_nombre text := left(trim(coalesce(p->>'nombre', '')), 120);
+  v_correo text := lower(trim(coalesce(p->>'correo', '')));
+  v_tel text := regexp_replace(coalesce(p->>'telefono', ''), '\D', '', 'g');
+  v_autoriza boolean := coalesce((p->>'autoriza')::boolean, false);
+  v_alianza record; v_id uuid; v_existente boolean := false;
+begin
+  -- Campo trampa para bots: si viene lleno, se responde "ok" sin guardar nada
+  if coalesce(trim(p->>'sitio_web'), '') <> '' then
+    return jsonb_build_object('ok', true, 'leadId', null, 'enlace', null);
+  end if;
+
+  select * into v_alianza from public.alianza_enlaces where slug = v_slug and activo;
+  if not found then raise exception 'Alianza no disponible'; end if;
+  if v_nombre = '' then raise exception 'Falta el nombre'; end if;
+  if length(v_tel) > 10 then v_tel := right(v_tel, 10); end if;
+  if length(v_tel) <> 10 then raise exception 'Telefono invalido'; end if;
+  if v_correo !~ '^[^@\s]+@[^@\s]+\.[^@\s]+$' then raise exception 'Correo invalido'; end if;
+  if not v_autoriza then raise exception 'Falta la autorizacion de contacto'; end if;
+
+  -- Freno global contra abuso (más de 40 altas nuevas en 10 minutos)
+  if (select count(*) from public.leads where evento = 'alianza_directa' and contacto_autorizado_at > now() - interval '10 minutes') > 40 then
+    raise exception 'Demasiadas solicitudes, intenta en unos minutos';
+  end if;
+
+  select id into v_id from public.leads where lower(trim(correo)) = v_correo order by created_at desc limit 1;
+  if v_id is not null then
+    v_existente := true;
+    update public.leads set
+      alianza_origen = v_slug, contacto_autorizado_at = now(),
+      nombre_completo = coalesce(nullif(nombre_completo, ''), v_nombre),
+      numero = coalesce(nullif(numero, ''), v_tel), updated_at = now()
+    where id = v_id;
+  else
+    insert into public.leads (nombre_completo, numero, correo, constitucion, calificado, evento, alianza_origen, contacto_autorizado_at, utm_source, utm_medium, utm_campaign)
+    values (v_nombre, v_tel, v_correo, '', false, 'alianza_directa', v_slug, now(),
+            nullif(left(p->>'utm_source', 120), ''), nullif(left(p->>'utm_medium', 120), ''), nullif(left(p->>'utm_campaign', 120), ''))
+    returning id into v_id;
+  end if;
+
+  if v_alianza.url_inicio is not null then
+    update public.leads set alianza_enlace_entregado_at = now() where id = v_id;
+  end if;
+
+  perform public._avisar_registro_alianza(v_id, v_alianza.nombre, v_alianza.url_inicio is not null, v_existente);
+
+  return jsonb_build_object('ok', true, 'leadId', v_id, 'enlace', v_alianza.url_inicio, 'alianza', v_alianza.nombre, 'existente', v_existente);
 end;
 $function$
 ;
@@ -1571,6 +1724,203 @@ end;
 $function$
 ;
 
+CREATE OR REPLACE FUNCTION public.sync_lead_to_ghl()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public', 'vault', 'extensions'
+AS $function$
+declare
+  v_token text;
+  v_location text;
+  v_first_name text;
+  v_last_name text;
+  v_digits text;
+  v_phone text;
+  v_monto numeric;
+  v_buro_empresa text;
+  v_buro_accionista text;
+  v_custom_fields jsonb;
+  v_tags jsonb;
+  v_body jsonb;
+  v_contact_resp extensions.http_response;
+  v_contact_json jsonb;
+  v_contact_id text;
+  v_search_resp extensions.http_response;
+  v_search_json jsonb;
+  v_opp_body jsonb;
+  v_opp_resp extensions.http_response;
+  c_pipeline_id constant text := 'A5H9ZRTzoPdSOQdwbsL2';
+  c_stage_id constant text := '248f3bc8-30be-40f1-bd92-8181997bcf3d';
+begin
+  -- Los leads de "documentación directa" (clientes de Facebook ya perfilados
+  -- por el equipo) ya existen como contacto en GHL de antemano — sincronizarlos
+  -- aquí duplicaría/pisaría ese contacto sin necesidad.
+  if new.evento = 'documentacion_directa' then
+    return new;
+  end if;
+
+  select decrypted_secret into v_token from vault.decrypted_secrets where name = 'ghl_api_token';
+  select decrypted_secret into v_location from vault.decrypted_secrets where name = 'ghl_location_id';
+
+  if v_token is null or v_location is null then
+    raise warning 'GHL: credenciales no configuradas en vault, se omite sincronizacion';
+    return new;
+  end if;
+
+  begin
+    v_first_name := split_part(trim(coalesce(new.nombre_completo, '')), ' ', 1);
+    v_last_name := trim(substring(trim(coalesce(new.nombre_completo, '')) from length(v_first_name) + 1));
+
+    v_digits := regexp_replace(coalesce(new.numero, ''), '\D', '', 'g');
+    if length(v_digits) = 10 then
+      v_phone := '+52' || v_digits;
+    elsif length(v_digits) = 12 and left(v_digits, 2) = '52' then
+      v_phone := '+' || v_digits;
+    elsif v_digits <> '' then
+      v_phone := '+' || v_digits;
+    else
+      v_phone := null;
+    end if;
+
+    v_monto := nullif(regexp_replace(coalesce(new.monto, ''), '\D', '', 'g'), '')::numeric;
+
+    if new.constitucion = 'Persona Moral' then
+      v_buro_empresa := trim(both ' ' from coalesce(new.buro_pm_empresa, '') ||
+        case when new.buro_pm_empresa_detalle is not null and new.buro_pm_empresa_detalle <> ''
+          then ' (' || new.buro_pm_empresa_detalle || ')' else '' end);
+      v_buro_accionista := trim(both ' ' from coalesce(new.buro_pm_accionista, '') ||
+        case when new.buro_pm_accionista_detalle is not null and new.buro_pm_accionista_detalle <> ''
+          then ' (' || new.buro_pm_accionista_detalle || ')' else '' end);
+    else
+      v_buro_empresa := trim(both ' ' from coalesce(new.buro_pf, '') ||
+        case when new.buro_pf_detalle is not null and new.buro_pf_detalle <> ''
+          then ' (' || new.buro_pf_detalle || ')' else '' end);
+      v_buro_accionista := '';
+    end if;
+
+    select jsonb_agg(jsonb_build_object('id', t.id, 'value', t.value))
+    into v_custom_fields
+    from (
+      values
+        ('0F0ndnNo0cumezA97XoK', new.constitucion),
+        ('BGsSxXt5mILB33pynPMC', new.rfc),
+        ('QFZa63IvVJihu8xE2rhN', new.cargo),
+        ('bPoncGNnaP3WhrBFEV5e', new.antiguedad),
+        ('mA8y8uFWOXXGVhhSXyaU', new.ingresos),
+        ('mBri7MNhGBHTGXZLCF9g', new.destino),
+        ('ws84Uls0nhnvqDERSelu', new.giro),
+        ('er6ivTiCPXTGCLI6DRIf', new.garantia),
+        ('hynpPTOFk4TpaOQBtFk7', nullif(v_buro_empresa, '')),
+        ('7TqzwHAX5jGLUkPFyQYK', nullif(v_buro_accionista, ''))
+    ) as t(id, value)
+    where t.value is not null and t.value <> '';
+
+    if v_monto is not null then
+      v_custom_fields := coalesce(v_custom_fields, '[]'::jsonb)
+        || jsonb_build_array(jsonb_build_object('id', '8p2yXRDNDjqcZGOq8aEt', 'value', v_monto));
+    end if;
+
+    -- Tags de atribución: se agregan como tags (no custom fields, no requieren
+    -- IDs de GHL) para poder segmentar/filtrar leads por campaña dentro de GHL.
+    v_tags := jsonb_build_array(case when new.evento = 'alianza_directa' then 'lead-alianza' else 'lead-perfilamiento-web' end);
+    if nullif(new.alianza_origen, '') is not null then
+      v_tags := v_tags || jsonb_build_array('alianza:' || new.alianza_origen);
+    end if;
+    if nullif(new.utm_source, '') is not null then
+      v_tags := v_tags || jsonb_build_array('utm_source:' || new.utm_source);
+    end if;
+    if nullif(new.utm_campaign, '') is not null then
+      v_tags := v_tags || jsonb_build_array('utm_campaign:' || new.utm_campaign);
+    end if;
+    if nullif(new.utm_medium, '') is not null then
+      v_tags := v_tags || jsonb_build_array('utm_medium:' || new.utm_medium);
+    end if;
+
+    v_body := jsonb_strip_nulls(jsonb_build_object(
+      'locationId', v_location,
+      'firstName', nullif(v_first_name, ''),
+      'lastName', nullif(v_last_name, ''),
+      'email', new.correo,
+      'phone', v_phone,
+      'tags', v_tags,
+      'customFields', coalesce(v_custom_fields, '[]'::jsonb)
+    ));
+
+    -- 1) Crear/actualizar contacto
+    v_contact_resp := extensions.http((
+      'POST',
+      'https://services.leadconnectorhq.com/contacts/upsert',
+      ARRAY[
+        extensions.http_header('Authorization', 'Bearer ' || v_token),
+        extensions.http_header('Version', '2021-07-28')
+      ],
+      'application/json',
+      v_body::text
+    )::extensions.http_request);
+
+    v_contact_json := v_contact_resp.content::jsonb;
+    v_contact_id := v_contact_json #>> '{contact,id}';
+
+    if v_contact_resp.status not between 200 and 299 or v_contact_id is null then
+      raise warning 'GHL: fallo upsert de contacto (status %): %', v_contact_resp.status, v_contact_resp.content;
+      return new;
+    end if;
+
+    -- 2) Ver si ya existe una oportunidad de este contacto en el pipeline
+    v_search_resp := extensions.http((
+      'GET',
+      'https://services.leadconnectorhq.com/opportunities/search'
+        || '?location_id=' || v_location
+        || '&pipeline_id=' || c_pipeline_id
+        || '&contact_id=' || v_contact_id,
+      ARRAY[
+        extensions.http_header('Authorization', 'Bearer ' || v_token),
+        extensions.http_header('Version', '2021-07-28')
+      ],
+      null,
+      null
+    )::extensions.http_request);
+    v_search_json := v_search_resp.content::jsonb;
+
+    -- 3) Crear la oportunidad solo si no existe ya una en este pipeline
+    if v_search_resp.status between 200 and 299
+       and coalesce((v_search_json -> 'meta' ->> 'total')::int, 0) = 0 then
+      v_opp_body := jsonb_build_object(
+        'pipelineId', c_pipeline_id,
+        'locationId', v_location,
+        'contactId', v_contact_id,
+        'name', coalesce(nullif(trim(new.nombre_completo), ''), 'Lead sin nombre'),
+        'pipelineStageId', c_stage_id,
+        'status', 'open',
+        'monetaryValue', v_monto
+      );
+
+      v_opp_resp := extensions.http((
+        'POST',
+        'https://services.leadconnectorhq.com/opportunities/',
+        ARRAY[
+          extensions.http_header('Authorization', 'Bearer ' || v_token),
+          extensions.http_header('Version', '2021-07-28')
+        ],
+        'application/json',
+        v_opp_body::text
+      )::extensions.http_request);
+
+      if v_opp_resp.status not between 200 and 299 then
+        raise warning 'GHL: fallo al crear oportunidad (status %): %', v_opp_resp.status, v_opp_resp.content;
+      end if;
+    end if;
+
+  exception when others then
+    raise warning 'GHL: error en sincronizacion de lead: %', sqlerrm;
+  end;
+
+  return new;
+end;
+$function$
+;
+
 CREATE OR REPLACE FUNCTION public.testimonio_por_token(p_token uuid)
  RETURNS jsonb
  LANGUAGE sql
@@ -1633,11 +1983,17 @@ $function$
 ;
 
 
--- ─── 3. Trigger de referidos ────────────────────────────────────────────────
+-- ─── 3. Triggers ────────────────────────────────────────────────────────────
 
 drop trigger if exists trg_notify_referido_inserted on public.referidos_clientes;
 create trigger trg_notify_referido_inserted after insert or update on public.referidos_clientes
   for each row execute function public.notify_referido_inserted();
+
+-- GHL recibe los leads calificados y los de alianza
+drop trigger if exists trg_sync_lead_to_ghl on public.leads;
+create trigger trg_sync_lead_to_ghl after insert or update on public.leads
+  for each row when (new.calificado is true or new.evento = 'alianza_directa')
+  execute function public.sync_lead_to_ghl();
 
 
 -- ─── 4. Permisos (anon / authenticated) ─────────────────────────────────────
@@ -1646,6 +2002,7 @@ create trigger trg_notify_referido_inserted after insert or update on public.ref
 
 revoke all on function public._avisar_opinion_gracias(p_id uuid) from public, anon, authenticated;
 revoke all on function public._avisar_referidos_gracias(p_id uuid) from public, anon, authenticated;
+revoke all on function public._avisar_registro_alianza(p_lead uuid, p_alianza text, p_enlace boolean, p_existente boolean) from public, anon, authenticated;
 revoke all on function public._avisar_registro_documentacion(p_lead_id uuid) from public, anon, authenticated;
 revoke all on function public._client_email_shell(p_icon text, p_header_from text, p_header_to text, p_title text, p_first_name text, p_body_html text, p_cta_url text, p_cta_label text) from public, anon, authenticated;
 grant execute on function public._client_email_shell(p_icon text, p_header_from text, p_header_to text, p_title text, p_first_name text, p_body_html text, p_cta_url text, p_cta_label text) to anon;
@@ -1694,6 +2051,9 @@ grant execute on function public.guardar_opinion_gracias(p jsonb) to authenticat
 revoke all on function public.guardar_preferencia_contacto(p_lead_id uuid, p_canal text, p_horario text) from public, anon, authenticated;
 grant execute on function public.guardar_preferencia_contacto(p_lead_id uuid, p_canal text, p_horario text) to anon;
 grant execute on function public.guardar_preferencia_contacto(p_lead_id uuid, p_canal text, p_horario text) to authenticated;
+revoke all on function public.notify_lead_inserted() from public, anon, authenticated;
+grant execute on function public.notify_lead_inserted() to anon;
+grant execute on function public.notify_lead_inserted() to authenticated;
 revoke all on function public.notify_referido_inserted() from public, anon, authenticated;
 grant execute on function public.notify_referido_inserted() to anon;
 grant execute on function public.notify_referido_inserted() to authenticated;
@@ -1701,6 +2061,9 @@ revoke all on function public.purge_expired_lead_documentos() from public, anon,
 revoke all on function public.record_document_upload(p_lead_id uuid, p_tipo_documento text, p_slot_index smallint, p_storage_path text, p_file_name text, p_file_size_bytes integer, p_mime_type text) from public, anon, authenticated;
 grant execute on function public.record_document_upload(p_lead_id uuid, p_tipo_documento text, p_slot_index smallint, p_storage_path text, p_file_name text, p_file_size_bytes integer, p_mime_type text) to anon;
 grant execute on function public.record_document_upload(p_lead_id uuid, p_tipo_documento text, p_slot_index smallint, p_storage_path text, p_file_name text, p_file_size_bytes integer, p_mime_type text) to authenticated;
+revoke all on function public.registrar_lead_alianza(p jsonb) from public, anon, authenticated;
+grant execute on function public.registrar_lead_alianza(p jsonb) to anon;
+grant execute on function public.registrar_lead_alianza(p jsonb) to authenticated;
 revoke all on function public.registrar_lead_documentacion_directa(p jsonb) from public, anon, authenticated;
 grant execute on function public.registrar_lead_documentacion_directa(p jsonb) to anon;
 grant execute on function public.registrar_lead_documentacion_directa(p jsonb) to authenticated;
@@ -1725,6 +2088,9 @@ grant execute on function public.submit_referido(p jsonb) to authenticated;
 revoke all on function public.submit_valoracion_lead(p_lead_id uuid, p_calificacion integer, p_comentario text) from public, anon, authenticated;
 grant execute on function public.submit_valoracion_lead(p_lead_id uuid, p_calificacion integer, p_comentario text) to anon;
 grant execute on function public.submit_valoracion_lead(p_lead_id uuid, p_calificacion integer, p_comentario text) to authenticated;
+revoke all on function public.sync_lead_to_ghl() from public, anon, authenticated;
+grant execute on function public.sync_lead_to_ghl() to anon;
+grant execute on function public.sync_lead_to_ghl() to authenticated;
 revoke all on function public.testimonio_por_token(p_token uuid) from public, anon, authenticated;
 grant execute on function public.testimonio_por_token(p_token uuid) to anon;
 grant execute on function public.testimonio_por_token(p_token uuid) to authenticated;
