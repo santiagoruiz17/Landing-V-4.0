@@ -5,7 +5,7 @@ import { Plus, Minus, HelpCircle } from 'lucide-react';
 const faqs = [
   {
     question: "¿Qué costo tiene su servicio de consultoría?",
-    answer: "Nuestra filosofía es ganar-ganar. En la mayoría de los productos financieros (crédito simple, arrendamiento, factoraje), nuestros honorarios son cubiertos por la institución financiera, por lo que para ti la gestión no tiene costo directo. En casos de estructuración compleja o consultoría especializada, se acuerda un honorario previo con total transparencia."
+    answer: "Nuestra filosofía es ganar-ganar. No cobramos comisión: en todos los productos financieros (crédito simple, arrendamiento, factoraje y más), nuestros honorarios son cubiertos por la institución financiera, por lo que para ti la gestión no tiene costo."
   },
   {
     question: "¿Qué tipo de empresas atienden?",

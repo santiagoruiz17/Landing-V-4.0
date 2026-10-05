@@ -27,7 +27,7 @@ export function landingTemplate(partner, cfg) {
 
   const faqs = [
     { q: `¿Qué empresas pueden solicitar financiamiento con ${nombre}?`, a: `${nombre} atiende tanto a Personas Morales como a Personas Físicas con Actividad Empresarial. Un asesor de Firma 7 te confirma si tu caso aplica y te acompaña durante la solicitud.` },
-    { q: '¿Cuánto cuesta el servicio de Firma 7?', a: 'Nada: la consultoría de Firma 7 no tiene costo para ti, en ningún producto financiero.' },
+    { q: '¿Cuánto cuesta el servicio de Firma 7?', a: 'Firma 7 no te cobra comisión: nuestros honorarios son cubiertos por la institución financiera, así que la gestión no tiene costo para ti.' },
     { q: '¿Qué documentos necesito?', a: 'Un asesor de Firma 7 se pone en contacto contigo y te indica exactamente qué necesitas. Normalmente se solicita constancia de situación fiscal, identificación oficial, comprobantes de domicilio y estados de cuenta bancarios.' },
     { q: `¿Qué pasa si ${nombre} no aprueba mi solicitud?`, a: 'Firma 7 compara más de 20 instituciones financieras. Si esta opción no es la ideal o no se aprueba, tu asesor revisa contigo otras alternativas para tu empresa.' },
   ];
@@ -289,7 +289,7 @@ export function landingTemplate(partner, cfg) {
       <ul class="why" style="background:none">
         <li>Comparamos más de 20 instituciones: si ${esc(nombre)} no es la ideal, te proponemos otra.</li>
         <li>Un asesor revisa tu caso y te pide solo lo necesario, en el orden correcto.</li>
-        <li>Sin costo de consultoría para ti, en todos los productos.</li>
+        <li>Sin comisión para ti: nuestros honorarios los cubre la institución financiera.</li>
       </ul>
     </div>
   </section>

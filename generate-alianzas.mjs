@@ -372,7 +372,7 @@ const partners = [
     `
   },
   { name: 'AFIRME', slug: 'afirme', logo: '../../images/logo-afirme.png' },
-  { name: 'Fondeadora', slug: 'creze', logo: '../../images/logo-creze.png' }
+  { name: 'Fondeadora', slug: 'creze', logo: '../../images/logo-fondeadora.svg' }
 ];
 
 const template = (partner) => `<!DOCTYPE html>
