@@ -1,6 +1,7 @@
 import React, { Suspense, useState } from 'react';
 import { Navbar } from '../components/Navbar';
 import { useSEO } from '../hooks/useSEO';
+import SEO from '../seo/rutas.json';
 import { supabase } from '../lib/supabase';
 import { Handshake, TrendingUp, Clock, ShieldCheck, Car, Truck, Building2, Wrench, CheckCircle2 } from 'lucide-react';
 
@@ -35,8 +36,7 @@ const INITIAL: FormData = { nombre: '', empresa: '', tipoNegocio: '', telefono: 
 
 export const QuieroSerAliado: React.FC = () => {
   useSEO({
-    title: 'Conviértete en Aliado | Vende más con financiamiento | Firma 7',
-    description: 'Lotes de autos, concesionarias, agencias de tractocamiones y venta de equipo especializado: alíate con Firma 7 y ofrece financiamiento a tus clientes para cerrar más ventas.',
+    ...SEO['/quiero-ser-aliado'],
     canonical: 'https://firma7.com/quiero-ser-aliado',
   });
 

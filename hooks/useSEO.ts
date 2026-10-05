@@ -29,6 +29,8 @@ export function useSEO({ title, description, canonical, noindex = false }: SEOOp
     setMetaTag('property', 'og:title', title);
     setMetaTag('property', 'og:description', description);
     setMetaTag('property', 'og:url', canonical);
+    setMetaTag('name', 'twitter:title', title);
+    setMetaTag('name', 'twitter:description', description);
     setMetaTag(
       'name',
       'robots',

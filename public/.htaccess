@@ -8,6 +8,12 @@
   RewriteCond %{HTTP_HOST} ^www\.firma7\.com$ [NC]
   RewriteRule ^ https://firma7.com%{REQUEST_URI} [L,R=301]
 
+  # Páginas públicas con su propio HTML (título, descripción e imagen propios para Google y WhatsApp).
+  # Las genera scripts/prerender.mjs en cada build dentro de /_prerender/. Si no existe el archivo
+  # (p. ej. un artículo publicado después del último despliegue) se sigue con la SPA de abajo.
+  RewriteCond %{DOCUMENT_ROOT}/_prerender/$1.html -f
+  RewriteRule ^(perfil|calculadora|blog|quiero-ser-aliado|aviso-de-privacidad|blog/[^/]+)/?$ /_prerender/$1.html [L]
+
   # Serve existing files and directories directly
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
@@ -15,9 +21,14 @@
   # Alianzas sub-pages have their own HTML, don't redirect them
   RewriteCond %{REQUEST_URI} !^/alianzas/
 
-  # Everything else → React Router SPA
-  RewriteRule ^ /index.html [L]
+  # Solo las rutas reales de la app van a React. Cualquier otra dirección devuelve un 404 de verdad
+  # (antes devolvía 200 con la portada, lo que Google toma como contenido duplicado / "soft 404").
+  # Si agregas una ruta nueva en App.tsx, agrégala también aquí.
+  RewriteRule ^(perfil|calculadora|aprobado|espera|aviso-de-privacidad|documentos-recibidos|gracias|documentacion|aprobar-testimonio|admin|quiero-ser-aliado|blog(/.*)?)/?$ /index.html [L]
 </IfModule>
+
+# Página que ve el visitante en una dirección inexistente (React muestra su pantalla de "no encontrada"; el estado HTTP sigue siendo 404)
+ErrorDocument 404 /index.html
 
 # ── Security Headers ─────────────────────────────────────────────────────────
 <IfModule mod_headers.c>

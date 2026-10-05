@@ -46,9 +46,11 @@
     }
   }
   </script>
-  <link rel="icon"
-    href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="%23006d4e"><circle cx="50" cy="50" r="12"/><circle cx="50" cy="20" r="12"/><circle cx="50" cy="80" r="12"/><circle cx="24" cy="35" r="12"/><circle cx="24" cy="65" r="12"/><circle cx="76" cy="35" r="12"/><circle cx="76" cy="65" r="12"/></svg>'
-    type="image/svg+xml">
+  <meta name="theme-color" content="#006d4e" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=2" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
 
   <style>
@@ -352,7 +354,7 @@
       <div class="desktop-menu">
         <a href="/#methodology" class="nav-link">Metodología</a>
         <a href="/alianzas/" class="nav-link" style="color:#006d4e;">Alianzas</a>
-        <a href="https://calculadora.firma7.com" target="_blank" class="nav-link flex-icon">
+        <a href="/calculadora" class="nav-link flex-icon">
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/></svg>
           Calculadora
         </a>
@@ -373,7 +375,7 @@
     <div class="mobile-menu" id="mobile-menu">
       <a href="/#methodology" class="mobile-nav-link">Metodología</a>
       <a href="/alianzas/" class="mobile-nav-link" style="color:#006d4e; background:#f9fafb;">Alianzas</a>
-      <a href="https://calculadora.firma7.com" target="_blank" class="mobile-nav-link flex-icon">
+      <a href="/calculadora" class="mobile-nav-link flex-icon">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/></svg>
         Calculadora de Crédito
       </a>
@@ -400,7 +402,80 @@
 
   <!-- GRID -->
   <main class="partners-section">
-    <div class="partners-grid" id="partners-grid"></div>
+    <div class="partners-grid" id="partners-grid">
+      <a class="partner-card" href="/alianzas/konfio/" style="text-decoration:none;animation-delay:0.000s">
+        <div class="partner-logo-wrap"><img src="/images/logo-konfio.png" alt="Logo de Konfío" loading="lazy" /></div>
+        <p class="partner-name">Konfío</p>
+      </a>
+      <a class="partner-card" href="/alianzas/pdn/" style="text-decoration:none;animation-delay:0.045s">
+        <div class="partner-logo-wrap"><img src="/images/logo-pdn.jpg" alt="Logo de PDN" loading="lazy" /></div>
+        <p class="partner-name">PDN</p>
+      </a>
+      <a class="partner-card" href="/alianzas/unifin/" style="text-decoration:none;animation-delay:0.090s">
+        <div class="partner-logo-wrap"><img src="/images/logo-unifin.png" alt="Logo de UNIFIN" loading="lazy" /></div>
+        <p class="partner-name">UNIFIN</p>
+      </a>
+      <a class="partner-card" href="/alianzas/finbe-abc/" style="text-decoration:none;animation-delay:0.135s">
+        <div class="partner-logo-wrap"><img src="/images/logo-finbe-abc.png" alt="Logo de FinBe ABC" loading="lazy" /></div>
+        <p class="partner-name">FinBe ABC</p>
+      </a>
+      <a class="partner-card" href="/alianzas/xepelin/" style="text-decoration:none;animation-delay:0.180s">
+        <div class="partner-logo-wrap"><img src="/images/logo-xepelin.png" alt="Logo de Xepelin" loading="lazy" /></div>
+        <p class="partner-name">Xepelin</p>
+      </a>
+      <a class="partner-card" href="/alianzas/finkargo/" style="text-decoration:none;animation-delay:0.225s">
+        <div class="partner-logo-wrap"><img src="/images/logo-finkargo.png" alt="Logo de finkargo" loading="lazy" /></div>
+        <p class="partner-name">finkargo</p>
+      </a>
+      <a class="partner-card" href="/alianzas/imagina-leasing/" style="text-decoration:none;animation-delay:0.270s">
+        <div class="partner-logo-wrap"><img src="/images/logo-imagina.png" alt="Logo de imagina LEASING" loading="lazy" /></div>
+        <p class="partner-name">imagina LEASING</p>
+      </a>
+      <a class="partner-card" href="/alianzas/covalto/" style="text-decoration:none;animation-delay:0.315s">
+        <div class="partner-logo-wrap"><img src="/images/logo-covalto.png" alt="Logo de Covalto" loading="lazy" /></div>
+        <p class="partner-name">Covalto</p>
+      </a>
+      <a class="partner-card" href="/alianzas/engen-capital/" style="text-decoration:none;animation-delay:0.360s">
+        <div class="partner-logo-wrap"><img src="/images/logo-engen-capital.png" alt="Logo de engen CAPITAL" loading="lazy" /></div>
+        <p class="partner-name">engen CAPITAL</p>
+      </a>
+      <a class="partner-card" href="/alianzas/hey-banco/" style="text-decoration:none;animation-delay:0.405s">
+        <div class="partner-logo-wrap"><img src="/images/logo-hey-banco.png" alt="Logo de hey banco" loading="lazy" /></div>
+        <p class="partner-name">hey banco</p>
+      </a>
+      <a class="partner-card" href="/alianzas/anticipa/" style="text-decoration:none;animation-delay:0.450s">
+        <div class="partner-logo-wrap"><img src="https://www.credenza.mx/img/clients/ANTICIPA.png" alt="Logo de Anticipa" loading="lazy" /></div>
+        <p class="partner-name">Anticipa</p>
+      </a>
+      <a class="partner-card" href="/alianzas/axionex-financiera/" style="text-decoration:none;animation-delay:0.495s">
+        <div class="partner-logo-wrap"><img src="/images/logo-axionex.png" alt="Logo de axionex Financiera" loading="lazy" /></div>
+        <p class="partner-name">axionex Financiera</p>
+      </a>
+      <a class="partner-card" href="/alianzas/bx-plus/" style="text-decoration:none;animation-delay:0.540s">
+        <div class="partner-logo-wrap"><img src="/images/logo-bxplus.png" alt="Logo de Bx+" loading="lazy" /></div>
+        <p class="partner-name">Bx+</p>
+      </a>
+      <a class="partner-card" href="/alianzas/finsus/" style="text-decoration:none;animation-delay:0.585s">
+        <div class="partner-logo-wrap"><img src="/images/logo-finsus.png" alt="Logo de Finsus" loading="lazy" /></div>
+        <p class="partner-name">Finsus</p>
+      </a>
+      <a class="partner-card" href="/alianzas/hay-cash/" style="text-decoration:none;animation-delay:0.630s">
+        <div class="partner-logo-wrap"><img src="/images/logo-hay-cash.png" alt="Logo de Hay Cash" loading="lazy" /></div>
+        <p class="partner-name">Hay Cash</p>
+      </a>
+      <a class="partner-card" href="/alianzas/banorte/" style="text-decoration:none;animation-delay:0.675s">
+        <div class="partner-logo-wrap"><img src="/images/logo-banorte.png" alt="Logo de BANORTE" loading="lazy" /></div>
+        <p class="partner-name">BANORTE</p>
+      </a>
+      <a class="partner-card" href="/alianzas/afirme/" style="text-decoration:none;animation-delay:0.720s">
+        <div class="partner-logo-wrap"><img src="/images/logo-afirme.png" alt="Logo de AFIRME" loading="lazy" /></div>
+        <p class="partner-name">AFIRME</p>
+      </a>
+      <a class="partner-card" href="/alianzas/creze/" style="text-decoration:none;animation-delay:0.765s">
+        <div class="partner-logo-wrap"><img src="/images/logo-fondeadora.svg" alt="Logo de Fondeadora" loading="lazy" /></div>
+        <p class="partner-name">Fondeadora</p>
+      </a>
+    </div>
   </main>
 
   <!-- FOOTER -->
@@ -422,7 +497,7 @@
           <span style="font-weight:400;">FIRMA 7</span>
         </div>
       </div>
-      <p>&copy; <span id="year"></span> Firma 7. Todos los derechos reservados. · <a href="/aviso-de-privacidad" style="color:inherit;text-decoration:underline;">Aviso de Privacidad</a> · <a href="/terminos-y-condiciones" style="color:inherit;text-decoration:underline;">Términos y Condiciones</a></p>
+      <p>&copy; <span id="year"></span> Firma 7. Todos los derechos reservados. · <a href="/aviso-de-privacidad" style="color:inherit;text-decoration:underline;">Aviso de Privacidad</a></p>
     </div>
   </footer>
 

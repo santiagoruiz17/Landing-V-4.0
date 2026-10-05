@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calendar, FileText } from 'lucide-react';
 import { useSEO } from '../hooks/useSEO';
+import SEO from '../seo/rutas.json';
 import { supabase } from '../lib/supabase';
 
 interface BlogPostSummary {
@@ -14,15 +15,16 @@ interface BlogPostSummary {
 }
 
 export const Blog: React.FC = () => {
-  useSEO({
-    title: 'Blog | Firma 7 — Consultoría Financiera',
-    description: 'Consejos y análisis sobre crédito empresarial, financiamiento PyME y estrategia financiera en México.',
-    canonical: 'https://firma7.com/blog',
-  });
-
   const navigate = useNavigate();
   const [posts, setPosts] = useState<BlogPostSummary[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Mientras el blog no tenga artículos, la página es casi vacía: se pide a Google no indexarla.
+  useSEO({
+    ...SEO['/blog'],
+    canonical: 'https://firma7.com/blog',
+    noindex: !loading && posts.length === 0,
+  });
 
   useEffect(() => {
     supabase

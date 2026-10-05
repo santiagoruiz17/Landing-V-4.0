@@ -28,6 +28,7 @@ export function landingTemplate(partner, cfg) {
   const requisitos = c?.requisitos ?? [];
   const nota = c?.nota ?? '';
 
+  const otras = (cfg.otras || []).filter((o) => o.slug !== partner.slug);
   const title = `Financiamiento ${nombre} para tu empresa | SOC · Firma 7`;
   const description = `Solicita financiamiento ${nombre} con asesoría de SOC · Firma 7: un asesor te acompaña en todo el proceso y compara +20 instituciones. Personas morales y físicas con actividad empresarial.`;
 
@@ -196,6 +197,8 @@ export function landingTemplate(partner, cfg) {
     .final h2 { color: #fff; }
     .final p { color: rgba(255,255,255,.85); max-width: 560px; margin: 0 auto 1.75rem; }
     .legal { font-size: .78rem; color: var(--gray-text); text-align: center; padding: 1.5rem; max-width: 760px; margin: 0 auto; }
+    .otras { text-align: center; padding: 2rem 1.5rem 0; font-size: .9rem; color: var(--gray-text); }
+    .otras a { color: var(--green); font-weight: 600; margin: 0 .55rem; white-space: nowrap; }
     footer { background: var(--green-dark); color: rgba(255,255,255,.55); text-align: center; padding: 2rem 1.5rem; font-size: .8rem; }
     footer a { color: rgba(255,255,255,.8); }
 
@@ -335,6 +338,12 @@ export function landingTemplate(partner, cfg) {
       ${cta('btn-light')}
     </div>
   </section>
+
+  ${otras.length ? `<nav class="otras" aria-label="Otras instituciones aliadas">
+    <span>Otras instituciones con las que trabajamos:</span>
+    ${otras.map((o) => `<a href="/alianzas/${o.slug}/">${esc(o.name)}</a>`).join('')}
+    <a href="/alianzas/">Ver todas</a>
+  </nav>` : ''}
 
   <p class="legal">Firma 7 es un asesor financiero independiente. ${esc(nombre)} es marca de su respectivo titular y se muestra únicamente con fines informativos. La aprobación del financiamiento depende de la evaluación de la institución financiera.</p>
 

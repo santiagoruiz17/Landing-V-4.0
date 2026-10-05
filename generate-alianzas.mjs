@@ -375,14 +375,80 @@ const partners = [
   { name: 'Fondeadora', slug: 'creze', logo: '../../images/logo-fondeadora.svg' }
 ];
 
+const escAttr = (s) => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+// SEO de las páginas sencillas: título, descripción y datos estructurados propios de cada institución.
+function seoSencilla(partner) {
+  const nombre = partner.name;
+  const url = `https://firma7.com/alianzas/${partner.slug}/`;
+  const title = `Crédito empresarial con ${nombre} | SOC · Firma 7`;
+  const quienes = /<h3>¿Quiénes son\?<\/h3>\s*<p>([^<]+)<\/p>/.exec(partner.contentHtml || '')?.[1]?.trim() || '';
+  const cierre = ' Asesoría sin costo de SOC · Firma 7.';
+  // Se arma con cláusulas completas (separadas por coma) hasta ~160 caracteres, para no cortar frases a la mitad.
+  const max = 160 - cierre.length - 1;
+  let cuerpo = '';
+  for (const clausula of quienes.replace(/[.\s]+$/, '').split(/,\s*/).filter(Boolean)) {
+    const intento = cuerpo ? `${cuerpo}, ${clausula}` : clausula;
+    if (cuerpo && intento.length > max) break;
+    cuerpo = intento;
+  }
+  if (cuerpo.length > max || /\s(de|a|en|y|o|con|para|por|del|la|el|los|las)$/i.test(cuerpo)) cuerpo = '';
+  const description = cuerpo
+    ? `${cuerpo}.${cierre}`
+    : `Conoce el financiamiento empresarial de ${nombre} y solicítalo con la asesoría sin costo de SOC · Firma 7.`;
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': `${url}#webpage`,
+        url,
+        name: title,
+        description,
+        inLanguage: 'es-MX',
+        isPartOf: { '@id': 'https://firma7.com/#website' },
+        breadcrumb: { '@id': `${url}#breadcrumb` },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        '@id': `${url}#breadcrumb`,
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Inicio', item: 'https://firma7.com/' },
+          { '@type': 'ListItem', position: 2, name: 'Alianzas', item: 'https://firma7.com/alianzas/' },
+          { '@type': 'ListItem', position: 3, name: nombre, item: url },
+        ],
+      },
+    ],
+  };
+  return `<title>${escAttr(title)}</title>
+  <meta name="description" content="${escAttr(description)}" />
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
+  <link rel="canonical" href="${url}" />
+  <meta property="og:title" content="${escAttr(title)}" />
+  <meta property="og:description" content="${escAttr(description)}" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="${url}" />
+  <meta property="og:image" content="https://firma7.com/og-firma7.png?v=2" />
+  <meta property="og:site_name" content="SOC · Firma 7" />
+  <meta property="og:locale" content="es_MX" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="${escAttr(title)}" />
+  <meta name="twitter:description" content="${escAttr(description)}" />
+  <meta name="twitter:image" content="https://firma7.com/og-firma7.png?v=2" />
+  <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`;
+}
+
 const template = (partner) => `<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>${partner.name} - Alianzas Estratégicas | SOC · Firma 7</title>
-  <meta name="description" content="Conoce nuestra alianza estratégica con ${partner.name}." />
-  <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="%23006d4e"><circle cx="50" cy="50" r="12"/><circle cx="50" cy="20" r="12"/><circle cx="50" cy="80" r="12"/><circle cx="24" cy="35" r="12"/><circle cx="24" cy="65" r="12"/><circle cx="76" cy="35" r="12"/><circle cx="76" cy="65" r="12"/></svg>' type="image/svg+xml">
+  ${seoSencilla(partner)}
+  <meta name="theme-color" content="#006d4e" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico?v=2" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=2" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -474,7 +540,7 @@ const template = (partner) => `<!DOCTYPE html>
       <div class="desktop-menu">
         <a href="/#methodology" class="nav-link">Metodología</a>
         <a href="/alianzas/" class="nav-link" style="color:#006d4e;">Alianzas</a>
-        <a href="https://calculadora.firma7.com" target="_blank" class="nav-link flex-icon">
+        <a href="/calculadora" class="nav-link flex-icon">
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/></svg>
           Calculadora
         </a>
@@ -493,7 +559,7 @@ const template = (partner) => `<!DOCTYPE html>
     <div class="mobile-menu" id="mobile-menu">
       <a href="/#methodology" class="mobile-nav-link">Metodología</a>
       <a href="/alianzas/" class="mobile-nav-link" style="color:#006d4e; background:#f9fafb;">Alianzas</a>
-      <a href="https://calculadora.firma7.com" target="_blank" class="mobile-nav-link flex-icon">
+      <a href="/calculadora" class="mobile-nav-link flex-icon">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/></svg>
         Calculadora de Crédito
       </a>
@@ -505,6 +571,7 @@ const template = (partner) => `<!DOCTYPE html>
     <div class="partner-logo-container">
       <img src="${partner.logo}" alt="Logo de ${partner.name}" />
     </div>
+    <h1 style="font-size:2.4rem">Financiamiento empresarial con ${partner.name}</h1>
     ${partner.contentHtml ? partner.contentHtml : '<p class="subtitle">Conoce los detalles de nuestra red de financiamiento y cómo esta alianza puede impulsar el crecimiento de tu empresa.</p>'}
     
     <a href="/perfil" class="contact-btn">
@@ -566,7 +633,11 @@ function leerEnv() {
 }
 
 const env = leerEnv();
-const cfg = { supabaseUrl: env.VITE_SUPABASE_URL, supabaseKey: env.VITE_SUPABASE_ANON_KEY };
+const cfg = {
+  supabaseUrl: env.VITE_SUPABASE_URL,
+  supabaseKey: env.VITE_SUPABASE_ANON_KEY,
+  otras: partners.filter((p) => ENLAZADAS.includes(p.slug)).map((p) => ({ name: p.name, slug: p.slug })),
+};
 const soloEnlazadas = process.argv.includes('--enlazadas');
 
 partners.forEach(partner => {
@@ -583,3 +654,32 @@ partners.forEach(partner => {
 });
 
 console.log('Se generaron ' + partners.length + ' subdirectorios con éxito.');
+
+// Directorio /alianzas/: las tarjetas van escritas en el HTML (enlaces reales para Google), no armadas con JavaScript.
+const DIRECTORIO = [
+  ['Konfío', 'konfio'], ['PDN', 'pdn'], ['UNIFIN', 'unifin'], ['FinBe ABC', 'finbe-abc'], ['Xepelin', 'xepelin'],
+  ['finkargo', 'finkargo'], ['imagina LEASING', 'imagina-leasing'], ['Covalto', 'covalto'], ['engen CAPITAL', 'engen-capital'],
+  ['hey banco', 'hey-banco'], ['Anticipa', 'anticipa'], ['axionex Financiera', 'axionex-financiera'], ['Bx+', 'bx-plus'],
+  ['Finsus', 'finsus'], ['Hay Cash', 'hay-cash'], ['BANORTE', 'banorte'], ['AFIRME', 'afirme'], ['Fondeadora', 'creze'],
+];
+
+function actualizarDirectorio() {
+  const tarjetas = DIRECTORIO.map(([nombre, slug], i) => {
+    const p = partners.find((x) => x.slug === slug);
+    if (!p) throw new Error('Directorio: falta la alianza ' + slug);
+    const logo = p.logo.replace('../../', '/');
+    return `      <a class="partner-card" href="/alianzas/${slug}/" style="text-decoration:none;animation-delay:${(i * 0.045).toFixed(3)}s">
+        <div class="partner-logo-wrap"><img src="${logo}" alt="Logo de ${escAttr(nombre)}" loading="lazy" /></div>
+        <p class="partner-name">${escAttr(nombre)}</p>
+      </a>`;
+  }).join('\n');
+  const archivo = path.join(process.cwd(), 'alianzas', 'index.html');
+  let html = fs.readFileSync(archivo, 'utf8');
+  const re = /(<div class="partners-grid" id="partners-grid">)[\s\S]*?(<\/div>\s*<\/main>)/;
+  if (!re.test(html)) throw new Error('No se encontró la cuadrícula del directorio en alianzas/index.html');
+  html = html.replace(re, `$1\n${tarjetas}\n    $2`);
+  html = html.replace(/<span id="partner-count">\d+<\/span>/, `<span id="partner-count">${DIRECTORIO.length}</span>`);
+  fs.writeFileSync(archivo, html);
+}
+
+if (!soloEnlazadas) actualizarDirectorio();
