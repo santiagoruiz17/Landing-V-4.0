@@ -132,7 +132,13 @@
     .ok-icon { width: 3.4rem; height: 3.4rem; border-radius: 50%; background: var(--green-light); color: var(--green); display: flex; align-items: center; justify-content: center; font-size: 1.7rem; margin: 0 auto 1rem; }
     .ok-box { text-align: center; }
     .ok-box p { color: #4b5563; margin-bottom: 1rem; }
-    .ok-link { display: block; margin-top: .75rem; font-size: .85rem; color: var(--green); }
+    .ok-docs { margin: 1.25rem 0 .6rem; font-weight: 600; color: var(--charcoal); font-size: .93rem; }
+    .btn-outline { background: #fff; color: var(--green); border: 2px solid var(--green); padding: .85rem 1.5rem; }
+    .btn-outline:hover { background: var(--green-light); box-shadow: none; }
+    .reqs { list-style: none; max-width: 640px; margin: 0 auto; display: grid; gap: .7rem; }
+    .reqs li { display: flex; gap: .75rem; align-items: flex-start; background: var(--gray-subtle); border: 1px solid var(--gray-border); border-radius: 12px; padding: .8rem 1rem; font-size: .95rem; }
+    .reqs li::before { content: '✓'; flex: none; width: 1.5rem; height: 1.5rem; border-radius: 50%; background: var(--green); color: #fff; font-size: .8rem; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-top: .05rem; }
+    .reqs-nota { text-align: center; font-size: .85rem; color: var(--gray-text); margin-top: 1rem; }
     .ok-box[hidden], #alianza-continuar[hidden] { display: none; }
   </style>
 </head>
@@ -172,9 +178,40 @@
     </div>
   </header>
 
-  
+  <section>
+    <div class="wrap">
+      <h2>Fondeadora en pocas palabras</h2>
+      <p class="sec-sub">Lo esencial antes de iniciar tu solicitud.</p>
+      <div class="grid g3">
+        <div class="card"><h3>Monto</h3><p>Personas morales: de $1 a $20 millones. Personas físicas con actividad empresarial: de $200 mil a $3 millones.</p></div>
+        <div class="card"><h3>Plazo</h3><p>Hasta 24 meses sin garantía y hasta 60 meses con garantía inmobiliaria.</p></div>
+        <div class="card"><h3>Rapidez</h3><p>Preoferta en 24 horas.</p></div>
+        <div class="card"><h3>Cobertura</h3><p>Atienden en todo el país, excepto Sinaloa. También sustituyen pasivos de otras financieras.</p></div>
+      </div>
+    </div>
+  </section>
 
-  
+  <section style="padding-top:0">
+    <div class="wrap about">
+      <h3>¿Quiénes son?</h3><p>Plataforma financiera mexicana que ofrece productos más accesibles y transparentes para personas y empresas.</p>
+      
+    </div>
+  </section>
+
+  <section style="padding-top:0">
+    <div class="wrap">
+      <h2>¿Qué necesitas para aplicar?</h2>
+      <p class="sec-sub">Lo mínimo que revisa Fondeadora. Un asesor te confirma si tu caso aplica.</p>
+      <ul class="reqs">
+        <li>Persona moral o persona física con actividad empresarial</li>
+        <li>Edad de 21 a 69 años</li>
+        <li>Ingresos desde $500 mil mensuales</li>
+        <li>Buró sin atrasos en los últimos 24 meses</li>
+        <li>Facturación y operación de al menos 36 meses</li>
+      </ul>
+      
+    </div>
+  </section>
 
   <section class="why">
     <div class="wrap">
@@ -254,7 +291,8 @@
         <p>Un asesor de Firma 7 se pondrá en contacto contigo para acompañarte y pedirte tu documentación.</p>
         <p id="alianza-abrio" hidden>Abrimos Fondeadora en otra pestaña para que inicies tu evaluación.</p>
         <a id="alianza-continuar" class="btn" href="#" target="_blank" rel="noopener" hidden>Continuar con Fondeadora</a>
-        <a class="ok-link" href="/documentacion" target="_blank" rel="noopener">¿Quieres adelantar tu documentación? Súbela aquí (opcional)</a>
+        <p class="ok-docs">Para agilizar tu trámite, adelanta tu documentación ahora:</p>
+        <a class="btn btn-outline" href="/documentacion" target="_blank" rel="noopener">Subir mi documentación</a>
       </div>
     </div>
   </div>

@@ -2,6 +2,8 @@
 // La usa generate-alianzas.mjs. Es HTML estático (lo lee Google sin JavaScript); el formulario emergente lo maneja
 // /alianzas-landing.js (los scripts en línea están bloqueados por la política de seguridad del sitio).
 
+import { CONTENIDO } from './alianzas-contenido.mjs';
+
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 // "<h3>Título</h3><p>Texto</p>" → [{ titulo, texto }]
@@ -15,12 +17,16 @@ export function landingTemplate(partner, cfg) {
   const { supabaseUrl, supabaseKey } = cfg;
   const nombre = partner.name;
   const url = `https://firma7.com/alianzas/${partner.slug}/`;
+  // Contenido curado (scripts/alianzas-contenido.mjs); si no existe, se usa el texto anterior de la alianza.
+  const c = CONTENIDO[partner.slug];
   const secciones = parseSecciones(partner.contentHtml);
-  const quienes = buscar(secciones, 'quiénes');
-  const como = buscar(secciones, 'cómo trabajan');
+  const quienes = c ? c.quienes : buscar(secciones, 'quiénes');
+  const como = c ? null : buscar(secciones, 'cómo trabajan');
   const tiempo = buscar(secciones, 'tiempo');
   const ventaja = buscar(secciones, 'ventaja');
   const monto = buscar(secciones, 'monto');
+  const requisitos = c?.requisitos ?? [];
+  const nota = c?.nota ?? '';
 
   const title = `Financiamiento ${nombre} para tu empresa | SOC · Firma 7`;
   const description = `Solicita financiamiento ${nombre} con asesoría de SOC · Firma 7: un asesor te acompaña en todo el proceso y compara +20 instituciones. Personas morales y físicas con actividad empresarial.`;
@@ -69,7 +75,7 @@ export function landingTemplate(partner, cfg) {
     ],
   };
 
-  const hechos = [
+  const hechos = c ? c.hechos : [
     monto && { t: 'Monto de financiamiento', x: monto },
     tiempo && { t: 'Tiempo de respuesta', x: tiempo },
     ventaja && { t: 'Ventaja principal', x: ventaja },
@@ -214,7 +220,13 @@ export function landingTemplate(partner, cfg) {
     .ok-icon { width: 3.4rem; height: 3.4rem; border-radius: 50%; background: var(--green-light); color: var(--green); display: flex; align-items: center; justify-content: center; font-size: 1.7rem; margin: 0 auto 1rem; }
     .ok-box { text-align: center; }
     .ok-box p { color: #4b5563; margin-bottom: 1rem; }
-    .ok-link { display: block; margin-top: .75rem; font-size: .85rem; color: var(--green); }
+    .ok-docs { margin: 1.25rem 0 .6rem; font-weight: 600; color: var(--charcoal); font-size: .93rem; }
+    .btn-outline { background: #fff; color: var(--green); border: 2px solid var(--green); padding: .85rem 1.5rem; }
+    .btn-outline:hover { background: var(--green-light); box-shadow: none; }
+    .reqs { list-style: none; max-width: 640px; margin: 0 auto; display: grid; gap: .7rem; }
+    .reqs li { display: flex; gap: .75rem; align-items: flex-start; background: var(--gray-subtle); border: 1px solid var(--gray-border); border-radius: 12px; padding: .8rem 1rem; font-size: .95rem; }
+    .reqs li::before { content: '✓'; flex: none; width: 1.5rem; height: 1.5rem; border-radius: 50%; background: var(--green); color: #fff; font-size: .8rem; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-top: .05rem; }
+    .reqs-nota { text-align: center; font-size: .85rem; color: var(--gray-text); margin-top: 1rem; }
     .ok-box[hidden], #alianza-continuar[hidden] { display: none; }
   </style>
 </head>
@@ -267,6 +279,17 @@ export function landingTemplate(partner, cfg) {
     <div class="wrap about">
       ${quienes ? `<h3>¿Quiénes son?</h3><p>${esc(quienes)}</p>` : ''}
       ${como ? `<h3>¿Cómo trabajan?</h3><p>${esc(como)}</p>` : ''}
+    </div>
+  </section>` : ''}
+
+  ${requisitos.length ? `<section style="padding-top:0">
+    <div class="wrap">
+      <h2>¿Qué necesitas para aplicar?</h2>
+      <p class="sec-sub">Lo mínimo que revisa ${esc(nombre)}. Un asesor te confirma si tu caso aplica.</p>
+      <ul class="reqs">
+        ${requisitos.map((r) => `<li>${esc(r)}</li>`).join('\n        ')}
+      </ul>
+      ${nota ? `<p class="reqs-nota">${esc(nota)}</p>` : ''}
     </div>
   </section>` : ''}
 
@@ -344,7 +367,8 @@ export function landingTemplate(partner, cfg) {
         <p>Un asesor de Firma 7 se pondrá en contacto contigo para acompañarte y pedirte tu documentación.</p>
         <p id="alianza-abrio" hidden>Abrimos ${esc(nombre)} en otra pestaña para que inicies tu evaluación.</p>
         <a id="alianza-continuar" class="btn" href="#" target="_blank" rel="noopener" hidden>Continuar con ${esc(nombre)}</a>
-        <a class="ok-link" href="/documentacion" target="_blank" rel="noopener">¿Quieres adelantar tu documentación? Súbela aquí (opcional)</a>
+        <p class="ok-docs">Para agilizar tu trámite, adelanta tu documentación ahora:</p>
+        <a class="btn btn-outline" href="/documentacion" target="_blank" rel="noopener">Subir mi documentación</a>
       </div>
     </div>
   </div>

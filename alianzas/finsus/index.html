@@ -132,7 +132,13 @@
     .ok-icon { width: 3.4rem; height: 3.4rem; border-radius: 50%; background: var(--green-light); color: var(--green); display: flex; align-items: center; justify-content: center; font-size: 1.7rem; margin: 0 auto 1rem; }
     .ok-box { text-align: center; }
     .ok-box p { color: #4b5563; margin-bottom: 1rem; }
-    .ok-link { display: block; margin-top: .75rem; font-size: .85rem; color: var(--green); }
+    .ok-docs { margin: 1.25rem 0 .6rem; font-weight: 600; color: var(--charcoal); font-size: .93rem; }
+    .btn-outline { background: #fff; color: var(--green); border: 2px solid var(--green); padding: .85rem 1.5rem; }
+    .btn-outline:hover { background: var(--green-light); box-shadow: none; }
+    .reqs { list-style: none; max-width: 640px; margin: 0 auto; display: grid; gap: .7rem; }
+    .reqs li { display: flex; gap: .75rem; align-items: flex-start; background: var(--gray-subtle); border: 1px solid var(--gray-border); border-radius: 12px; padding: .8rem 1rem; font-size: .95rem; }
+    .reqs li::before { content: '✓'; flex: none; width: 1.5rem; height: 1.5rem; border-radius: 50%; background: var(--green); color: #fff; font-size: .8rem; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-top: .05rem; }
+    .reqs-nota { text-align: center; font-size: .85rem; color: var(--gray-text); margin-top: 1rem; }
     .ok-box[hidden], #alianza-continuar[hidden] { display: none; }
   </style>
 </head>
@@ -177,17 +183,32 @@
       <h2>Finsus en pocas palabras</h2>
       <p class="sec-sub">Lo esencial antes de iniciar tu solicitud.</p>
       <div class="grid g3">
-        <div class="card"><h3>Monto de financiamiento</h3><p>Sus líneas de crédito para negocios alcanzan generalmente hasta $7,500,000 de pesos en esquemas sin garantía, y pueden llegar hasta $25,000,000 de pesos si se cuenta con respaldo inmobiliario.</p></div>
-        <div class="card"><h3>Tiempo de respuesta</h3><p>Al estar centralizado en una plataforma digital, la pre-aprobación inicial suele darse en cuestión de horas. El fondeo final se concreta en pocos días hábiles tras la firma y revisión del expediente.</p></div>
-        <div class="card"><h3>Ventaja principal</h3><p>Trámite de solicitud completamente en línea, simplificando el acceso al crédito sin necesidad de acudir a sucursales físicas.</p></div>
+        <div class="card"><h3>Monto sin garantía</h3><p>Personas morales: de $100,000 a $15,000,000. Personas físicas: de $100,000 a $750,000 (hasta $3,000,000 con aval).</p></div>
+        <div class="card"><h3>Con garantía inmobiliaria</h3><p>Personas morales hasta $50 millones, con plazos de hasta 5 años.</p></div>
+        <div class="card"><h3>Plazos</h3><p>De 6 a 36 meses en crédito sin garantía.</p></div>
+        <div class="card"><h3>Ventaja</h3><p>Saldos insolutos y sin penalización por pagos anticipados.</p></div>
       </div>
     </div>
   </section>
 
   <section style="padding-top:0">
     <div class="wrap about">
-      <h3>¿Quiénes son?</h3><p>Sociedad Financiera Popular (SOFIPO) regulada, que opera bajo un modelo 100% digital.</p>
-      <h3>¿Cómo trabajan?</h3><p>Ofrecen soluciones de inversión y financiamiento para PyMEs. Evalúan la capacidad de pago mediante procesos tecnológicos, permitiendo a las empresas acceder a esquemas de crédito con o sin el requerimiento de una garantía inmobiliaria.</p>
+      <h3>¿Quiénes son?</h3><p>Institución financiera 100% digital, regulada como SOFIPO, enfocada en facilitar el acceso al crédito.</p>
+      
+    </div>
+  </section>
+
+  <section style="padding-top:0">
+    <div class="wrap">
+      <h2>¿Qué necesitas para aplicar?</h2>
+      <p class="sec-sub">Lo mínimo que revisa Finsus. Un asesor te confirma si tu caso aplica.</p>
+      <ul class="reqs">
+        <li>Persona moral o persona física con actividad comercial de al menos 1 año</li>
+        <li>Ventas facturables de al menos $1,800,000 en los últimos 12 meses</li>
+        <li>Entre 24 y 70 años (accionista principal o titular)</li>
+        <li>Buró sin quitas ni saldos vencidos</li>
+      </ul>
+      
     </div>
   </section>
 
@@ -269,7 +290,8 @@
         <p>Un asesor de Firma 7 se pondrá en contacto contigo para acompañarte y pedirte tu documentación.</p>
         <p id="alianza-abrio" hidden>Abrimos Finsus en otra pestaña para que inicies tu evaluación.</p>
         <a id="alianza-continuar" class="btn" href="#" target="_blank" rel="noopener" hidden>Continuar con Finsus</a>
-        <a class="ok-link" href="/documentacion" target="_blank" rel="noopener">¿Quieres adelantar tu documentación? Súbela aquí (opcional)</a>
+        <p class="ok-docs">Para agilizar tu trámite, adelanta tu documentación ahora:</p>
+        <a class="btn btn-outline" href="/documentacion" target="_blank" rel="noopener">Subir mi documentación</a>
       </div>
     </div>
   </div>

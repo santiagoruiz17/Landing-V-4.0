@@ -132,7 +132,13 @@
     .ok-icon { width: 3.4rem; height: 3.4rem; border-radius: 50%; background: var(--green-light); color: var(--green); display: flex; align-items: center; justify-content: center; font-size: 1.7rem; margin: 0 auto 1rem; }
     .ok-box { text-align: center; }
     .ok-box p { color: #4b5563; margin-bottom: 1rem; }
-    .ok-link { display: block; margin-top: .75rem; font-size: .85rem; color: var(--green); }
+    .ok-docs { margin: 1.25rem 0 .6rem; font-weight: 600; color: var(--charcoal); font-size: .93rem; }
+    .btn-outline { background: #fff; color: var(--green); border: 2px solid var(--green); padding: .85rem 1.5rem; }
+    .btn-outline:hover { background: var(--green-light); box-shadow: none; }
+    .reqs { list-style: none; max-width: 640px; margin: 0 auto; display: grid; gap: .7rem; }
+    .reqs li { display: flex; gap: .75rem; align-items: flex-start; background: var(--gray-subtle); border: 1px solid var(--gray-border); border-radius: 12px; padding: .8rem 1rem; font-size: .95rem; }
+    .reqs li::before { content: '✓'; flex: none; width: 1.5rem; height: 1.5rem; border-radius: 50%; background: var(--green); color: #fff; font-size: .8rem; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-top: .05rem; }
+    .reqs-nota { text-align: center; font-size: .85rem; color: var(--gray-text); margin-top: 1rem; }
     .ok-box[hidden], #alianza-continuar[hidden] { display: none; }
   </style>
 </head>
@@ -177,17 +183,32 @@
       <h2>Konfío en pocas palabras</h2>
       <p class="sec-sub">Lo esencial antes de iniciar tu solicitud.</p>
       <div class="grid g3">
-        <div class="card"><h3>Monto de financiamiento</h3><p>Hasta $5 millones de pesos</p></div>
-        <div class="card"><h3>Tiempo de respuesta</h3><p>Pre-aprobación en cuestión de minutos. Una vez autorizado, el fondeo se deposita entre 24 y 48 horas.</p></div>
-        <div class="card"><h3>Ventaja principal</h3><p>Liquidez rápida, proceso 100% digital.</p></div>
+        <div class="card"><h3>Monto</h3><p>Personas morales: de $80,000 a $10,000,000. Personas físicas con actividad empresarial: de $80,000 a $1,000,000.</p></div>
+        <div class="card"><h3>Rapidez</h3><p>Evaluación digital en minutos y dispersión del crédito en 24 a 48 horas.</p></div>
+        <div class="card"><h3>Sin garantías</h3><p>Proceso 100% digital, sin aval ni garantías.</p></div>
+        <div class="card"><h3>Ventaja fiscal</h3><p>La comisión por apertura y los intereses son 100% deducibles de ISR.</p></div>
       </div>
     </div>
   </section>
 
   <section style="padding-top:0">
     <div class="wrap about">
-      <h3>¿Quiénes son?</h3><p>Fintech mexicana fundada en 2013 y regulada por la CNBV, especializada en impulsar el crecimiento de las PyMEs.</p>
-      <h3>¿Cómo trabajan?</h3><p>Proceso 100% digital. Evalúan la salud de tu negocio conectándose de forma segura a tu facturación del SAT, sin exigir garantías hipotecarias.</p>
+      <h3>¿Quiénes son?</h3><p>Fintech mexicana regulada y especializada en PyMEs, con más de 85 mil empresas beneficiadas.</p>
+      
+    </div>
+  </section>
+
+  <section style="padding-top:0">
+    <div class="wrap">
+      <h2>¿Qué necesitas para aplicar?</h2>
+      <p class="sec-sub">Lo mínimo que revisa Konfío. Un asesor te confirma si tu caso aplica.</p>
+      <ul class="reqs">
+        <li>INE vigente y tener entre 25 y 75 años</li>
+        <li>De 3 a 6 meses de facturación continua</li>
+        <li>Clave CIEC del SAT y constancia de situación fiscal</li>
+        <li>Persona moral: cuadro accionario actualizado y datos del representante legal</li>
+      </ul>
+      
     </div>
   </section>
 
@@ -269,7 +290,8 @@
         <p>Un asesor de Firma 7 se pondrá en contacto contigo para acompañarte y pedirte tu documentación.</p>
         <p id="alianza-abrio" hidden>Abrimos Konfío en otra pestaña para que inicies tu evaluación.</p>
         <a id="alianza-continuar" class="btn" href="#" target="_blank" rel="noopener" hidden>Continuar con Konfío</a>
-        <a class="ok-link" href="/documentacion" target="_blank" rel="noopener">¿Quieres adelantar tu documentación? Súbela aquí (opcional)</a>
+        <p class="ok-docs">Para agilizar tu trámite, adelanta tu documentación ahora:</p>
+        <a class="btn btn-outline" href="/documentacion" target="_blank" rel="noopener">Subir mi documentación</a>
       </div>
     </div>
   </div>

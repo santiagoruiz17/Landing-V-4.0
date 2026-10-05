@@ -132,7 +132,13 @@
     .ok-icon { width: 3.4rem; height: 3.4rem; border-radius: 50%; background: var(--green-light); color: var(--green); display: flex; align-items: center; justify-content: center; font-size: 1.7rem; margin: 0 auto 1rem; }
     .ok-box { text-align: center; }
     .ok-box p { color: #4b5563; margin-bottom: 1rem; }
-    .ok-link { display: block; margin-top: .75rem; font-size: .85rem; color: var(--green); }
+    .ok-docs { margin: 1.25rem 0 .6rem; font-weight: 600; color: var(--charcoal); font-size: .93rem; }
+    .btn-outline { background: #fff; color: var(--green); border: 2px solid var(--green); padding: .85rem 1.5rem; }
+    .btn-outline:hover { background: var(--green-light); box-shadow: none; }
+    .reqs { list-style: none; max-width: 640px; margin: 0 auto; display: grid; gap: .7rem; }
+    .reqs li { display: flex; gap: .75rem; align-items: flex-start; background: var(--gray-subtle); border: 1px solid var(--gray-border); border-radius: 12px; padding: .8rem 1rem; font-size: .95rem; }
+    .reqs li::before { content: '✓'; flex: none; width: 1.5rem; height: 1.5rem; border-radius: 50%; background: var(--green); color: #fff; font-size: .8rem; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-top: .05rem; }
+    .reqs-nota { text-align: center; font-size: .85rem; color: var(--gray-text); margin-top: 1rem; }
     .ok-box[hidden], #alianza-continuar[hidden] { display: none; }
   </style>
 </head>
@@ -177,17 +183,32 @@
       <h2>Hay Cash en pocas palabras</h2>
       <p class="sec-sub">Lo esencial antes de iniciar tu solicitud.</p>
       <div class="grid g3">
-        <div class="card"><h3>Monto de financiamiento</h3><p>Otorgan un adelanto de capital que generalmente alcanza hasta 2.5 veces el promedio de las ventas mensuales cobradas con tarjeta.</p></div>
-        <div class="card"><h3>Tiempo de respuesta</h3><p>Su proceso es 100% digital. Una vez que se entrega la información completa y se aprueba el trámite, el fondeo se realiza en un lapso de 24 a 72 horas.</p></div>
-        <div class="card"><h3>Ventaja principal</h3><p>El esquema de pago es variable y se adapta directamente al flujo de ingresos del negocio, sin plazos fijos ni cuotas forzosas.</p></div>
+        <div class="card"><h3>Monto</h3><p>De $250,000 a $10,000,000: te adelantan hasta 2.5 veces tu venta promedio mensual en terminal.</p></div>
+        <div class="card"><h3>Pagas conforme vendes</h3><p>El pago se descuenta directo de tu terminal, de acuerdo con tus ventas.</p></div>
+        <div class="card"><h3>Sin garantía real</h3><p>No necesitas dejar un bien en garantía.</p></div>
+        <div class="card"><h3>Respuesta</h3><p>En menos de 24 horas. Las terminales no tienen costo ni renta.</p></div>
       </div>
     </div>
   </section>
 
   <section style="padding-top:0">
     <div class="wrap about">
-      <h3>¿Quiénes son?</h3><p>Empresa financiera mexicana especializada en brindar liquidez rápida a negocios formales a través del esquema de adelanto de ventas.</p>
-      <h3>¿Cómo trabajan?</h3><p>Evalúan el historial de facturación de la Terminal Punto de Venta (TPV) del negocio (solicitando un volumen mínimo de ventas mensuales con tarjeta). El crédito se paga de manera automática mediante la retención de un porcentaje fijo sobre las ventas futuras diarias.</p>
+      <h3>¿Quiénes son?</h3><p>Fintech mexicana que da financiamiento a negocios que cobran con tarjeta en terminal punto de venta (TPV): más de 5 años, 2,600 financiamientos y presencia en 32 estados.</p>
+      
+    </div>
+  </section>
+
+  <section style="padding-top:0">
+    <div class="wrap">
+      <h2>¿Qué necesitas para aplicar?</h2>
+      <p class="sec-sub">Lo mínimo que revisa Hay Cash. Un asesor te confirma si tu caso aplica.</p>
+      <ul class="reqs">
+        <li>Negocio que cobre con tarjeta en terminal punto de venta (TPV)</li>
+        <li>Ventas en terminal de al menos $200,000 al mes</li>
+        <li>Sin atrasos vigentes en buró</li>
+        <li>Constancia de situación fiscal, 6 estados de cuenta donde recibes tus ventas de TPV y clave CIEC</li>
+      </ul>
+      <p class="reqs-nota">Mayor aprobación: restaurantes, abarrotes, retail, farmacias, servicios automotrices y gasolineras.</p>
     </div>
   </section>
 
@@ -269,7 +290,8 @@
         <p>Un asesor de Firma 7 se pondrá en contacto contigo para acompañarte y pedirte tu documentación.</p>
         <p id="alianza-abrio" hidden>Abrimos Hay Cash en otra pestaña para que inicies tu evaluación.</p>
         <a id="alianza-continuar" class="btn" href="#" target="_blank" rel="noopener" hidden>Continuar con Hay Cash</a>
-        <a class="ok-link" href="/documentacion" target="_blank" rel="noopener">¿Quieres adelantar tu documentación? Súbela aquí (opcional)</a>
+        <p class="ok-docs">Para agilizar tu trámite, adelanta tu documentación ahora:</p>
+        <a class="btn btn-outline" href="/documentacion" target="_blank" rel="noopener">Subir mi documentación</a>
       </div>
     </div>
   </div>
