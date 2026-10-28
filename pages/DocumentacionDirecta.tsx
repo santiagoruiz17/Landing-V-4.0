@@ -219,12 +219,12 @@ export const DocumentacionDirecta: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 font-sans text-charcoal">
         <Header />
-        <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           {/* BORRADOR (portal de clientes): se reactiva junto con la creación de cuentas.
           <CuentaExistenteBanner />
           */}
           {!enviado && (
-            <div className="flex items-start gap-2 text-xs text-gray-500 bg-firma-green/5 border border-firma-green/20 rounded-xl px-4 py-3 mb-6">
+            <div className="flex items-start gap-2 max-w-3xl mx-auto text-xs text-gray-500 bg-firma-green/5 border border-firma-green/20 rounded-xl px-4 py-3 mb-6">
               <Link2 size={15} className="text-firma-green flex-shrink-0 mt-0.5" />
               <span>
                 Guarda o comparte este enlace — puedes cerrarlo y volver más tarde para continuar subiendo tu documentación sin perder tu avance.

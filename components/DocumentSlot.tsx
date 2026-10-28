@@ -1,11 +1,11 @@
 import React, { useRef, useState } from 'react';
 import { Upload, Camera, CheckCircle2, Loader2, AlertCircle, RotateCcw } from 'lucide-react';
-import { uploadDocumento } from '../lib/uploadDocumento';
+import { uploadDocumento, limiteMbPorTipo } from '../lib/uploadDocumento';
 
 export type DocumentoTipo =
-  | 'constancia_situacion_fiscal' | 'ine' | 'declaracion_anual' | 'estado_cuenta'
+  | 'constancia_situacion_fiscal' | 'ine' | 'declaracion_anual' | 'acuse_declaracion_anual' | 'estado_cuenta'
   | 'comprobante_domicilio_fiscal' | 'comprobante_domicilio_particular' | 'comprobante_domicilio_operativo'
-  | 'acta_constitutiva' | 'escrituras_modificaciones'
+  | 'acta_constitutiva' | 'acta_asamblea' | 'escrituras_modificaciones'
   | 'ine_accionista' | 'comprobante_domicilio_accionista' | 'constancia_situacion_fiscal_accionista'
   | 'acta_matrimonio_accionista';
 
@@ -18,6 +18,8 @@ interface DocumentSlotProps {
   label: string;
   hint?: string;
   optional?: boolean;
+  // Texto de la etiqueta cuando es opcional (por defecto "Opcional"; p. ej. "Si aplica").
+  optionalLabel?: string;
   // Ofrece "Tomar foto" con la cámara trasera (solo se muestra en celulares/tabletas).
   camara?: boolean;
   numero?: number;
@@ -31,7 +33,7 @@ const esDispositivoTactil = () =>
   typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(pointer: coarse)').matches;
 
 export const DocumentSlot: React.FC<DocumentSlotProps> = ({
-  leadId, tipoDocumento, slotIndex = 1, label, hint, optional, camara, numero, initialFileName, initialPurgado, onUploaded,
+  leadId, tipoDocumento, slotIndex = 1, label, hint, optional, optionalLabel, camara, numero, initialFileName, initialPurgado, onUploaded,
 }) => {
   const [purgado, setPurgado] = useState(Boolean(initialPurgado));
   const [status, setStatus] = useState<Status>(initialFileName ? 'success' : 'idle');
@@ -77,8 +79,8 @@ export const DocumentSlot: React.FC<DocumentSlotProps> = ({
         )}
         <span className="field-label !mb-0">{label}</span>
         {optional && (
-          <span className="text-[9px] font-semibold text-gray-400 uppercase tracking-wider bg-gray-100 rounded-full px-2 py-0.5">
-            Opcional
+          <span className="text-[9px] font-semibold text-gray-400 uppercase tracking-wider bg-gray-100 rounded-full px-2 py-0.5 whitespace-nowrap flex-shrink-0">
+            {optionalLabel ?? 'Opcional'}
           </span>
         )}
       </div>
@@ -130,7 +132,7 @@ export const DocumentSlot: React.FC<DocumentSlotProps> = ({
             className="w-full flex items-center gap-3 border-2 border-dashed border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-500 hover:border-firma-green/50 hover:bg-firma-green/5 transition-colors"
           >
             <Upload size={16} className="text-gray-400 flex-shrink-0" />
-            Subir archivo (PDF o imagen, máx. 10MB)
+            Subir archivo (PDF o imagen, máx. {limiteMbPorTipo(tipoDocumento)}MB)
           </button>
         )
       )}

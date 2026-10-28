@@ -91,7 +91,7 @@ export const EstadosCuentaSlot: React.FC<EstadosCuentaSlotProps> = ({ leadId, me
             className="w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-500 hover:text-firma-green hover:bg-firma-green/5 transition-colors"
           >
             <Upload size={16} className="text-gray-400 flex-shrink-0" />
-            Selecciona uno o varios archivos (PDF o imagen, máx. 10MB c/u)
+            Selecciona uno o varios archivos (PDF o imagen, máx. 20MB c/u)
           </button>
         )}
 

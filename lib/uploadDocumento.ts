@@ -1,7 +1,14 @@
 import { supabase } from './supabase';
 import { compressImageIfNeeded } from './imageCompression';
 
-const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
+const MB = 1024 * 1024;
+// Actas y estados de cuenta suelen ser escaneos pesados: se permite hasta 20 MB. El resto, 10 MB.
+// (El bucket de Supabase acepta hasta 20 MB; este tope por tipo se valida aquí.)
+const TIPOS_20MB = ['acta_constitutiva', 'acta_asamblea', 'estado_cuenta'];
+
+export function limiteMbPorTipo(tipoDocumento: string): number {
+  return TIPOS_20MB.includes(tipoDocumento) ? 20 : 10;
+}
 const BUCKET = 'lead-documentos';
 
 export interface UploadDocumentoResult {
@@ -19,8 +26,9 @@ export async function uploadDocumento(params: {
   const { leadId, tipoDocumento, slotIndex } = params;
   const file = await compressImageIfNeeded(params.file);
 
-  if (file.size > MAX_FILE_SIZE_BYTES) {
-    return { ok: false, error: 'El archivo pesa más de 10MB. Intenta subir el PDF directo del banco/portal en vez de una foto o escaneo.' };
+  const limiteMb = limiteMbPorTipo(tipoDocumento);
+  if (file.size > limiteMb * MB) {
+    return { ok: false, error: `El archivo pesa más de ${limiteMb}MB. Intenta subir el PDF directo del banco/portal en vez de una foto o escaneo.` };
   }
 
   const ext = file.name.includes('.') ? file.name.split('.').pop() : 'pdf';
