@@ -130,6 +130,12 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({ leadId, tipo, on
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sent]);
 
+  // Aviso al equipo de que el cliente entró a subir documentos (una sola vez por lead; igual si llegó del
+  // pre-calificador o de la liga de documentos que compartimos: el servidor ignora los avisos repetidos).
+  useEffect(() => {
+    supabase.rpc('avisar_entrada_documentacion', { p_lead_id: leadId }).then(() => {});
+  }, [leadId]);
+
   // Restaura lo que el cliente ya haya subido/llenado antes (por si cerró el
   // navegador a medias) — el leadId es lo único que se necesita para recuperarlo.
   useEffect(() => {
