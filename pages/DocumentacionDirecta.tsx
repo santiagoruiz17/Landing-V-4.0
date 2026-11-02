@@ -1,20 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Building2, User, FileText, Loader2, AlertCircle, Link2, Lock, Mail, ArrowLeft } from 'lucide-react';
+import { Building2, User, FileText, Loader2, AlertCircle, Link2, Lock, Mail, ArrowLeft, Car, Briefcase, Wallet } from 'lucide-react';
 import { useSEO } from '../hooks/useSEO';
 import { supabase } from '../lib/supabase';
 import { EMAIL_REGEX, soloDigitos10 } from '../lib/validation';
 import { DocumentUpload } from '../components/DocumentUpload';
+import { DocumentUploadAutomotriz } from '../components/DocumentUploadAutomotriz';
 // BORRADOR (portal de clientes): imports de ClienteCrearCuentaCTA y CuentaExistenteBanner
 // desactivados junto con sus usos de abajo.
 
-type Constitucion = 'Persona Física con Actividad Empresarial' | 'Persona Moral';
-type Paso = 'tipo' | 'form' | 'codigo' | 'documentos';
+type Producto = 'empresarial' | 'automotriz';
+type Constitucion = 'Persona Física con Actividad Empresarial' | 'Persona Moral' | 'Persona Física (asalariado)';
+type Paso = 'producto' | 'tipo' | 'form' | 'codigo' | 'documentos';
 
 function constitucionDesdeTipoUrl(tipo: string | null): Constitucion | null {
   if (tipo === 'moral') return 'Persona Moral';
   if (tipo === 'fisica') return 'Persona Física con Actividad Empresarial';
+  if (tipo === 'asalariado') return 'Persona Física (asalariado)';
   return null;
+}
+
+function tipoUrlDesdeConstitucion(c: Constitucion): 'moral' | 'fisica' | 'asalariado' {
+  if (c === 'Persona Moral') return 'moral';
+  if (c === 'Persona Física (asalariado)') return 'asalariado';
+  return 'fisica';
 }
 
 const Header: React.FC = () => (
@@ -56,9 +65,29 @@ export const DocumentacionDirecta: React.FC = () => {
   const constitucionFromUrl = constitucionDesdeTipoUrl(searchParams.get('tipo'));
   const tieneResumeUrl = Boolean(leadIdFromUrl && constitucionFromUrl);
 
-  const [paso, setPaso] = useState<Paso>(tieneResumeUrl ? 'documentos' : 'tipo');
+  const [paso, setPaso] = useState<Paso>(tieneResumeUrl ? 'documentos' : 'producto');
+  const [producto, setProducto] = useState<Producto | null>(
+    tieneResumeUrl ? (searchParams.get('producto') === 'automotriz' ? 'automotriz' : 'empresarial') : null
+  );
   const [constitucion, setConstitucion] = useState<Constitucion | null>(tieneResumeUrl ? constitucionFromUrl : null);
   const [leadId, setLeadId] = useState(tieneResumeUrl ? leadIdFromUrl : '');
+  // Al volver con una liga personal se consulta el trámite para saber con certeza de qué producto y persona es.
+  const [resolviendo, setResolviendo] = useState(tieneResumeUrl);
+
+  useEffect(() => {
+    if (!tieneResumeUrl) return;
+    (async () => {
+      try {
+        const { data } = await supabase.rpc('get_lead_progreso', { p_lead_id: leadIdFromUrl });
+        if (data?.producto === 'automotriz' || data?.producto === 'empresarial') setProducto(data.producto);
+        const c = data?.constitucion as Constitucion | undefined;
+        if (c === 'Persona Moral' || c === 'Persona Física con Actividad Empresarial' || c === 'Persona Física (asalariado)') setConstitucion(c);
+      } finally {
+        setResolviendo(false);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Persona Física con Actividad Empresarial
   const [nombre, setNombre] = useState('');
@@ -90,6 +119,12 @@ export const DocumentacionDirecta: React.FC = () => {
     const t = setTimeout(() => setReenvioEn(s => s - 1), 1000);
     return () => clearTimeout(t);
   }, [reenvioEn]);
+
+  const elegirProducto = (p: Producto) => {
+    setProducto(p);
+    setConstitucion(null);
+    setPaso('tipo');
+  };
 
   const elegirTipo = (c: Constitucion) => {
     setConstitucion(c);
@@ -124,12 +159,14 @@ export const DocumentacionDirecta: React.FC = () => {
             correo: correoContacto,
             empresa,
             constitucion,
+            producto: producto ?? 'empresarial',
           }
         : {
             nombreCompleto: nombre,
             numero: telefono,
             correo,
             constitucion,
+            producto: producto ?? 'empresarial',
           },
     });
     const res = data as { status?: string; leadId?: string; sent?: boolean; reason?: string } | null;
@@ -164,7 +201,11 @@ export const DocumentacionDirecta: React.FC = () => {
     }
     setStatus('idle');
     setLeadId(res.leadId);
-    setSearchParams({ leadId: res.leadId, tipo: esMoral ? 'moral' : 'fisica' });
+    setSearchParams({
+      leadId: res.leadId,
+      tipo: tipoUrlDesdeConstitucion(constitucion),
+      ...(producto === 'automotriz' ? { producto: 'automotriz' } : {}),
+    });
     setPaso('documentos');
   };
 
@@ -175,8 +216,8 @@ export const DocumentacionDirecta: React.FC = () => {
       return;
     }
     setCodigoStatus('verifying');
-    const { data, error } = await supabase.rpc('verificar_codigo_lead', { p_correo: correoIngresado, p_codigo: codigo });
-    const res = data as { ok?: boolean; leadId?: string; tipo?: string; reason?: string; intentosRestantes?: number } | null;
+    const { data, error } = await supabase.rpc('verificar_codigo_lead', { p_correo: correoIngresado, p_codigo: codigo, p_producto: producto ?? 'empresarial' });
+    const res = data as { ok?: boolean; leadId?: string; tipo?: string; producto?: string; reason?: string; intentosRestantes?: number } | null;
     if (error || !res) {
       setCodigoStatus('error');
       setCodigoMsg('No se pudo verificar. Intenta de nuevo.');
@@ -185,8 +226,10 @@ export const DocumentacionDirecta: React.FC = () => {
     if (res.ok && res.leadId) {
       const c = constitucionDesdeTipoUrl(res.tipo ?? null);
       if (c) setConstitucion(c);
+      const prod: Producto = res.producto === 'automotriz' ? 'automotriz' : 'empresarial';
+      setProducto(prod);
       setLeadId(res.leadId);
-      setSearchParams({ leadId: res.leadId, tipo: res.tipo ?? 'fisica' });
+      setSearchParams({ leadId: res.leadId, tipo: res.tipo ?? 'fisica', ...(prod === 'automotriz' ? { producto: 'automotriz' } : {}) });
       setCodigoStatus('idle');
       setPaso('documentos');
       return;
@@ -202,7 +245,7 @@ export const DocumentacionDirecta: React.FC = () => {
   const reenviarCodigo = async () => {
     setCodigoMsg('');
     setCodigoStatus('idle');
-    const { data } = await supabase.rpc('solicitar_codigo_lead', { p_correo: correoIngresado });
+    const { data } = await supabase.rpc('solicitar_codigo_lead', { p_correo: correoIngresado, p_producto: producto ?? 'empresarial' });
     const res = data as { sent?: boolean; reason?: string } | null;
     if (res?.sent) {
       setReenvioEn(60);
@@ -214,6 +257,18 @@ export const DocumentacionDirecta: React.FC = () => {
       setCodigoMsg('No pudimos enviar otro código ahora. Intenta más tarde o escríbenos por WhatsApp.');
     }
   };
+
+  if (paso === 'documentos' && leadId && resolviendo) {
+    return (
+      <div className="min-h-screen bg-gray-50 font-sans text-charcoal">
+        <Header />
+        <main className="max-w-2xl mx-auto px-4 py-20 text-center">
+          <Loader2 size={28} className="text-firma-green animate-spin mx-auto mb-3" />
+          <p className="text-sm text-gray-400">Cargando tu trámite…</p>
+        </main>
+      </div>
+    );
+  }
 
   if (paso === 'documentos' && leadId && constitucion) {
     return (
@@ -231,7 +286,11 @@ export const DocumentacionDirecta: React.FC = () => {
               </span>
             </div>
           )}
-          <DocumentUpload leadId={leadId} tipo={esMoral ? 'moral' : 'fisica'} onEnviadoChange={setEnviado} />
+          {producto === 'automotriz' ? (
+            <DocumentUploadAutomotriz leadId={leadId} tipo={tipoUrlDesdeConstitucion(constitucion)} onEnviadoChange={setEnviado} />
+          ) : (
+            <DocumentUpload leadId={leadId} tipo={esMoral ? 'moral' : 'fisica'} onEnviadoChange={setEnviado} />
+          )}
           {/* BORRADOR (portal de clientes): se reactiva cuando esté listo el proceso de crear cuentas.
           <div className="mt-6">
             <ClienteCrearCuentaCTA />
@@ -262,11 +321,62 @@ export const DocumentacionDirecta: React.FC = () => {
           </p>
         </div>
 
-        {paso === 'tipo' && (
+        {paso === 'producto' && (
+          <div className="bg-white border border-gray-100 rounded-2xl p-6 md:p-8 shadow-sm">
+            <p className="text-xs font-bold tracking-widest text-gray-400 uppercase text-center mb-5">
+              Elige un producto
+            </p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <button
+                type="button"
+                onClick={() => elegirProducto('empresarial')}
+                className="flex flex-col items-center text-center gap-3 border-2 border-gray-200 rounded-2xl px-5 py-7 hover:border-firma-green/60 hover:bg-firma-green/5 hover:-translate-y-0.5 transition-all"
+              >
+                <div className="w-14 h-14 rounded-2xl bg-firma-green/10 flex items-center justify-center">
+                  <Briefcase size={26} className="text-firma-green" />
+                </div>
+                <div>
+                  <p className="font-serif text-xl font-bold text-charcoal">Crédito empresarial</p>
+                  <p className="text-sm text-gray-500 mt-1">Para tu negocio o empresa</p>
+                </div>
+              </button>
+              <button
+                type="button"
+                onClick={() => elegirProducto('automotriz')}
+                className="flex flex-col items-center text-center gap-3 border-2 border-gray-200 rounded-2xl px-5 py-7 hover:border-firma-green/60 hover:bg-firma-green/5 hover:-translate-y-0.5 transition-all"
+              >
+                <div className="w-14 h-14 rounded-2xl bg-firma-green/10 flex items-center justify-center">
+                  <Car size={26} className="text-firma-green" />
+                </div>
+                <div>
+                  <p className="font-serif text-xl font-bold text-charcoal">Crédito automotriz</p>
+                  <p className="text-sm text-gray-500 mt-1">Para comprar tu auto</p>
+                </div>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {paso === 'tipo' && producto && (
           <div className="bg-white border border-gray-100 rounded-2xl p-6 md:p-8 shadow-sm space-y-3">
             <p className="text-xs font-bold tracking-widest text-gray-400 uppercase text-center mb-2">
-              ¿Cómo está constituido tu negocio?
+              {producto === 'automotriz' ? '¿Cómo solicitarás tu crédito automotriz?' : '¿Cómo está constituido tu negocio?'}
             </p>
+            {producto === 'automotriz' && (
+            <button
+              type="button"
+              onClick={() => elegirTipo('Persona Física (asalariado)')}
+              className="w-full flex items-center gap-4 border-2 border-gray-200 rounded-xl px-5 py-4 text-left hover:border-firma-green/50 hover:bg-firma-green/5 transition-colors"
+            >
+              <div className="w-10 h-10 rounded-xl bg-firma-green/10 flex items-center justify-center flex-shrink-0">
+                <Wallet size={20} className="text-firma-green" />
+              </div>
+              <div>
+                <p className="font-semibold text-charcoal">Persona física (asalariado)</p>
+                <p className="text-sm text-gray-500">Recibes un sueldo de una empresa</p>
+              </div>
+            </button>
+            )}
             <button
               type="button"
               onClick={() => elegirTipo('Persona Física con Actividad Empresarial')}
@@ -277,7 +387,7 @@ export const DocumentacionDirecta: React.FC = () => {
               </div>
               <div>
                 <p className="font-semibold text-charcoal">Persona Física con Actividad Empresarial</p>
-                <p className="text-sm text-gray-500">Facturas y operas a tu nombre</p>
+                <p className="text-sm text-gray-500">{producto === 'automotriz' ? 'Trabajas por tu cuenta o tienes un negocio a tu nombre' : 'Facturas y operas a tu nombre'}</p>
               </div>
             </button>
             <button
@@ -290,8 +400,16 @@ export const DocumentacionDirecta: React.FC = () => {
               </div>
               <div>
                 <p className="font-semibold text-charcoal">Persona Moral</p>
-                <p className="text-sm text-gray-500">Tu negocio es una empresa constituida (S.A., S.A.P.I., etc.)</p>
+                <p className="text-sm text-gray-500">{producto === 'automotriz' ? 'La compra la hará una empresa constituida' : 'Tu negocio es una empresa constituida (S.A., S.A.P.I., etc.)'}</p>
               </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => { setPaso('producto'); setProducto(null); }}
+              className="w-full text-sm text-gray-400 hover:text-charcoal font-medium text-center pt-2"
+            >
+              Volver
             </button>
           </div>
         )}
