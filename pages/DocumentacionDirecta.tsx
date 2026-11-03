@@ -151,27 +151,33 @@ export const DocumentacionDirecta: React.FC = () => {
     if (!validate() || !constitucion) return;
     setStatus('sending');
     setErrorMsg('');
-    const { data, error } = await supabase.rpc('registrar_lead_documentacion_directa', {
-      p: esMoral
-        ? {
-            nombreCompleto: contacto,
-            numero: telefonoContacto,
-            correo: correoContacto,
-            empresa,
-            constitucion,
-            producto: producto ?? 'empresarial',
-          }
-        : {
-            nombreCompleto: nombre,
-            numero: telefono,
-            correo,
-            constitucion,
-            producto: producto ?? 'empresarial',
-          },
-    });
+    const payload = esMoral
+      ? {
+          nombreCompleto: contacto,
+          numero: telefonoContacto,
+          correo: correoContacto,
+          empresa,
+          constitucion,
+          producto: producto ?? 'empresarial',
+        }
+      : {
+          nombreCompleto: nombre,
+          numero: telefono,
+          correo,
+          constitucion,
+          producto: producto ?? 'empresarial',
+        };
+    const registrar = () => supabase.rpc('registrar_lead_documentacion_directa', { p: payload });
+    let { data, error } = await registrar();
+    if (error || !(data as { status?: string } | null)?.status) {
+      await new Promise(r => setTimeout(r, 1500));
+      ({ data, error } = await registrar());
+    }
     const res = data as { status?: string; leadId?: string; sent?: boolean; reason?: string } | null;
     if (error || !res?.status) {
+      console.error('registrar_lead_documentacion_directa', error);
       setStatus('error');
+      setErrorMsg('No pudimos continuar. Revisa tu conexión e inténtalo de nuevo; si sigue sin funcionar, escríbenos por WhatsApp y te ayudamos.');
       return;
     }
 
@@ -505,7 +511,17 @@ export const DocumentacionDirecta: React.FC = () => {
             {status === 'error' && (
               <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
                 <AlertCircle size={16} className="flex-shrink-0" />
-                {errorMsg || 'No se pudo continuar. Por favor intenta de nuevo.'}
+                <span>
+                  {errorMsg || 'No se pudo continuar. Por favor intenta de nuevo.'}{' '}
+                  <a
+                    href="https://wa.me/525525069817?text=Hola%2C%20no%20pude%20continuar%20en%20la%20p%C3%A1gina%20para%20subir%20mi%20documentaci%C3%B3n."
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline font-semibold"
+                  >
+                    Escribir por WhatsApp
+                  </a>
+                </span>
               </div>
             )}
 
