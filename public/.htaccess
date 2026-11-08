@@ -12,7 +12,7 @@
   # Las genera scripts/prerender.mjs en cada build dentro de /_prerender/. Si no existe el archivo
   # (p. ej. un artículo publicado después del último despliegue) se sigue con la SPA de abajo.
   RewriteCond %{DOCUMENT_ROOT}/_prerender/$1.html -f
-  RewriteRule ^(perfil|calculadora|blog|quiero-ser-aliado|aviso-de-privacidad|blog/[^/]+)/?$ /_prerender/$1.html [L]
+  RewriteRule ^(perfil|credito-automotriz|calculadora|blog|quiero-ser-aliado|aviso-de-privacidad|blog/[^/]+)/?$ /_prerender/$1.html [L]
 
   # Serve existing files and directories directly
   RewriteCond %{REQUEST_FILENAME} !-f
@@ -24,7 +24,7 @@
   # Solo las rutas reales de la app van a React. Cualquier otra dirección devuelve un 404 de verdad
   # (antes devolvía 200 con la portada, lo que Google toma como contenido duplicado / "soft 404").
   # Si agregas una ruta nueva en App.tsx, agrégala también aquí.
-  RewriteRule ^(perfil|calculadora|aprobado|espera|aviso-de-privacidad|documentos-recibidos|gracias|documentacion|aprobar-testimonio|admin|quiero-ser-aliado|blog(/.*)?)/?$ /index.html [L]
+  RewriteRule ^(perfil|credito-automotriz|calculadora|aprobado|espera|aviso-de-privacidad|documentos-recibidos|gracias|documentacion|aprobar-testimonio|admin|quiero-ser-aliado|blog(/.*)?)/?$ /index.html [L]
 </IfModule>
 
 # Página que ve el visitante en una dirección inexistente (React muestra su pantalla de "no encontrada"; el estado HTTP sigue siendo 404)

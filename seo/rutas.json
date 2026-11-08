@@ -9,6 +9,11 @@
     "description": "Simula tu pago mensual de crédito empresarial o automotriz. Calcula plazos y montos antes de solicitar tu financiamiento con Firma 7.",
     "nombre": "Calculadora de crédito empresarial y automotriz"
   },
+  "/credito-automotriz": {
+    "title": "Crédito Automotriz para Autos Nuevos y Seminuevos | Firma 7",
+    "description": "Financia tu auto nuevo o seminuevo con crédito bancario: enganche mínimo de 10% y plazos hasta 120 meses. Evalúa tu perfil en línea con Firma 7.",
+    "nombre": "Crédito automotriz"
+  },
   "/blog": {
     "title": "Blog de Crédito Empresarial y Financiamiento PyME | Firma 7",
     "description": "Consejos y análisis sobre crédito empresarial, financiamiento PyME y estrategia financiera para empresas en México.",

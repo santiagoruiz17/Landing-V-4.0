@@ -29,6 +29,7 @@ const agregar = (loc, { archivo, lastmod, changefreq, priority }) => {
 // Páginas fijas
 agregar(`${SITE}/`, { archivo: 'components/Hero.tsx', changefreq: 'weekly', priority: '1.0' });
 agregar(`${SITE}/perfil`, { archivo: 'pages/Perfil.tsx', changefreq: 'monthly', priority: '0.9' });
+agregar(`${SITE}/credito-automotriz`, { archivo: 'pages/CreditoAutomotriz.tsx', changefreq: 'monthly', priority: '0.9' });
 agregar(`${SITE}/calculadora`, { archivo: 'pages/Calculadora.tsx', changefreq: 'monthly', priority: '0.7' });
 agregar(`${SITE}/quiero-ser-aliado`, { archivo: 'pages/QuieroSerAliado.tsx', changefreq: 'monthly', priority: '0.6' });
 agregar(`${SITE}/aviso-de-privacidad`, { archivo: 'pages/AvisoPrivacidad.tsx', changefreq: 'yearly', priority: '0.3' });

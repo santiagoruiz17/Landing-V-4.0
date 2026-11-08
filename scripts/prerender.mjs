@@ -87,6 +87,26 @@ for (const [ruta, r] of Object.entries(rutas)) {
   const url = `${SITE}${ruta}`;
   const p = { url, title: r.title, description: r.description, migas: [inicio, { nombre: r.nombre, url }] };
   if (ruta === '/blog') p.noindex = articulos.length === 0;
+  if (ruta === '/credito-automotriz') {
+    const faq = JSON.parse(fs.readFileSync(path.join(root, 'seo', 'faq-automotriz.json'), 'utf8'));
+    p.extra = [
+      {
+        '@type': 'Service',
+        '@id': `${url}#servicio`,
+        name: 'Crédito automotriz',
+        serviceType: 'Intermediación de crédito bancario automotriz',
+        description: r.description,
+        areaServed: { '@type': 'Country', name: 'México' },
+        provider: { '@id': `${SITE}/#organization` },
+        url,
+      },
+      {
+        '@type': 'FAQPage',
+        '@id': `${url}#faq`,
+        mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+      },
+    ];
+  }
   if (ruta === '/calculadora') {
     p.extra = [{
       '@type': 'WebApplication',

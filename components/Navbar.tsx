@@ -59,7 +59,7 @@ export const Navbar: React.FC = () => {
           </div>
 
           {/* Desktop Menu */}
-          <div className="hidden md:flex space-x-8 items-center">
+          <div className="hidden lg:flex space-x-5 xl:space-x-8 items-center">
             <button onClick={() => scrollToSection('methodology')} className="text-sm font-medium text-gray-600 hover:text-[#006d4e] transition-colors cursor-pointer" style={{ cursor: 'pointer' }}>
               Metodología
             </button>
@@ -75,6 +75,13 @@ export const Navbar: React.FC = () => {
               style={{ background: 'none', border: 'none' }}
             >
               Blog
+            </button>
+            <button
+              onClick={() => navigate('/credito-automotriz')}
+              className="text-sm font-medium text-gray-600 hover:text-[#006d4e] transition-colors cursor-pointer"
+              style={{ background: 'none', border: 'none' }}
+            >
+              Crédito Automotriz
             </button>
             <button
               onClick={() => navigate('/calculadora')}
@@ -104,7 +111,7 @@ export const Navbar: React.FC = () => {
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center">
+          <div className="lg:hidden flex items-center">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="text-gray-600 hover:text-[#006d4e] focus:outline-none transition-colors cursor-pointer"
@@ -118,7 +125,7 @@ export const Navbar: React.FC = () => {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-white border-t border-gray-100 absolute w-full shadow-xl">
+        <div className="lg:hidden bg-white border-t border-gray-100 absolute w-full shadow-xl">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             <button
               onClick={() => scrollToSection('methodology')}
@@ -139,6 +146,13 @@ export const Navbar: React.FC = () => {
               style={{ background: 'none', border: 'none', cursor: 'pointer' }}
             >
               Blog
+            </button>
+            <button
+              onClick={() => { setIsMobileMenuOpen(false); navigate('/credito-automotriz'); }}
+              className="block w-full text-left px-3 py-4 text-base font-medium text-gray-600 hover:text-[#006d4e] hover:bg-gray-50 transition-colors"
+              style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+            >
+              Crédito Automotriz
             </button>
             <button
               onClick={() => { setIsMobileMenuOpen(false); navigate('/calculadora'); }}

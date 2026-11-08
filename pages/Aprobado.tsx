@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Shield, FileText } from 'lucide-react';
 import { useSEO } from '../hooks/useSEO';
 import { DocumentUpload } from '../components/DocumentUpload';
+import { DocumentUploadAutomotriz } from '../components/DocumentUploadAutomotriz';
 // BORRADOR (portal de clientes): imports de ClienteCrearCuentaCTA y CuentaExistenteBanner
 // desactivados junto con sus usos de abajo.
 
@@ -25,6 +26,8 @@ export const Aprobado: React.FC = () => {
   const nombre = searchParams.get('nombre') || '';
   const leadId = searchParams.get('leadId') || '';
   const esMoral = tipo === 'moral';
+  const esAutomotriz = searchParams.get('producto') === 'automotriz';
+  const tipoAuto: 'asalariado' | 'fisica' | 'moral' = tipo === 'moral' ? 'moral' : tipo === 'asalariado' ? 'asalariado' : 'fisica';
   const enFormulario = !!leadId && searchParams.get('vista') === 'documentos';
 
   const cambiarVista = (formulario: boolean) => {
@@ -99,7 +102,9 @@ export const Aprobado: React.FC = () => {
           {/* BORRADOR (portal de clientes): se reactiva cuando esté listo el proceso de crear cuentas.
           <ClienteCrearCuentaCTA />
           */}
-          <DocumentUpload leadId={leadId} tipo={esMoral ? 'moral' : 'fisica'} />
+          {esAutomotriz
+            ? <DocumentUploadAutomotriz leadId={leadId} tipo={tipoAuto} />
+            : <DocumentUpload leadId={leadId} tipo={esMoral ? 'moral' : 'fisica'} />}
           <p className="text-center text-xs text-gray-400 pb-6">
             ¿Dudas con algún documento?{' '}
             <a href={WHATSAPP_DUDAS} target="_blank" rel="noopener noreferrer" className="text-[#006d4e] font-semibold underline">
@@ -131,7 +136,9 @@ export const Aprobado: React.FC = () => {
               {nombre ? `¡Felicidades, ${nombre}!` : '¡Felicidades!'}
             </h1>
             <p className="text-[#15803d] text-base leading-relaxed">
-              Tu empresa <strong>pre-califica</strong> para un crédito empresarial con nuestras instituciones financieras.
+              {esAutomotriz
+                ? <>Tu perfil <strong>avanza</strong> para tu crédito automotriz bancario.</>
+                : <>Tu empresa <strong>pre-califica</strong> para un crédito empresarial con nuestras instituciones financieras.</>}
             </p>
           </div>
 

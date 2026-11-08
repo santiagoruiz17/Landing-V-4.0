@@ -17,6 +17,7 @@ const Footer      = React.lazy(() => import('./components/Footer').then(m => ({ 
 
 const Perfil              = React.lazy(() => import('./pages/Perfil').then(m => ({ default: m.Perfil })));
 const Calculadora         = React.lazy(() => import('./pages/Calculadora').then(m => ({ default: m.Calculadora })));
+const CreditoAutomotriz   = React.lazy(() => import('./pages/CreditoAutomotriz').then(m => ({ default: m.CreditoAutomotriz })));
 const Aprobado            = React.lazy(() => import('./pages/Aprobado').then(m => ({ default: m.Aprobado })));
 const Espera              = React.lazy(() => import('./pages/Espera').then(m => ({ default: m.Espera })));
 const AvisoPrivacidad     = React.lazy(() => import('./pages/AvisoPrivacidad').then(m => ({ default: m.AvisoPrivacidad })));
@@ -133,6 +134,7 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/perfil" element={<Perfil />} />
           <Route path="/calculadora" element={<Calculadora />} />
+          <Route path="/credito-automotriz" element={<CreditoAutomotriz />} />
           <Route path="/aprobado" element={<Aprobado />} />
           <Route path="/espera" element={<Espera />} />
           <Route path="/aviso-de-privacidad" element={<AvisoPrivacidad />} />
