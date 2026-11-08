@@ -57,3 +57,33 @@ export function getStoredUtmParams(): UtmParams {
     return EMPTY;
   }
 }
+
+// ─── Alianza de origen ───────────────────────────────────────────────────────
+// Las páginas de las alianzas (/alianzas/<institución>/) mandan a /perfil?alianza=<slug>.
+// Se guarda el slug 30 días para que el lead quede marcado con la alianza de la que llegó
+// (se convierte en la etiqueta "alianza:<slug>" en GHL), aunque navegue por otras páginas antes de terminar.
+const ALIANZA_KEY = 'firma7_alianza_origen';
+
+export function captureAlianzaOrigen(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    const slug = (new URLSearchParams(window.location.search).get('alianza') ?? '').trim().toLowerCase();
+    if (!/^[a-z0-9-]{1,40}$/.test(slug)) return;
+    localStorage.setItem(ALIANZA_KEY, JSON.stringify({ slug, savedAt: Date.now() }));
+  } catch {
+    /* noop */
+  }
+}
+
+export function getStoredAlianzaOrigen(): string {
+  if (typeof window === 'undefined') return '';
+  try {
+    const raw = localStorage.getItem(ALIANZA_KEY);
+    if (!raw) return '';
+    const parsed = JSON.parse(raw);
+    if (!parsed?.savedAt || Date.now() - parsed.savedAt > MAX_AGE_MS) return '';
+    return typeof parsed.slug === 'string' ? parsed.slug : '';
+  } catch {
+    return '';
+  }
+}

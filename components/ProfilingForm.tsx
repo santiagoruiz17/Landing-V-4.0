@@ -4,7 +4,7 @@ import { Eye, UserPlus, X, PlusCircle, ShieldCheck } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { trackLead } from '../lib/metaPixel';
 import { trackEvent } from '../lib/analytics';
-import { getStoredUtmParams } from '../lib/utmTracking';
+import { getStoredUtmParams, getStoredAlianzaOrigen } from '../lib/utmTracking';
 import { EMAIL_REGEX, soloDigitos10 } from '../lib/validation';
 
 // ─── N8N Webhook ──────────────────────────────────────────────────────────────
@@ -62,6 +62,7 @@ interface FormData {
   utmMedium: string;
   utmCampaign: string;
   utmContent: string;
+  alianzaOrigen: string;
 }
 
 const ACCIONISTA_VACIO: Accionista = { nombre: '', porcentaje: '', esRepresentanteLegal: false, correo: '', telefono: '' };
@@ -80,12 +81,13 @@ const INITIAL: FormData = {
   garantiaMaquinaria: [{ ...EQUIPO_VACIO }],
   garantiaTransporte: { ...EQUIPO_VACIO },
   utmSource: '', utmMedium: '', utmCampaign: '', utmContent: '',
+  alianzaOrigen: '',
 };
 
 // Datos frescos para una sesión nueva: arranca de INITIAL pero con la
 // atribución de campaña capturada por captureUtmParams() en App.tsx.
 function getInitialFormData(): FormData {
-  return { ...INITIAL, ...getStoredUtmParams() };
+  return { ...INITIAL, ...getStoredUtmParams(), alianzaOrigen: getStoredAlianzaOrigen() };
 }
 
 // ─── Progreso guardado ─────────────────────────────────────────────────────────

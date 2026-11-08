@@ -1,0 +1,11 @@
+-- 2026-11-08 · Origen de alianza en el pre-calificador y etiquetas de GHL
+-- (aplicado con DO + replace sobre las funciones vivas; aquí queda el registro de qué cambió)
+--
+-- 1) submit_lead(p jsonb): guarda leads.alianza_origen a partir de p->>'alianzaOrigen' (solo si cumple ^[a-z0-9-]{1,40}$).
+--    Las landings de las alianzas mandan a /perfil?alianza=<slug>; la página guarda el slug 30 días (lib/utmTracking.ts)
+--    y el lead sale en GHL con la etiqueta "alianza:<slug>" (esa parte de sync_lead_to_ghl ya existía).
+--
+-- 2) sync_lead_to_ghl(): la etiqueta de origen "lead-perfilamiento-web" pasa a ser "Lead Pagina web" y se agrega una
+--    etiqueta con la fecha de llegada del lead en formato DD/MM/YYYY (hora de México, a partir de leads.created_at).
+--    Los leads de alianza_directa conservan "lead-alianza" y también reciben la etiqueta de fecha.
+--    OJO: cualquier automatización de GHL que se dispare con la etiqueta vieja debe actualizarse a "Lead Pagina web".

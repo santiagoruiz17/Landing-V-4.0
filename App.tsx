@@ -5,7 +5,7 @@ import { Hero } from './components/Hero';
 import { SocialProofToast } from './components/SocialProofToast';
 import { ExitIntentPopup } from './components/ExitIntentPopup';
 import { useSEO } from './hooks/useSEO';
-import { captureUtmParams } from './lib/utmTracking';
+import { captureUtmParams, captureAlianzaOrigen } from './lib/utmTracking';
 
 const Partners    = React.lazy(() => import('./components/Partners').then(m => ({ default: m.Partners })));
 const Methodology = React.lazy(() => import('./components/Methodology').then(m => ({ default: m.Methodology })));
@@ -124,7 +124,7 @@ function LandingPage() {
 }
 
 function App() {
-  useEffect(() => { captureUtmParams(); }, []);
+  useEffect(() => { captureUtmParams(); captureAlianzaOrigen(); }, []);
 
   return (
     <BrowserRouter>

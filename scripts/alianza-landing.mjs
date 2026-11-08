@@ -35,7 +35,7 @@ export function landingTemplate(partner, cfg) {
   const faqs = [
     { q: `¿Qué empresas pueden solicitar financiamiento con ${nombre}?`, a: `${nombre} atiende tanto a Personas Morales como a Personas Físicas con Actividad Empresarial. Un asesor de Firma 7 te confirma si tu caso aplica y te acompaña durante la solicitud.` },
     { q: '¿Cuánto cuesta el servicio de Firma 7?', a: 'Firma 7 no te cobra comisión: nuestros honorarios son cubiertos por la institución financiera, así que la gestión no tiene costo para ti.' },
-    { q: '¿Qué documentos necesito?', a: 'Un asesor de Firma 7 se pone en contacto contigo y te indica exactamente qué necesitas. Normalmente se solicita constancia de situación fiscal, identificación oficial, comprobantes de domicilio y estados de cuenta bancarios.', link: { href: '/documentacion', text: 'Subir mi documentación' } },
+    { q: '¿Qué documentos necesito?', a: 'Un asesor de Firma 7 se pone en contacto contigo y te indica exactamente qué necesitas. Normalmente se solicita constancia de situación fiscal, identificación oficial, comprobantes de domicilio y estados de cuenta bancarios.', link: { href: `/perfil?alianza=${partner.slug}`, text: 'Iniciar mi evaluación' } },
     { q: `¿Qué pasa si ${nombre} no aprueba mi solicitud?`, a: 'Firma 7 compara más de 20 instituciones financieras. Si esta opción no es la ideal o no se aprueba, tu asesor revisa contigo otras alternativas para tu empresa.' },
   ];
 
@@ -71,7 +71,7 @@ export function landingTemplate(partner, cfg) {
       },
       {
         '@type': 'FAQPage',
-        mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.link ? `${f.a} Puedes subir tu documentación en https://firma7.com${f.link.href}` : f.a } })),
+        mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
       },
     ],
   };
@@ -82,8 +82,8 @@ export function landingTemplate(partner, cfg) {
     ventaja && { t: 'Ventaja principal', x: ventaja },
   ].filter(Boolean);
 
-  const cta = (extra = '') => `<button type="button" class="btn ${extra}" data-alianza-cta>Iniciar con ${esc(nombre)}
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg></button>`;
+  const cta = (extra = '') => `<a class="btn ${extra}" href="/perfil?alianza=${esc(partner.slug)}">Iniciar mi evaluación con ${esc(nombre)}
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg></a>`;
 
   const circulos = '<circle cx="50" cy="50" r="12"/><circle cx="50" cy="20" r="12"/><circle cx="50" cy="80" r="12"/><circle cx="24" cy="35" r="12"/><circle cx="24" cy="65" r="12"/><circle cx="76" cy="35" r="12"/><circle cx="76" cy="65" r="12"/>';
 
@@ -234,7 +234,7 @@ export function landingTemplate(partner, cfg) {
     .ok-box[hidden], #alianza-continuar[hidden] { display: none; }
   </style>
 </head>
-<body data-alianza="${esc(partner.slug)}" data-alianza-nombre="${esc(nombre)}" data-sb-url="${esc(supabaseUrl)}" data-sb-key="${esc(supabaseKey)}">
+<body>
 
   <nav class="navbar">
     <div class="navbar-inner">
@@ -300,10 +300,10 @@ export function landingTemplate(partner, cfg) {
   <section class="why">
     <div class="wrap">
       <h2>Cómo funciona con Firma 7</h2>
-      <p class="sec-sub">Tres pasos, sin papeleo al inicio.</p>
+      <p class="sec-sub">Tres pasos sencillos.</p>
       <div class="grid g3 steps">
-        <div class="step"><h3>Déjanos tus datos</h3><p>Nombre, teléfono y correo. Te toma menos de un minuto.</p></div>
-        <div class="step"><h3>Continúa en ${esc(nombre)}</h3><p>Se abre su plataforma para que inicies tu evaluación.</p></div>
+        <div class="step"><h3>Inicia tu evaluación</h3><p>Responde unas preguntas sobre tu empresa. Toma pocos minutos.</p></div>
+        <div class="step"><h3>Sube tu documentación</h3><p>Si tu perfil avanza, te guiamos para cargar los documentos que se necesitan.</p></div>
         <div class="step"><h3>Te acompañamos</h3><p>Un asesor de Firma 7 te contacta, te indica qué documentos reunir y da seguimiento.</p></div>
       </div>
     </div>
@@ -326,7 +326,7 @@ export function landingTemplate(partner, cfg) {
       <h2>Preguntas frecuentes</h2>
       <p class="sec-sub">Resolvemos lo que más nos preguntan sobre ${esc(nombre)}.</p>
       <div class="faq">
-        ${faqs.map((f) => `<details><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p>${f.link ? `<p><a class="btn btn-outline faq-btn" href="${f.link.href}" target="_blank" rel="noopener">${esc(f.link.text)}</a></p>` : ''}</details>`).join('\n        ')}
+        ${faqs.map((f) => `<details><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p>${f.link ? `<p><a class="btn btn-outline faq-btn" href="${f.link.href}">${esc(f.link.text)}</a></p>` : ''}</details>`).join('\n        ')}
       </div>
     </div>
   </section>
@@ -334,7 +334,7 @@ export function landingTemplate(partner, cfg) {
   <section class="final">
     <div class="wrap">
       <h2>¿Listo para iniciar con ${esc(nombre)}?</h2>
-      <p>Déjanos tus datos y comienza tu evaluación hoy mismo. Un asesor de Firma 7 te acompaña.</p>
+      <p>Responde unas preguntas y comienza tu evaluación hoy mismo. Un asesor de Firma 7 te acompaña.</p>
       ${cta('btn-light')}
     </div>
   </section>
@@ -350,38 +350,6 @@ export function landingTemplate(partner, cfg) {
   <footer>
     <p>&copy; <span id="anio">2026</span> SOC · Firma 7 — <a href="/aviso-de-privacidad">Aviso de Privacidad</a></p>
   </footer>
-
-  <!-- FORMULARIO EMERGENTE -->
-  <div class="modal" id="alianza-modal" role="dialog" aria-modal="true" aria-labelledby="modal-titulo" hidden>
-    <div class="modal-backdrop" data-cerrar></div>
-    <div class="modal-card">
-      <button class="modal-x" type="button" data-cerrar aria-label="Cerrar">&times;</button>
-
-      <div id="alianza-paso-form">
-        <h2 id="modal-titulo">Inicia con ${esc(nombre)}</h2>
-        <p class="modal-sub">Déjanos tus datos. Un asesor de Firma 7 te acompañará en tu solicitud.</p>
-        <form id="alianza-form" novalidate>
-          <label>Nombre completo<input type="text" name="nombre" autocomplete="name" required /></label>
-          <label>Teléfono de contacto<input type="tel" name="telefono" inputmode="numeric" autocomplete="tel" placeholder="10 dígitos" required /></label>
-          <label>Correo electrónico<input type="email" name="correo" autocomplete="email" required /></label>
-          <div class="hp" aria-hidden="true"><label>Sitio web<input type="text" name="sitio_web" tabindex="-1" autocomplete="off" /></label></div>
-          <label class="check"><input type="checkbox" name="autoriza" /><span>Autorizo que un asesor de Firma 7 se ponga en contacto conmigo para ayudarme con mi solicitud y pedirme mi documentación. <a href="/aviso-de-privacidad" target="_blank" rel="noopener">Aviso de Privacidad</a></span></label>
-          <p class="error" id="alianza-error" role="alert" hidden></p>
-          <button type="submit" class="btn" id="alianza-enviar">Continuar con ${esc(nombre)}</button>
-        </form>
-      </div>
-
-      <div id="alianza-paso-ok" class="ok-box" hidden>
-        <div class="ok-icon">✓</div>
-        <h2 style="text-align:center">¡Listo, <span id="alianza-nombre-ok"></span>!</h2>
-        <p>Un asesor de Firma 7 se pondrá en contacto contigo para acompañarte y pedirte tu documentación.</p>
-        <p id="alianza-abrio" hidden>Abrimos ${esc(nombre)} en otra pestaña para que inicies tu evaluación.</p>
-        <a id="alianza-continuar" class="btn" href="#" target="_blank" rel="noopener" hidden>Continuar con ${esc(nombre)}</a>
-        <p class="ok-docs">Para agilizar tu trámite, adelanta tu documentación ahora:</p>
-        <a class="btn btn-outline" href="/documentacion" target="_blank" rel="noopener">Subir mi documentación</a>
-      </div>
-    </div>
-  </div>
 
   <script src="/alianzas-landing.js"></script>
 </body>
