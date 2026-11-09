@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Upload, Camera, CheckCircle2, Loader2, AlertCircle, RotateCcw } from 'lucide-react';
-import { uploadDocumento, limiteMbPorTipo } from '../lib/uploadDocumento';
+import { uploadDocumento, limiteMbPorTipo, permiteFoto, aceptaArchivos } from '../lib/uploadDocumento';
 
 export type DocumentoTipo =
   | 'constancia_situacion_fiscal' | 'ine' | 'declaracion_anual' | 'acuse_declaracion_anual' | 'estado_cuenta'
@@ -41,7 +41,8 @@ export const DocumentSlot: React.FC<DocumentSlotProps> = ({
   const [error, setError] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
   const camaraRef = useRef<HTMLInputElement>(null);
-  const mostrarCamara = Boolean(camara) && esDispositivoTactil();
+  // La cámara solo se ofrece para la INE; cualquier otro documento se sube en PDF.
+  const mostrarCamara = Boolean(camara) && permiteFoto(tipoDocumento) && esDispositivoTactil();
 
   const handleFile = async (file: File | undefined) => {
     if (!file) return;
@@ -90,7 +91,7 @@ export const DocumentSlot: React.FC<DocumentSlotProps> = ({
       <input
         ref={inputRef}
         type="file"
-        accept="application/pdf,image/*"
+        accept={aceptaArchivos(tipoDocumento)}
         className="hidden"
         onChange={e => { handleFile(e.target.files?.[0]); e.target.value = ''; }}
       />
@@ -132,7 +133,9 @@ export const DocumentSlot: React.FC<DocumentSlotProps> = ({
             className="w-full flex items-center gap-3 border-2 border-dashed border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-500 hover:border-firma-green/50 hover:bg-firma-green/5 transition-colors"
           >
             <Upload size={16} className="text-gray-400 flex-shrink-0" />
-            Subir archivo (PDF o imagen, máx. {limiteMbPorTipo(tipoDocumento)}MB)
+            {permiteFoto(tipoDocumento)
+              ? `Subir archivo (PDF o imagen, máx. ${limiteMbPorTipo(tipoDocumento)}MB)`
+              : `Subir archivo en PDF (máx. ${limiteMbPorTipo(tipoDocumento)}MB)`}
           </button>
         )
       )}

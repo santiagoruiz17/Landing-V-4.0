@@ -61,8 +61,8 @@ const TODOS_ITEMS = Object.values(IT);
 type PasoId = 'empresa' | 'persona' | 'finanzas' | 'ciec' | 'accionistas' | 'enviar';
 
 const PASO_META: Record<PasoId, { titulo: string; corto: string; descripcion: string }> = {
-  empresa: { titulo: 'Documentos de la empresa', corto: 'Empresa', descripcion: 'Sube estos documentos de tu empresa. Aceptamos PDF o foto.' },
-  persona: { titulo: 'Tus documentos', corto: 'Tus datos', descripcion: 'Sube estos documentos. Aceptamos PDF o foto.' },
+  empresa: { titulo: 'Documentos de la empresa', corto: 'Empresa', descripcion: 'Sube estos documentos de tu empresa en PDF.' },
+  persona: { titulo: 'Tus documentos', corto: 'Tus datos', descripcion: 'Sube estos documentos en PDF; solo tu INE puede ser una foto.' },
   finanzas: { titulo: 'Información financiera', corto: 'Finanzas', descripcion: 'Tus estados de cuenta y tu declaración anual.' },
   ciec: { titulo: 'Clave CIEC', corto: 'CIEC', descripcion: 'Con ella evaluamos tu perfil más rápido.' },
   accionistas: { titulo: 'Accionistas', corto: 'Accionistas', descripcion: 'Registra a quienes tengan 25% o más de las acciones, hasta sumar al menos 75%.' },

@@ -258,7 +258,7 @@ export const DocumentUploadAutomotriz: React.FC<Props> = ({ leadId, tipo, onEnvi
           <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
             <div className="h-full bg-gradient-to-r from-firma-green/70 to-firma-green rounded-full transition-all duration-500 ease-out" style={{ width: `${pct}%` }} />
           </div>
-          <p className="text-sm text-gray-500 mt-3">Sube estos documentos. Aceptamos PDF o foto.</p>
+          <p className="text-sm text-gray-500 mt-3">Sube estos documentos en PDF; solo tu INE puede ser una foto.</p>
         </div>
 
         <div className="grid gap-x-10 gap-y-7 md:grid-cols-2">

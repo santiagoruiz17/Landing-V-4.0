@@ -11,6 +11,23 @@ export function limiteMbPorTipo(tipoDocumento: string): number {
 }
 const BUCKET = 'lead-documentos';
 
+// Solo la INE (del cliente o del accionista) puede ser una foto y abrir la cámara del celular.
+// Todo lo demás (estados de cuenta, comprobantes, actas, constancias…) se sube únicamente en PDF.
+const TIPOS_CON_FOTO = ['ine', 'ine_accionista'];
+
+export function permiteFoto(tipoDocumento: string): boolean {
+  return TIPOS_CON_FOTO.includes(tipoDocumento);
+}
+
+// Valor del atributo `accept` del selector de archivos: con solo PDF, el celular abre los documentos (no la cámara).
+export function aceptaArchivos(tipoDocumento: string): string {
+  return permiteFoto(tipoDocumento) ? 'application/pdf,image/*' : 'application/pdf,.pdf';
+}
+
+export function esPdf(file: File): boolean {
+  return file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
+}
+
 export interface UploadDocumentoResult {
   ok: boolean;
   error?: string;
@@ -24,6 +41,9 @@ export async function uploadDocumento(params: {
   file: File;
 }): Promise<UploadDocumentoResult> {
   const { leadId, tipoDocumento, slotIndex } = params;
+  if (!permiteFoto(tipoDocumento) && !esPdf(params.file)) {
+    return { ok: false, error: 'Este documento debe subirse en PDF. Descárgalo en PDF desde el banco o portal, o escanéalo y guárdalo como PDF.' };
+  }
   const file = await compressImageIfNeeded(params.file);
 
   const limiteMb = limiteMbPorTipo(tipoDocumento);
