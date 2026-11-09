@@ -7,7 +7,7 @@ import { ProgresoErrorCard } from './ProgresoErrorCard';
 import { DocumentosEnviados } from './DocumentosEnviados';
 import { DocumentosGuardados } from './DocumentosGuardados';
 import { supabase } from '../lib/supabase';
-import { cargarProgresoLead } from '../lib/leadProgreso';
+import { cargarProgresoLead, avisarEquipoDocumentacion, MENSAJE_ENVIO_FALLIDO } from '../lib/leadProgreso';
 import { DocumentSlot, DocumentoTipo } from './DocumentSlot';
 import { CiecInput } from './CiecInput';
 import { BancoCard } from './BancoCard';
@@ -120,6 +120,7 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({ leadId, tipo, on
   const nextAccionistaSlotRef = useRef(2);
   const nextBancoSlotRef = useRef(2);
   const [sending, setSending] = useState(false);
+  const [envioError, setEnvioError] = useState(false);
   const [sent, setSent] = useState(false);
   const [reenvioLinkStatus, setReenvioLinkStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [primerNombre, setPrimerNombre] = useState('');
@@ -383,11 +384,12 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({ leadId, tipo, on
 
   const enviar = async () => {
     setSending(true);
-    // La preferencia se guarda antes de avisar al equipo para que vaya en el correo.
-    await supabase.rpc('guardar_preferencia_contacto', { p_lead_id: leadId, p_canal: contactoCanal, p_horario: contactoHorario });
-    await supabase.rpc('send_lead_documentos_email', { p_lead_id: leadId, p_kind: 'completo' });
-    trackCompleteRegistration();
+    setEnvioError(false);
+    // Solo se muestra "enviado" si el servidor confirmó el aviso al equipo.
+    const { ok } = await avisarEquipoDocumentacion(leadId, contactoCanal, contactoHorario);
     setSending(false);
+    if (!ok) { setEnvioError(true); return; }
+    trackCompleteRegistration();
     setSent(true);
   };
 
@@ -904,6 +906,13 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({ leadId, tipo, on
             </p>
           )}
         </div>
+
+        {envioError && (
+          <p role="alert" className="mt-5 flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+            <AlertTriangle size={16} className="mt-0.5 flex-shrink-0" />
+            <span>{MENSAJE_ENVIO_FALLIDO}</span>
+          </p>
+        )}
 
         {/* ── Navegación ───────────────────────────────────────────── */}
         <div className="mt-7 pt-5 border-t border-gray-100">

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Car, Send, Loader2, Bookmark, Check } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { cargarProgresoLead } from '../lib/leadProgreso';
+import { cargarProgresoLead, avisarEquipoDocumentacion, MENSAJE_ENVIO_FALLIDO } from '../lib/leadProgreso';
 import { ProgresoErrorCard } from './ProgresoErrorCard';
 import { DocumentSlot, DocumentoTipo } from './DocumentSlot';
 import { EstadosCuentaSlot } from './EstadosCuentaSlot';
@@ -94,6 +94,7 @@ export const DocumentUploadAutomotriz: React.FC<Props> = ({ leadId, tipo, onEnvi
   const [completados, setCompletados] = useState<Set<string>>(new Set());
   const [primerNombre, setPrimerNombre] = useState('');
   const [sending, setSending] = useState(false);
+  const [envioError, setEnvioError] = useState(false);
   const [sent, setSent] = useState(false);
   const [reenvioLinkStatus, setReenvioLinkStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [canal, setCanal] = useState<'whatsapp' | 'llamada'>('whatsapp');
@@ -199,10 +200,12 @@ export const DocumentUploadAutomotriz: React.FC<Props> = ({ leadId, tipo, onEnvi
   // correo al equipo es de "documentación completa" o de "enviada, faltan documentos".
   const enviar = async () => {
     setSending(true);
-    await supabase.rpc('guardar_preferencia_contacto', { p_lead_id: leadId, p_canal: canal, p_horario: horario });
-    await supabase.rpc('send_lead_documentos_email', { p_lead_id: leadId, p_kind: 'completo' });
-    trackCompleteRegistration();
+    setEnvioError(false);
+    // Solo se muestra "enviado" si el servidor confirmó el aviso al equipo.
+    const { ok } = await avisarEquipoDocumentacion(leadId, canal, horario);
     setSending(false);
+    if (!ok) { setEnvioError(true); return; }
+    trackCompleteRegistration();
     setSent(true);
   };
 
@@ -382,6 +385,11 @@ export const DocumentUploadAutomotriz: React.FC<Props> = ({ leadId, tipo, onEnvi
             {sending ? 'Enviando…' : 'Enviar a mi asesor'}
           </button>
         </div>
+        {envioError && (
+          <p role="alert" className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+            {MENSAJE_ENVIO_FALLIDO}
+          </p>
+        )}
         <p className="text-[11px] text-gray-400 mt-3 sm:text-right">
           {hechos === 0
             ? 'Sube al menos un documento para poder guardar tu avance.'
