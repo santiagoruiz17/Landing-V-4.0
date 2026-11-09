@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Car, Send, Loader2, Bookmark, Check } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { cargarProgresoLead } from '../lib/leadProgreso';
+import { ProgresoErrorCard } from './ProgresoErrorCard';
 import { DocumentSlot, DocumentoTipo } from './DocumentSlot';
 import { EstadosCuentaSlot } from './EstadosCuentaSlot';
 import { DocumentosEnviados } from './DocumentosEnviados';
@@ -87,6 +89,8 @@ export const DocumentUploadAutomotriz: React.FC<Props> = ({ leadId, tipo, onEnvi
   const [nombreAccionista, setNombreAccionista] = useState('');
   const [progresoDocs, setProgresoDocs] = useState<ProgresoDoc[]>([]);
   const [cargado, setCargado] = useState(false);
+  const [progresoError, setProgresoError] = useState(false);
+  const [reintentoProgreso, setReintentoProgreso] = useState(0);
   const [completados, setCompletados] = useState<Set<string>>(new Set());
   const [primerNombre, setPrimerNombre] = useState('');
   const [sending, setSending] = useState(false);
@@ -104,8 +108,12 @@ export const DocumentUploadAutomotriz: React.FC<Props> = ({ leadId, tipo, onEnvi
 
   // Restaura lo que el cliente ya haya subido antes
   useEffect(() => {
+    let cancelado = false;
     (async () => {
-      const { data } = await supabase.rpc('get_lead_progreso', { p_lead_id: leadId });
+      const { ok, data } = await cargarProgresoLead(leadId);
+      if (cancelado) return;
+      if (!ok) { setProgresoError(true); return; }
+      setProgresoError(false);
       const docs: ProgresoDoc[] = data?.documentos ?? [];
       setProgresoDocs(docs);
       const claves = new Set<string>();
@@ -125,8 +133,9 @@ export const DocumentUploadAutomotriz: React.FC<Props> = ({ leadId, tipo, onEnvi
       if (data?.contactoHorario === 'cualquiera' || data?.contactoHorario === 'manana' || data?.contactoHorario === 'tarde') setHorario(data.contactoHorario);
       setCargado(true);
     })();
+    return () => { cancelado = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [leadId, tipo]);
+  }, [leadId, tipo, reintentoProgreso]);
 
   const marcar = (tipoDocumento: string, slotIndex: number) => {
     if (tipoDocumento === 'estado_cuenta') {
@@ -222,6 +231,10 @@ export const DocumentUploadAutomotriz: React.FC<Props> = ({ leadId, tipo, onEnvi
         )}
       </div>
     );
+  }
+
+  if (!cargado && progresoError) {
+    return <ProgresoErrorCard onReintentar={() => { setProgresoError(false); setReintentoProgreso(n => n + 1); }} />;
   }
 
   if (!cargado) {

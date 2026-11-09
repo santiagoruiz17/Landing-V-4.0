@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Building2, User, FileText, Loader2, AlertCircle, Link2, Lock, Mail, ArrowLeft, Car, Briefcase, Wallet } from 'lucide-react';
 import { useSEO } from '../hooks/useSEO';
 import { supabase } from '../lib/supabase';
+import { cargarProgresoLead } from '../lib/leadProgreso';
 import { EMAIL_REGEX, soloDigitos10 } from '../lib/validation';
 import { DocumentUpload } from '../components/DocumentUpload';
 import { DocumentUploadAutomotriz } from '../components/DocumentUploadAutomotriz';
@@ -78,7 +79,8 @@ export const DocumentacionDirecta: React.FC = () => {
     if (!tieneResumeUrl) return;
     (async () => {
       try {
-        const { data } = await supabase.rpc('get_lead_progreso', { p_lead_id: leadIdFromUrl });
+        // Con reintentos: si no se pudiera resolver, un cliente de crédito automotriz vería el formulario empresarial.
+        const { data } = await cargarProgresoLead(leadIdFromUrl);
         if (data?.producto === 'automotriz' || data?.producto === 'empresarial') setProducto(data.producto);
         const c = data?.constitucion as Constitucion | undefined;
         if (c === 'Persona Moral' || c === 'Persona Física con Actividad Empresarial' || c === 'Persona Física (asalariado)') setConstitucion(c);

@@ -51,31 +51,82 @@ export async function uploadDocumento(params: {
     return { ok: false, error: `El archivo pesa más de ${limiteMb}MB. Intenta subir el PDF directo del banco/portal en vez de una foto o escaneo.` };
   }
 
-  const ext = file.name.includes('.') ? file.name.split('.').pop() : 'pdf';
-  const path = `${leadId}/${tipoDocumento}/${slotIndex}-${Date.now()}.${ext}`;
+  // Extensión segura: solo letras/números (algunos teléfonos mandan nombres raros).
+  const extRaw = file.name.includes('.') ? (file.name.split('.').pop() ?? '') : '';
+  const ext = /^[A-Za-z0-9]{1,8}$/.test(extRaw) ? extRaw.toLowerCase() : 'pdf';
+  let path = '';
 
-  const { error: uploadError } = await supabase.storage.from(BUCKET).upload(path, file, {
-    contentType: file.type || 'application/octet-stream',
-  });
-  if (uploadError) {
-    return { ok: false, error: 'No se pudo subir el archivo. Intenta de nuevo.' };
+  // Subida con reintentos: una falla momentánea de señal/red del celular no debe tumbar la carga.
+  // Cada intento usa su propia ruta (la política de subida solo permite crear, no sobrescribir).
+  let ultimoError: unknown = null;
+  let subido = false;
+  for (let intento = 0; intento < INTENTOS && !subido; intento++) {
+    if (intento > 0) await pausa(ESPERA_MS[intento - 1]);
+    path = `${leadId}/${tipoDocumento}/${slotIndex}-${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from(BUCKET).upload(path, file, {
+      contentType: file.type || 'application/octet-stream',
+    });
+    if (!error) { subido = true; break; }
+    ultimoError = error;
+    if (!esErrorReintentable(error)) break;
+  }
+  if (!subido) {
+    return { ok: false, error: mensajeDeError(ultimoError, 'subir') };
   }
 
   // La metadata se registra vía RPC (security definer): un upsert directo del
   // navegador requeriría un policy de SELECT en la tabla para que Postgres pueda
   // localizar la fila en conflicto, y eso expondría metadata de otros leads.
-  const { error: rpcError } = await supabase.rpc('record_document_upload', {
-    p_lead_id: leadId,
-    p_tipo_documento: tipoDocumento,
-    p_slot_index: slotIndex,
-    p_storage_path: path,
-    p_file_name: file.name,
-    p_file_size_bytes: file.size,
-    p_mime_type: file.type || null,
-  });
-  if (rpcError) {
-    return { ok: false, error: 'El archivo se subió pero no se pudo registrar. Intenta de nuevo.' };
+  let rpcFallo: unknown = null;
+  let registrado = false;
+  for (let intento = 0; intento < INTENTOS && !registrado; intento++) {
+    if (intento > 0) await pausa(ESPERA_MS[intento - 1]);
+    const { error } = await supabase.rpc('record_document_upload', {
+      p_lead_id: leadId,
+      p_tipo_documento: tipoDocumento,
+      p_slot_index: slotIndex,
+      p_storage_path: path,
+      p_file_name: file.name,
+      p_file_size_bytes: file.size,
+      p_mime_type: file.type || null,
+    });
+    if (!error) { registrado = true; break; }
+    rpcFallo = error;
+    if (!esErrorReintentable(error)) break;
+  }
+  if (!registrado) {
+    return { ok: false, error: mensajeDeError(rpcFallo, 'registrar') };
   }
 
   return { ok: true, fileName: file.name };
+}
+
+const INTENTOS = 3;
+const ESPERA_MS = [1200, 3000];
+const pausa = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Un error "con estatus" lo respondió el servidor (permisos, formato…); uno sin estatus es de red (sin señal, bloqueo, etc.).
+function estatusDe(err: unknown): number | null {
+  const e = err as { status?: number | string; statusCode?: number | string } | null;
+  const raw = e?.status ?? e?.statusCode;
+  const n = typeof raw === 'string' ? parseInt(raw, 10) : raw;
+  return typeof n === 'number' && Number.isFinite(n) ? n : null;
+}
+
+function esErrorDeRed(err: unknown): boolean {
+  return estatusDe(err) === null;
+}
+
+function esErrorReintentable(err: unknown): boolean {
+  const s = estatusDe(err);
+  return s === null || s >= 500 || s === 408 || s === 429;
+}
+
+function mensajeDeError(err: unknown, paso: 'subir' | 'registrar'): string {
+  if (esErrorDeRed(err)) {
+    return 'No pudimos conectar con el servidor (revisa tu señal o Wi‑Fi, o desactiva VPN / "Relevo privado" de iCloud). Intenta de nuevo; si sigue igual, mándalo por WhatsApp al 55 2506 9817.';
+  }
+  return paso === 'subir'
+    ? 'No se pudo subir el archivo. Intenta de nuevo; si sigue igual, mándalo por WhatsApp al 55 2506 9817.'
+    : 'El archivo se subió pero no se pudo registrar. Intenta de nuevo.';
 }

@@ -3,9 +3,11 @@ import {
   FileText, Send, CheckCircle2, Loader2, UserPlus, Landmark, PlusCircle, AlertTriangle, Mail,
   ArrowLeft, ArrowRight, Check, ShieldCheck, Bookmark,
 } from 'lucide-react';
+import { ProgresoErrorCard } from './ProgresoErrorCard';
 import { DocumentosEnviados } from './DocumentosEnviados';
 import { DocumentosGuardados } from './DocumentosGuardados';
 import { supabase } from '../lib/supabase';
+import { cargarProgresoLead } from '../lib/leadProgreso';
 import { DocumentSlot, DocumentoTipo } from './DocumentSlot';
 import { CiecInput } from './CiecInput';
 import { BancoCard } from './BancoCard';
@@ -111,6 +113,8 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({ leadId, tipo, on
   const [domicilioDistinto, setDomicilioDistinto] = useState(false);
   const [progresoDocs, setProgresoDocs] = useState<ProgresoDoc[]>([]);
   const [progresoCargado, setProgresoCargado] = useState(false);
+  const [progresoError, setProgresoError] = useState(false);
+  const [reintentoProgreso, setReintentoProgreso] = useState(0);
   // Pasó el plazo de retención: ya eliminamos los archivos, pero conservamos el registro de lo que subió.
   const [expirado, setExpirado] = useState(false);
   const nextAccionistaSlotRef = useRef(2);
@@ -139,8 +143,14 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({ leadId, tipo, on
   // Restaura lo que el cliente ya haya subido/llenado antes (por si cerró el
   // navegador a medias) — el leadId es lo único que se necesita para recuperarlo.
   useEffect(() => {
+    let cancelado = false;
     (async () => {
-      const { data } = await supabase.rpc('get_lead_progreso', { p_lead_id: leadId });
+      // Si la conexión falla NO se debe mostrar el formulario vacío (parecería que no ha subido nada):
+      // se reintenta y, si sigue fallando, se muestra un aviso con botón para reintentar.
+      const { ok, data } = await cargarProgresoLead(leadId);
+      if (cancelado) return;
+      if (!ok) { setProgresoError(true); return; }
+      setProgresoError(false);
 
       const docs: ProgresoDoc[] = data?.documentos ?? [];
       setProgresoDocs(docs);
@@ -190,8 +200,9 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({ leadId, tipo, on
       if (data?.contactoHorario === 'cualquiera' || data?.contactoHorario === 'manana' || data?.contactoHorario === 'tarde') setContactoHorario(data.contactoHorario);
       setProgresoCargado(true);
     })();
+    return () => { cancelado = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [leadId]);
+  }, [leadId, reintentoProgreso]);
 
   const reenviarLink = async () => {
     setReenvioLinkStatus('sending');
@@ -413,6 +424,10 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({ leadId, tipo, on
   // Se espera a tener el progreso restaurado antes de montar los campos: si no,
   // cada campo nace en blanco y ya no se actualiza aunque llegue su archivo
   // previo (el estado inicial de un input solo se lee una vez, al montarse).
+  if (!progresoCargado && progresoError) {
+    return <ProgresoErrorCard onReintentar={() => { setProgresoError(false); setReintentoProgreso(n => n + 1); }} />;
+  }
+
   if (!progresoCargado) {
     return (
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 text-center">
