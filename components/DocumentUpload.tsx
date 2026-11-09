@@ -4,6 +4,8 @@ import {
   ArrowLeft, ArrowRight, Check, ShieldCheck, Bookmark,
 } from 'lucide-react';
 import { ProgresoErrorCard } from './ProgresoErrorCard';
+import { SalidaSinGuardarModal } from './SalidaSinGuardarModal';
+import { useSalidaSinGuardar } from '../hooks/useSalidaSinGuardar';
 import { DocumentosEnviados } from './DocumentosEnviados';
 import { DocumentosGuardados } from './DocumentosGuardados';
 import { supabase } from '../lib/supabase';
@@ -121,6 +123,8 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({ leadId, tipo, on
   const nextBancoSlotRef = useRef(2);
   const [sending, setSending] = useState(false);
   const [envioError, setEnvioError] = useState(false);
+  // Hay documentos cargados en esta visita que todavía no se "guardan" (no se avisa al asesor).
+  const [sinGuardar, setSinGuardar] = useState(false);
   const [sent, setSent] = useState(false);
   const [reenvioLinkStatus, setReenvioLinkStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [primerNombre, setPrimerNombre] = useState('');
@@ -248,6 +252,16 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({ leadId, tipo, on
     TIPOS_DOC_REQUERIDOS_ACCIONISTA.filter(t => completedKeys.has(`${t}-${a.slotIndex}`)).length
     + (completedKeys.has(`ine_accionista-${a.slotIndex + SLOT_REVERSO_INE_ACCIONISTA}`) ? 1 : 0);
 
+  // Qué documentos concretos le faltan a cada persona (para decírselo al cliente con nombre).
+  const faltanDocsPersona = (a: Accionista) => {
+    const faltan: string[] = [];
+    if (!completedKeys.has(`ine_accionista-${a.slotIndex}`)) faltan.push('INE (frente)');
+    if (!completedKeys.has(`ine_accionista-${a.slotIndex + SLOT_REVERSO_INE_ACCIONISTA}`)) faltan.push('INE (reverso)');
+    if (!completedKeys.has(`comprobante_domicilio_accionista-${a.slotIndex}`)) faltan.push('comprobante de domicilio');
+    if (!completedKeys.has(`constancia_situacion_fiscal_accionista-${a.slotIndex}`)) faltan.push('constancia de situación fiscal');
+    return faltan;
+  };
+
   const totalRequired = requiredSimples.length
     + (esMoral ? personasConDocs.length * DOCS_REQUERIDOS_POR_ACCIONISTA : 0)
     + bancos.length * MESES_ESTADO_CUENTA;
@@ -275,7 +289,11 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({ leadId, tipo, on
     .filter(i => !i.optional && !completedKeys.has(i.key))
     .forEach(i => pendientes[pasoDocsId].push(i.label));
   itemsFinanzas.filter(i => !completedKeys.has(i.key)).forEach(i => pendientes.finanzas.push(i.label));
-  if (completedBancos < bancos.length * MESES_ESTADO_CUENTA) pendientes.finanzas.push('Estados de cuenta bancarios');
+  if (completedBancos < bancos.length * MESES_ESTADO_CUENTA) {
+    const faltanEstados = bancos.length * MESES_ESTADO_CUENTA - completedBancos;
+    const totalEstados = bancos.length * MESES_ESTADO_CUENTA;
+    pendientes.finanzas.push(`Estados de cuenta bancarios (faltan ${faltanEstados} de ${totalEstados} meses)`);
+  }
   if (!ciecSaved) pendientes.ciec.push('Clave CIEC del SAT');
   if (esMoral) {
     if (!porcentajeCumplido) pendientes.accionistas.push(`Acciones documentadas (mínimo ${PORCENTAJE_MINIMO_ACCIONISTAS}%)`);
@@ -283,7 +301,10 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({ leadId, tipo, on
     accionistas.forEach(a => {
       const quien = a.nombre.trim() || `accionista ${a.slotIndex}`;
       if (requiereDocs(a)) {
-        if (completedDocsPersona(a) < DOCS_REQUERIDOS_POR_ACCIONISTA) pendientes.accionistas.push(`Documentación de ${quien}`);
+        if (completedDocsPersona(a) < DOCS_REQUERIDOS_POR_ACCIONISTA) {
+          const faltan = faltanDocsPersona(a);
+          pendientes.accionistas.push(`Documentación de ${quien}${faltan.length ? `: falta ${faltan.join(', ')}` : ''}`);
+        }
       } else if (!a.nombre.trim() || !a.correo.trim() || a.telefono.length < 10) {
         pendientes.accionistas.push(`Nombre, correo y teléfono de ${quien}`);
       }
@@ -310,6 +331,7 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({ leadId, tipo, on
 
   // ── Acciones ────────────────────────────────────────────────────────────────
   const marcarCompletado = (tipoDocumento: string, slotIndex: number) => {
+    setSinGuardar(true);
     if (tipoDocumento === 'estado_cuenta' || TIPOS_DOC_ACCIONISTA.includes(tipoDocumento)) {
       setCompletedKeys(prev => new Set(prev).add(`${tipoDocumento}-${slotIndex}`));
       return;
@@ -390,8 +412,11 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({ leadId, tipo, on
     setSending(false);
     if (!ok) { setEnvioError(true); return; }
     trackCompleteRegistration();
+    setSinGuardar(false);
     setSent(true);
   };
+
+  const salida = useSalidaSinGuardar(sinGuardar && !sent);
 
   if (sent) {
     if (faltantes.length > 0) {
@@ -466,9 +491,13 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({ leadId, tipo, on
     const n = pendientes[id].length;
     if (n === 0) return null;
     return (
-      <p className="text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2">
-        {n === 1 ? 'Te falta 1 cosa en este paso' : `Te faltan ${n} cosas en este paso`}. Si no lo tienes a la mano, puedes continuar y completarlo después.
-      </p>
+      <div className="text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2.5">
+        <p className="font-semibold">{n === 1 ? 'Te falta 1 cosa en este paso:' : `Te faltan ${n} cosas en este paso:`}</p>
+        <ul className="mt-1 list-disc space-y-0.5 pl-4">
+          {pendientes[id].map(texto => <li key={texto}>{texto}</li>)}
+        </ul>
+        <p className="mt-1.5 text-amber-600">Si no lo tienes a la mano, puedes continuar y completarlo después.</p>
+      </div>
     );
   };
 
@@ -524,6 +553,24 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({ leadId, tipo, on
           </div>
         </div>
       </div>
+
+      <div className="flex items-start gap-2.5 border-b border-amber-100 bg-amber-50 px-6 py-3 text-xs leading-relaxed text-amber-800 md:text-[13px]">
+        <Bookmark size={15} className="mt-0.5 flex-shrink-0" />
+        <p>
+          <strong>Importante:</strong> antes de salir pulsa <strong>«Guardar y cargar el resto después»</strong> (o «Enviar a mi asesor» al final) para que tu asesor reciba lo que ya cargaste.
+        </p>
+      </div>
+
+      <SalidaSinGuardarModal
+        abierto={salida.mostrar}
+        guardando={sending}
+        error={envioError}
+        mensajeError={MENSAJE_ENVIO_FALLIDO}
+        puedeSalir={salida.puedeSalir()}
+        onGuardar={enviar}
+        onSeguir={salida.cerrar}
+        onSalir={salida.salirSinGuardar}
+      />
 
       {/* ── Pasos y contenido: barra lateral en computadora, pasos en horizontal en celular ── */}
       <div className="lg:grid lg:grid-cols-[17.5rem_minmax(0,1fr)]">
@@ -930,7 +977,7 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({ leadId, tipo, on
                   type="button"
                   onClick={enviar}
                   disabled={sending || completedRequired === 0}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-gray-300 text-sm font-semibold text-gray-600 hover:border-firma-green hover:text-firma-green transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-gray-300 disabled:hover:text-gray-600"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-firma-green text-white text-sm font-semibold shadow-sm hover:bg-emerald-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {sending ? <Loader2 size={15} className="animate-spin" /> : <Bookmark size={15} />}
                   {sending ? 'Guardando…' : 'Guardar y cargar el resto después'}

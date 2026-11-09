@@ -3,6 +3,8 @@ import { Car, Send, Loader2, Bookmark, Check } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { cargarProgresoLead, avisarEquipoDocumentacion, MENSAJE_ENVIO_FALLIDO } from '../lib/leadProgreso';
 import { ProgresoErrorCard } from './ProgresoErrorCard';
+import { SalidaSinGuardarModal } from './SalidaSinGuardarModal';
+import { useSalidaSinGuardar } from '../hooks/useSalidaSinGuardar';
 import { DocumentSlot, DocumentoTipo } from './DocumentSlot';
 import { EstadosCuentaSlot } from './EstadosCuentaSlot';
 import { DocumentosEnviados } from './DocumentosEnviados';
@@ -95,6 +97,8 @@ export const DocumentUploadAutomotriz: React.FC<Props> = ({ leadId, tipo, onEnvi
   const [primerNombre, setPrimerNombre] = useState('');
   const [sending, setSending] = useState(false);
   const [envioError, setEnvioError] = useState(false);
+  // Hay documentos cargados en esta visita que todavía no se "guardan" (no se avisa al asesor).
+  const [sinGuardar, setSinGuardar] = useState(false);
   const [sent, setSent] = useState(false);
   const [reenvioLinkStatus, setReenvioLinkStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [canal, setCanal] = useState<'whatsapp' | 'llamada'>('whatsapp');
@@ -139,6 +143,7 @@ export const DocumentUploadAutomotriz: React.FC<Props> = ({ leadId, tipo, onEnvi
   }, [leadId, tipo, reintentoProgreso]);
 
   const marcar = (tipoDocumento: string, slotIndex: number) => {
+    setSinGuardar(true);
     if (tipoDocumento === 'estado_cuenta') {
       setCompletados(prev => new Set(prev).add(`estado_cuenta-${slotIndex}`));
       return;
@@ -206,8 +211,11 @@ export const DocumentUploadAutomotriz: React.FC<Props> = ({ leadId, tipo, onEnvi
     setSending(false);
     if (!ok) { setEnvioError(true); return; }
     trackCompleteRegistration();
+    setSinGuardar(false);
     setSent(true);
   };
+
+  const salida = useSalidaSinGuardar(sinGuardar && !sent);
 
   if (sent) {
     return (
@@ -264,6 +272,24 @@ export const DocumentUploadAutomotriz: React.FC<Props> = ({ leadId, tipo, onEnvi
           </div>
         </div>
       </div>
+
+      <div className="flex items-start gap-2.5 border-b border-amber-100 bg-amber-50 px-6 py-3 text-xs leading-relaxed text-amber-800 md:text-[13px]">
+        <Bookmark size={15} className="mt-0.5 flex-shrink-0" />
+        <p>
+          <strong>Importante:</strong> antes de salir pulsa <strong>«Guardar y cargar el resto después»</strong> (o «Enviar a mi asesor») para que tu asesor reciba lo que ya cargaste.
+        </p>
+      </div>
+
+      <SalidaSinGuardarModal
+        abierto={salida.mostrar}
+        guardando={sending}
+        error={envioError}
+        mensajeError={MENSAJE_ENVIO_FALLIDO}
+        puedeSalir={salida.puedeSalir()}
+        onGuardar={enviar}
+        onSeguir={salida.cerrar}
+        onSalir={salida.salirSinGuardar}
+      />
 
       <div className="p-6 lg:p-10">
         <div className="mb-7">
@@ -370,7 +396,7 @@ export const DocumentUploadAutomotriz: React.FC<Props> = ({ leadId, tipo, onEnvi
             type="button"
             onClick={enviar}
             disabled={sending || hechos === 0}
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full border border-gray-300 text-sm font-semibold text-gray-600 hover:border-firma-green hover:text-firma-green transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-gray-300 disabled:hover:text-gray-600"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-firma-green text-white text-sm font-semibold shadow-sm hover:bg-emerald-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {sending ? <Loader2 size={15} className="animate-spin" /> : <Bookmark size={15} />}
             {sending ? 'Guardando…' : 'Guardar y cargar el resto después'}
